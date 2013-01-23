@@ -53,7 +53,8 @@ class TestSQL (QtGui.QWidget):
 		self.buttonInsert.clicked.connect (self.insert)
 
 		base.metadata.create_all (engine)
-		self.sess = session()
+                 #下面这条是什么意思？
+		self.sess = session()          
 		self.shownum = 0
 
 	def showfirst (self):
