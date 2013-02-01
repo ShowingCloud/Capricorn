@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Session SYSTEM "Session-4.4.dtd">
+<!-- eric4 session file for project menu_1 -->
+<!-- This file was generated automatically, do not edit. -->
+<!-- Saved: 2013-01-25, 16:06:03 -->
+<Session version="4.4">
+  <Filenames>
+    <Filename cline="0" cindex="0" folds="" zoom="0">H:\python_work\show_1\Ui_imageDlg.py</Filename>
+    <Filename cline="0" cindex="0" folds="" zoom="0">H:\python_work\show_1\basicLayout.py</Filename>
+    <Filename cline="207" cindex="0" folds="" zoom="0">H:\python_work\show_1\imageWindow.py</Filename>
+    <Filename cline="88" cindex="57" folds="" zoom="0">H:\python_work\show_1\renderArea.py</Filename>
+    <Filename cline="1" cindex="0" folds="" zoom="0">H:\python_work\show_1\main.py</Filename>
+    <Filename cline="38" cindex="0" folds="" zoom="0">H:\python_work\show_1\newImageDlg.py</Filename>
+    <Filename cline="3" cindex="34" folds="" zoom="0">H:\python_work\show_1\MenuResources.qrc</Filename>
+  </Filenames>
+  <ActiveWindow cline="207" cindex="0">H:\python_work\show_1\imageWindow.py</ActiveWindow>
+  <Breakpoints>
+  </Breakpoints>
+  <Watchexpressions>
+  </Watchexpressions>
+  <DebugInfo>
+    <CommandLine></CommandLine>
+    <WorkingDirectory></WorkingDirectory>
+    <Environment></Environment>
+    <ReportExceptions value="True" />
+    <Exceptions>
+    </Exceptions>
+    <IgnoredExceptions>
+    </IgnoredExceptions>
+    <AutoClearShell value="True" />
+    <TracePython value="False" />
+    <AutoContinue value="True" />
+    <CovexcPattern></CovexcPattern>
+  </DebugInfo>
+  <Bookmarks>
+  </Bookmarks>
+</Session>
