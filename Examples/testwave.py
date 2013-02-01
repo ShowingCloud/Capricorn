@@ -7,7 +7,7 @@ class waveform():
 	def __init__ (self):
 		self.audio = wave.open ('test.wav', 'r')
 		self.nchannels, self.sampwidth, self.framerate, self.nframes, self.comptype, self.compname = self.audio.getparams()
-
+                
 	def cell (self, start, size, channel):
 		self.audio.setpos (start)
 		data = self.audio.readframes (size)
@@ -40,7 +40,7 @@ class waveform():
 
 	def waveform (self):
 		self.read (0, 1000, 100) # from 0s to 1s, with 100 grids
-
+              
 if __name__ == "__main__":
 	waveform = waveform()
 	waveform.waveform()
