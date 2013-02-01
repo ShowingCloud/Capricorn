@@ -1,0 +1,16 @@
+<!DOCTYPE RCC><RCC version="1.0">
+	<qresource prefix="/">
+		<file>images/title.png</file>
+		<file>images/t1.png</file>
+		<file>images/t2.png</file>
+		<file>images/t3.png</file>
+		<file>images/t4.png</file>
+		<file>images/t5.png</file>
+		<file>images/t6.png</file>
+		<file>images/t7.png</file>
+		<file>images/t8.png</file>
+		<file>images/t9.png</file>
+		<file>images/t10.png</file>
+		<file>images/bj.png</file>
+	</qresource>
+</RCC>
