@@ -15,7 +15,6 @@ import test_plot_main3
 #import test_plot_main
 
 
-
 QtCore.QTextCodec.setCodecForTr(QtCore.QTextCodec.codecForName("utf8"))
 
 class MainClass(QtGui.QMainWindow):
@@ -61,15 +60,20 @@ class MainClass(QtGui.QMainWindow):
         ui.action_Undo.triggered.connect(self.undo)
         ui.action_Redo.triggered.connect(self.redo)
         ui.action_SetLayout.triggered.connect(self.setLayout)
-        
+
         
         ui.action_Image.triggered.connect(self.imageDlg)
         ui.action_ImageWindow.triggered.connect(self.showImageWindow)
         ui.action_Config.triggered.connect(self.configureAndSettings)
-
-        widget = test_plot_main3.Widget(self)
-        mainLayout = QtGui.QVBoxLayout()
-        mainLayout.addWidget(widget)
+        
+        ui.figure_Slider.setRange(0,  100)
+        ui.figure_Slider.setTickInterval(2)
+        self.connect(ui.figure_Slider, QtCore.SIGNAL("valueChanged(int)"), self.sliderChanged)
+        
+        self.image_widget = test_plot_main3.Widget(self)
+        mainLayout = QtGui.QHBoxLayout()
+        mainLayout.addWidget(self.image_widget)
+        mainLayout.addWidget(ui.figure_Slider)
         self.ui.sub_widget.setLayout(mainLayout)
         
         self.connect(ui.textEdit, QtCore.SIGNAL("textChanged()"),ui.action_Save.setEnabled(True))
@@ -77,8 +81,11 @@ class MainClass(QtGui.QMainWindow):
         ui.action_Save_as.setShortcut(QtGui.QKeySequence.SaveAs)
         ui.action_Save_as.setStatusTip('save as ')
         self.createToolBars()
-        self.createDockWindows()
-
+#        self.createDockWindows()
+        
+    def sliderChanged(self,value):
+        self.image_widget.fig2.changeSize(value/100.)
+        
     def setLayout(self):
         dialog = basicLayout.Dialog(self)
         dialog.show()
