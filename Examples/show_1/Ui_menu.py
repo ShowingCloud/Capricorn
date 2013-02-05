@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'H:\python_work\show_1\menu.ui'
 #
-# Created: Tue Jan 29 13:47:47 2013
+# Created: Mon Feb 04 11:20:29 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,6 +21,15 @@ class Ui_MainWindow(object):
         self.sub_widget = QtGui.QWidget(self.centralWidget)
         self.sub_widget.setGeometry(QtCore.QRect(0, 210, 881, 151))
         self.sub_widget.setObjectName("sub_widget")
+        self.figure_Slider = QtGui.QSlider(self.sub_widget)
+        self.figure_Slider.setGeometry(QtCore.QRect(840, 10, 19, 121))
+        self.figure_Slider.setMouseTracking(True)
+        self.figure_Slider.setStyleSheet("color: rgb(200, 1, 255);\n"
+"background-color: rgb(224, 255, 108);")
+        self.figure_Slider.setOrientation(QtCore.Qt.Vertical)
+        self.figure_Slider.setInvertedAppearance(False)
+        self.figure_Slider.setInvertedControls(False)
+        self.figure_Slider.setObjectName("figure_Slider")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtGui.QMenuBar(MainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 1009, 23))
