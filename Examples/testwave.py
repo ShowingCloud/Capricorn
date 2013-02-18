@@ -8,38 +8,34 @@ class waveform():
 		self.audio = wave.open ('test.wav', 'r')
 		self.nchannels, self.sampwidth, self.framerate, self.nframes, self.comptype, self.compname = self.audio.getparams()
                 
-	def cell (self, start, size, channel):
-		self.audio.setpos (start)
+	def read (self, size):
+		self.audio.setpos (0)
 		data = self.audio.readframes (size)
 
-		if channel != -1:
-			data = data[:, channel] # take one of the channels
-
 		if self.sampwidth == 1:
-			sample = struct.unpack ('%sb' % size, data)
+			packstr = '%sb'
 		elif self.sampwidth == 2:
-			sample = struct.unpack ('%sh' % size, data)
+			packstr = '%sh'
 		elif self.sampwidth == 4:
-			sample = struct.unpack ('%si' % size, data)
+			packstr = '%si'
 		elif self.sampwidth == 8:
-			sample = struct.unpack ('%sq' % size, data)
+			packstr = '%sq'
+		else:
+			return None
 
-		return (min (sample), max (sample))
+		if self.nchannels == 1:
+			sample = struct.unpack (packstr % size, data)
+		else:
+			sample = []
+			left = data[:, 0]
+			sample.append (struct.unpack (packstr % size, left))
+			right = data[:, 1]
+			sample.append (struct.unpack (packstr % size, right))
 
-	def read (self, starttime, endtime, number):
-		start = starttime * self.framerate / 1000 # both starttime and endtime are millisecondes, e.g.
-		end = endtime * self.framerate / 1000
-		interval = (end - start) / number
-
-		for i in xrange (number):
-			if self.nchannels > 1: # if we've got several channels, take the first two
-				print self.cell (start + i * interval, interval, 0)
-				print self.cell (start + i * interval, interval, 1)
-			else:
-				print self.cell (start + i * interval, interval, -1)
+		return sample
 
 	def waveform (self):
-		self.read (0, 1000, 100) # from 0s to 1s, with 100 grids
+		print self.read (self.nframes)
               
 if __name__ == "__main__":
 	waveform = waveform()
