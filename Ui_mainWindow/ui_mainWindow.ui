@@ -834,7 +834,7 @@
            <item>
             <widget class="QTabWidget" name="tabWidget_script">
              <property name="currentIndex">
-              <number>5</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="tab_script_1">
               <attribute name="title">
@@ -2308,7 +2308,7 @@
                 <item>
                  <widget class="QProgressBar" name="progressBar">
                   <property name="value">
-                   <number>24</number>
+                   <number>0</number>
                   </property>
                  </widget>
                 </item>
@@ -2339,24 +2339,10 @@
     <property name="title">
      <string>file</string>
     </property>
-    <widget class="QMenu" name="menuOpen">
-     <property name="title">
-      <string>open</string>
-     </property>
-     <addaction name="actionOpenDatabase"/>
-     <addaction name="actionOpenScript"/>
-    </widget>
-    <widget class="QMenu" name="menuNew">
-     <property name="title">
-      <string>new</string>
-     </property>
-     <addaction name="actionNewDatabase"/>
-     <addaction name="actionNewScript"/>
-    </widget>
-    <addaction name="menuNew"/>
-    <addaction name="menuOpen"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
+    <addaction name="actionNew_project"/>
+    <addaction name="actionImport_project"/>
+    <addaction name="actionProjectSave"/>
+    <addaction name="actionProjectSave_as"/>
    </widget>
    <widget class="QMenu" name="menuMusic">
     <property name="title">
@@ -2375,22 +2361,22 @@
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
    </widget>
-   <widget class="QMenu" name="menuDatabse">
+   <widget class="QMenu" name="menuDatabase">
     <property name="title">
-     <string>Databse</string>
+     <string>Database</string>
     </property>
+    <addaction name="actionNew_Database"/>
     <addaction name="actionImport_Database"/>
-    <addaction name="actionExport_Database"/>
-    <addaction name="actionSave_Databse"/>
+    <addaction name="actionSave_Database"/>
     <addaction name="actionDbSave_as"/>
    </widget>
    <widget class="QMenu" name="menuScript">
     <property name="title">
      <string>Script</string>
     </property>
+    <addaction name="actionNew_script"/>
     <addaction name="actionImport_script"/>
     <addaction name="actionSave_script"/>
-    <addaction name="actionExport_script"/>
     <addaction name="actionScriptSave_as"/>
    </widget>
    <widget class="QMenu" name="menuExtras">
@@ -2411,14 +2397,20 @@
     <addaction name="actionVersion"/>
     <addaction name="actionAbout_us"/>
    </widget>
+   <widget class="QMenu" name="menuPFM_Advanced">
+    <property name="title">
+     <string>PFM Advanced</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMusic"/>
    <addaction name="menuZoom"/>
-   <addaction name="menuDatabse"/>
+   <addaction name="menuDatabase"/>
    <addaction name="menuScript"/>
    <addaction name="menuExtras"/>
    <addaction name="menuWindow"/>
    <addaction name="menuInfo"/>
+   <addaction name="menuPFM_Advanced"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -2429,23 +2421,26 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
-   <addaction name="actionSave"/>
-   <addaction name="actionPlay"/>
-   <addaction name="actionPause"/>
-   <addaction name="actionStop"/>
-   <addaction name="actionZoom_in"/>
-   <addaction name="actionZoom_out"/>
+   <addaction name="actionImport_project"/>
+   <addaction name="actionProjectSave"/>
+   <addaction name="actionProjectSave_as"/>
+   <addaction name="actionImport_Database"/>
+   <addaction name="actionSave_Database"/>
+   <addaction name="actionDbSave_as"/>
+   <addaction name="actionImport_script"/>
+   <addaction name="actionSave_script"/>
+   <addaction name="actionScriptSave_as"/>
   </widget>
-  <action name="actionSave">
+  <action name="actionProjectSave">
    <property name="text">
-    <string>save</string>
+    <string>save project</string>
    </property>
   </action>
-  <action name="actionSave_as">
+  <action name="actionProjectSave_as">
    <property name="text">
-    <string>save as</string>
+    <string>project save as</string>
    </property>
   </action>
   <action name="actionImport_music">
@@ -2488,12 +2483,7 @@
     <string>import Database</string>
    </property>
   </action>
-  <action name="actionExport_Database">
-   <property name="text">
-    <string>export Database</string>
-   </property>
-  </action>
-  <action name="actionSave_Databse">
+  <action name="actionSave_Database">
    <property name="text">
     <string>save Databse</string>
    </property>
@@ -2506,11 +2496,6 @@
   <action name="actionSave_script">
    <property name="text">
     <string>save script</string>
-   </property>
-  </action>
-  <action name="actionExport_script">
-   <property name="text">
-    <string>export script</string>
    </property>
   </action>
   <action name="actionMinimize">
@@ -2538,24 +2523,29 @@
     <string>save as</string>
    </property>
   </action>
-  <action name="actionNewDatabase">
-   <property name="text">
-    <string>Database</string>
-   </property>
-  </action>
-  <action name="actionNewScript">
-   <property name="text">
-    <string>Script</string>
-   </property>
-  </action>
-  <action name="actionOpenDatabase">
-   <property name="text">
-    <string>Database</string>
-   </property>
-  </action>
   <action name="actionOpenScript">
    <property name="text">
     <string>Script</string>
+   </property>
+  </action>
+  <action name="actionNew_project">
+   <property name="text">
+    <string>new project</string>
+   </property>
+  </action>
+  <action name="actionImport_project">
+   <property name="text">
+    <string>import project</string>
+   </property>
+  </action>
+  <action name="actionNew_script">
+   <property name="text">
+    <string>new script</string>
+   </property>
+  </action>
+  <action name="actionNew_Database">
+   <property name="text">
+    <string>new Database</string>
    </property>
   </action>
  </widget>

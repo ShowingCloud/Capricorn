@@ -1,7 +1,7 @@
 from PyQt4 import QtCore,QtGui
 from ui_mainWindow import Ui_MainWindow
 import sys
-from ctypes import *
+
 class uiShow(QtGui.QMainWindow):
     def __init__(self,parent=None):
         QtGui.QMainWindow.__init__(self,parent)
