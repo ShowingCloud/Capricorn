@@ -5,37 +5,29 @@ import wave, struct
 class waveform():
 
 	def __init__ (self):
-		self.audio = wave.open ('test.wav', 'r')
-		self.nchannels, self.sampwidth, self.framerate, self.nframes, self.comptype, self.compname = self.audio.getparams()
-                
+		self.audio = wave.open ('Rossini.wav', 'r')
+
 	def read (self, size):
-		self.audio.setpos (0)
 		data = self.audio.readframes (size)
 
-		if self.sampwidth == 1:
-			packstr = '%sb'
-		elif self.sampwidth == 2:
-			packstr = '%sh'
-		elif self.sampwidth == 4:
-			packstr = '%si'
-		elif self.sampwidth == 8:
-			packstr = '%sq'
-		else:
-			return None
+		sw = self.audio.getsampwidth()
+		data = struct.unpack ('<%d%s' % (len (data) / sw,
+			wave._array_fmts[sw]), data)
 
-		if self.nchannels == 1:
-			sample = struct.unpack (packstr % size, data)
-		else:
+		nc = self.audio.getnchannels()
+		if nc > 1:
+			left = [data[si] for si in xrange (0, len (data), nc)]
+			right = [data[si] for si in xrange (1, len (data), nc)]
 			sample = []
-			left = data[:, 0]
-			sample.append (struct.unpack (packstr % size, left))
-			right = data[:, 1]
-			sample.append (struct.unpack (packstr % size, right))
+			sample.append (left)
+			sample.append (right)
+		else:
+			sample = data
 
 		return sample
 
 	def waveform (self):
-		print self.read (self.nframes)
+		print self.read (self.audio.getnframes())
               
 if __name__ == "__main__":
 	waveform = waveform()
