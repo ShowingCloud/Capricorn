@@ -1,11 +1,10 @@
 # coding=utf-8
-import numpy as np
+import numpy
 from PySide import QtGui,QtCore
 
-import sys, wave, struct
-
+import sys, wave
+import time
 from PySide.phonon import Phonon
-
 
 class waveform():
     def __init__(self, path):
@@ -14,23 +13,23 @@ class waveform():
         self.nchannels, self.sampwidth, self.framerate, self.nframes, self.comptype, self.compname \
                  = self.audio.getparams()
         self.waveform()
+        
     def read (self, size):
         data = self.audio.readframes (size)
+
         sw = self.audio.getsampwidth()
-        data = struct.unpack ('<%d%s' % (len (data) / sw,
-            wave._array_fmts[sw]), data)
+        data = numpy.frombuffer (data, dtype = numpy.dtype ("i%d" % sw))
 
         nc = self.audio.getnchannels()
         if nc > 1:
-            left = [data[si] for si in xrange (0, len (data), nc)]
-            right = [data[si] for si in xrange (1, len (data), nc)]
-            sample = []
-            sample.append (left)
-            sample.append (right)
+            left = data[0::nc]
+            right = data[1::nc]
+            sample = [left, right]
         else:
             sample = data
 
         return sample
+
 
     def waveform (self):
         self.waveData = self.read (self.audio.getnframes())
@@ -51,7 +50,7 @@ if __name__ == '__main__':
     
     form = waveform(path)
     waveData = form.getWaveData()
-    print 'waveData.__class__ =', waveData.__class__
+#    print 'waveData.__class__ =', waveData.__class__
 #    
 #    if isinstance(wave, list):
 #        dataOne = wave[0]
@@ -61,9 +60,12 @@ if __name__ == '__main__':
 #    else:
 #        dataOne = wave
 #        print 'dataOne[30]= ',dataOne[0:30]
-    len = len(waveData)     
+    len = sys.getsizeof(waveData)
     print 'len=',len
     print 'analysis succeed!'
+    print form.audio.getparams()
+    
+    time.sleep(30)
     sys.exit(app.exec_())
      
     

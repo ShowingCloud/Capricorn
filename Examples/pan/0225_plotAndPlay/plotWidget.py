@@ -1,3 +1,4 @@
+from PySide import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from upperPlotFigure import fig
 class plotWidget(FigureCanvas):
@@ -32,3 +33,8 @@ class plotWidget(FigureCanvas):
         menu.addAction(actionstop)
         
         menu.exec_(event.globalPos())
+if __name__ == "__main__":
+    app = QtGui.QApplication(sys.argv)
+    widget = plotWidget()
+    widget.show()
+    sys.exit(app.exec_())

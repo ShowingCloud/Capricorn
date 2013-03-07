@@ -1,121 +1,126 @@
 from PySide import QtCore
 from matplotlib.figure import Figure
-
+from PySide.phonon import Phonon
+import numpy as np
 
 class fig(Figure):
     def __init__(self):
         super(fig,self).__init__()
-        self.x = 1000
-        self.zoomWidth = 600
-        self.timeInterval = 10
-        self.lengthPerMove = 3
-        self.direction = 1
+        self.zoomWidth = 0
+        
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.timerFunction)
+        self.timer.timeout.connect(self.freshOrNot)
         self.signal = freshSignal()
         
-        # connect signal and slot
-#        self.signal.freshFunction.connect(self.saySomeWords)
-        
-#    def saySomeWords(self,words):
-#        print words
+    def freshOrNot(self):
+        if self.media.state() == Phonon.PlayingState:
+            self.fresh()
+        else:
+            return
         
     def fresh(self):
-        self.ax.set_xlim(self.x,self.x+self.zoomWidth)
-        self.vline.set_xdata(self.x+self.zoomWidth/2.0)
+        if not hasattr(self, 'ax'):
+            return
+        timeNow = self.getPlayerTime() * self.framerate * 1.0 / 1000
+        
+        zoomLeft = timeNow - self.zoomWidth/2.0
+        zoomRigt = timeNow + self.zoomWidth/2.0
+        self.ax.set_xlim(zoomLeft, zoomRigt)
+        self.vline.set_xdata(timeNow)
         self.canvas.draw()
-        self.signal.freshFunction.emit(self.x, self.zoomWidth)
-    
+        
+        self.signal.freshFunction.emit(zoomLeft, self.zoomWidth)
+        self.signal.freshTimeNow.emit('%d'%timeNow)
+        self.signal.visionTimeLength.emit('%d'%self.zoomWidth)
+        
     def freshFromLowerPlot(self,left,width):
-        self.x = left
-        self.zoomWidth = width
-        self.ax.set_xlim(self.x,self.x+self.zoomWidth)
-        self.vline.set_xdata(self.x+self.zoomWidth/2.0)
-        self.canvas.draw()
+        pass
+#        self.x = left
+#        self.zoomWidth = width
+#        self.ax.set_xlim(self.x,self.x+self.zoomWidth)
+#        self.vline.set_xdata(self.x+self.zoomWidth/2.0)
+#        self.canvas.draw()
         
-    def timerFunction(self):
+    def drawImage(self,dataDict):
+        print 'drawImage'
+        waveData = dataDict['data']
+        self.framerate = dataDict['framerate']
+        
+#        interval = dataDict['interval'].tickInterval ()
+#        self.timeNow = dataDict['currentTimeFuntion']
+
+        self.media = dataDict['media']
+        interval = self.media.tickInterval ()
+        self.getPlayerTime = self.media.currentTime
+        
+        self.clf()
+        self.ax = self.add_axes([0.1,0.1,0.8,0.8])
+        ax = self.ax  
+        dataOne = 0
+        dataTwo = 0
+        if isinstance(waveData, list):
+            
+            dataOne = waveData[0]
+            dataTwo = waveData[1]
+            dataLength = len(dataOne)
+            chunksize = 1000
+            numchunks = dataLength // chunksize
+             
+            team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
+            team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
+            
+            max_1 = team_1.max(axis=1)
+            max_2 = team_2.max(axis=1)
+            max_1_2 = np.maximum(max_1,max_2)
+
+            min_1 = team_1.min(axis=1)
+            min_2 = team_2.min(axis=1)
+            min_1_2 = np.minimum(min_1,min_2)
+            
+            mean_1 = team_1.mean(axis=1)
+            mean_2 = team_2.mean(axis=1)
+            
+            xchunks = np.linspace(0, dataLength, numchunks)
+#            xcenters = xchunks.mean(axis=0)
+            xcenters = xchunks
+
+            ax.fill_between(xcenters, max_1_2, y2=min_1_2,color='0.6')
+            ax.plot(xcenters,mean_1,'b',xcenters,mean_2,'y')
+        else:
+            dataOne = waveData
+            ax.plot(dataOne,'b')
+#        dataLength = len(dataOne)
+##        del dataOne,dataTwo
+#        print dataLength
+        
+#        self.connectMoveAction()
+        ax.axhline(y=0,color='0.8')
+        self.vline = ax.axvline(x=0,color='red')
+        
+#        self.signal.freshTotalTime.emit('%d'%dataLength)
+        self.zoomWidth = self.framerate * 20
+        
         self.fresh()
-        self.x = self.x + self.lengthPerMove*self.direction
-        
-    def pauseMove(self):
-        self.timer.stop()
-        
-    def startMove(self):
-        self.direction = 1
-        self.timer.start(self.timeInterval)
-        
-    def reverseMove(self):
-        self.direction = -1
-        self.timer.start(self.timeInterval)
-        
-    def goRight(self):
-        self.x = self.x + self.lengthPerMove
-        self.fresh()
-    
-    def goLeft(self):
-        self.x = self.x - self.lengthPerMove
-        self.fresh()
+        self.timer.start(interval)
+#        
+
         
     def zoomIn(self):
         self.zoomWidth = self.zoomWidth/2.0
-        self.x = self.x + self.zoomWidth/2.0
         self.fresh()
         
     def zoomOut(self):
         self.zoomWidth = self.zoomWidth*2.0
-        self.x = self.x - self.zoomWidth/4.0
         self.fresh()
         
     def speedUp(self):
-        self.lengthPerMove = self.lengthPerMove*2.0
+        pass
+#        self.lengthPerMove = self.lengthPerMove*2.0
     
     def speedDown(self):
-        self.lengthPerMove = self.lengthPerMove/2.0
-        
-    def drawImage(self,wave):
-        self.clf()
-        self.ax = self.add_axes([0.1,0.1,0.8,0.8])
-        ax = self.ax
-        ax.set_xlim(self.x,self.x+self.zoomWidth)
-#        
-        if isinstance(wave, list):
-#            print 'wave=',wave
-            dataOne = wave[0]
-            dataTwo = wave[1]
-#            len = len(dataOne)
-            ax.plot(dataOne,'b',dataTwo,'y')
-        else:
-#            print 'wave=',wave
-            dataOne = wave
-            ax.plot(dataOne,'b')
-        
-#        dataOne = zip(*waveData)[0]
-#        dataTwo = zip(*waveData)[1]
-#        line,  = ax.plot(dataOne)
-#        ax.fill_between(t,dataOne,dataTwo)
-#        print ax.fill_between(t,dataOne,dataTwo)
-#        print dir(ax)
-        ax.axhline(y=0,color='0.8')
-        self.vline = ax.axvline(x=self.x+self.zoomWidth/2.0,color='red')
-#        self.vline.set_xdata(self.x+self.zoomWidth/3.0)
-#        ax.set_axis_on()
-#        ax.fill_between(t,dataTwo)
-#        ax.plot(t,[0]*dataNumber,'r')
-        
-#        ax.draw_artist(line[0])
-
-#        self.canvas.draw()
-#        ax.figure.canvas.draw()
-#        line[0].figure.canvas.draw()
-#        self.translation()
-
-
-#        background = self.canvas.copy_from_bbox(ax.bbox)
-#        ax.draw_artist(line)
-#        self.canvas.blit(axes.bbox)
-        self.canvas.draw()
-        self.connectMoveAction()
-    
+        pass
+#        self.lengthPerMove = self.lengthPerMove/2.0
+            
     def connectMoveAction(self):
         self.pressX = None
         self.connect()
@@ -142,9 +147,13 @@ class fig(Figure):
         'on release we reset the press data'
         self.pressX = None
         self.fresh()
+
         
 class freshSignal(QtCore.QObject):
     freshFunction = QtCore.Signal(int, int)
-        
+    freshTimeNow = QtCore.Signal(str)
+    freshTotalTime = QtCore.Signal(str)
+    visionTimeLength = QtCore.Signal(str)
+    
 if __name__ == "__main__":
     fig2 = fig()

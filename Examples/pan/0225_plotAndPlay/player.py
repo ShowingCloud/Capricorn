@@ -16,8 +16,9 @@ class Player(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon('myplayer.png'))
 
         self.media = Phonon.MediaObject(self)
+        
         self.media.setCurrentSource(Phonon.MediaSource())
-        self.media.setTickInterval(100)
+        self.media.setTickInterval(10)
 #        self.media.finished.connect(app.quit)
         self.output = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.media, self.output)
@@ -27,15 +28,23 @@ class Player(QtGui.QWidget):
         self.color = QtGui.QColor(255, 255, 0)
         self.buttonPlay.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
         
-        self.buttondisplay = QtGui.QPushButton('display Figure', self)
-        self.color = QtGui.QColor(55, 155, 0)
-        self.buttondisplay.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
+#        self.buttondisplay = QtGui.QPushButton('display Figure', self)
+#        self.color = QtGui.QColor(55, 155, 0)
+#        self.buttondisplay.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
         
+#        self.comboboxShowImage = QtGui.QComboBox(self)
+#        years = ["show two images","show only upper one","show only lower one"]
+#        self.comboboxShowImage.addItems(years)
+                
         self.buttonStop = QtGui.QPushButton('Stop', self)
         self.buttonStop.setIcon(QtGui.QIcon('stop.ico'))
         self.color = QtGui.QColor(100, 180, 0)
         self.buttonStop.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
         
+#        self.buttonPause = QtGui.QPushButton('Pause', self)
+#        self.color = QtGui.QColor(10, 180, 22)
+#        self.buttonPause.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
+#        
         self.slider = Phonon.VolumeSlider(self)
         self.slider.setAudioOutput(self.output)
         
@@ -70,9 +79,11 @@ class Player(QtGui.QWidget):
         midLayout.addWidget(self.lcdTimer)
         
         lowerLayout=QtGui.QHBoxLayout()
-        lowerLayout.addWidget(self.buttondisplay)
+#        lowerLayout.addWidget(self.buttondisplay)
+#        lowerLayout.addWidget(self.comboboxShowImage)
         lowerLayout.addWidget(self.buttonPlay)
         lowerLayout.addWidget(self.buttonStop)
+#        lowerLayout.addWidget(self.buttonPause)
         lowerLayout.addWidget(self.slider)
         
         layout=QtGui.QVBoxLayout()
@@ -103,11 +114,17 @@ class Player(QtGui.QWidget):
 #        self.fileEdit.setText(self.path)
         
     def tick(self, time):
+##        print 'player'
+#        print 'time',time
+#        print 'currentTime',self.media.currentTime()
         displayTime = QtCore.QTime(0, (time / 60000) % 60, (time / 1000) % 60)
         self.lcdTimer.display(displayTime.toString('mm:ss'))
 
-
+    
     def changePlayPause(self):
+        
+#        print 'total time',self.media.totalTime()
+#        print 'currentTime',self.media.currentTime()
         if self.media.state() == Phonon.PlayingState:
             self.media.pause()
         else:

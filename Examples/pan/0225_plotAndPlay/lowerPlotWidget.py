@@ -18,134 +18,97 @@ class plotWidget(FigureCanvas):
         super(plotWidget,self).__init__(self.figure)
         self.setParent(parent)
         self.setWindowTitle("pyside test_plot fig FigureCanvas")
-        
-#        
-#        self.buttonPlay = QtGui.QPushButton('go', self) 
-#        self.buttonReverse = QtGui.QPushButton('reverse', self)       
-#        self.buttonStop = QtGui.QPushButton('Stop', self)
-#        
-#        self.buttonGoRight = QtGui.QPushButton('goRight', self)
-#        self.buttonGoLeft = QtGui.QPushButton('goLeft', self)
-#        
-#        self.buttonZoomIn = QtGui.QPushButton('ZoomIn', self)
-#        self.buttonZoomOut = QtGui.QPushButton('ZoomOut', self)
-#        
-#        self.buttonSpeedUp = QtGui.QPushButton('quicker', self)
-#        self.buttonSpeedDown = QtGui.QPushButton('slower', self)
-#        
-#        self.buttonPlay.clicked.connect(self.plotWidget.figure.startMove)
-#        self.buttonReverse.clicked.connect(self.plotWidget.figure.reverseMove)
-#        self.buttonStop.clicked.connect(self.plotWidget.figure.pauseMove)
-#        self.buttonGoRight.clicked.connect(self.plotWidget.figure.goRight)
-#        self.buttonGoLeft.clicked.connect(self.plotWidget.figure.goLeft)
-#        self.buttonZoomIn.clicked.connect(self.plotWidget.figure.zoomIn)
-#        self.buttonZoomOut.clicked.connect(self.plotWidget.figure.zoomOut)
-#        self.buttonSpeedUp.clicked.connect(self.plotWidget.figure.speedUp)
-#        self.buttonSpeedDown.clicked.connect(self.plotWidget.figure.speedDown)
-#        
-#        controlLayout=QtGui.QHBoxLayout()
-#        controlLayout.addWidget(self.buttonPlay)
-#        controlLayout.addWidget(self.buttonReverse)
-#        controlLayout.addWidget(self.buttonStop)
-#        controlLayout.addWidget(self.buttonGoRight)
-#        controlLayout.addWidget(self.buttonGoLeft) 
-#        controlLayout.addWidget(self.buttonZoomIn)
-#        controlLayout.addWidget(self.buttonZoomOut)
-#        controlLayout.addWidget(self.buttonSpeedUp)
-#        controlLayout.addWidget(self.buttonSpeedDown)
-#
-#        timeNowLabel = QtGui.QLabel('time now:',self)
-#        timeNowLabel.setAlignment(QtCore.Qt.AlignHCenter)
-#        timeNOwLineEdit = QtGui.QLineEdit(self)
-#       
-#        totalTimeLabel = QtGui.QLabel('total time:',self)
-#        totalTimeLengthLabel = QtGui.QLabel('',self)
-#        
-#        visionTimeLabel = QtGui.QLabel('vision time:',self)
-#        visionTimeLineEdit = QtGui.QLineEdit(self)
-#        
-#        controlLayout2=QtGui.QGridLayout ()
-#        controlLayout2.addWidget(timeNowLabel,0,0,1,1)
-#        controlLayout2.addWidget(timeNOwLineEdit,0,1,1,2)
-#        controlLayout2.addWidget(totalTimeLabel,0,3,1,1)
-#        controlLayout2.addWidget(totalTimeLengthLabel,0,4,1,2)
-#        controlLayout2.addWidget(visionTimeLabel,0,6,1,1)
-#        controlLayout2.addWidget(visionTimeLineEdit,0,8,1,2)
-#        
-#        layout=QtGui.QVBoxLayout()
-#        layout.addWidget(self.plotWidget)
-#        layout.addLayout(controlLayout)
-#        layout.addLayout(controlLayout2)
-#        self.setLayout(layout)
-#        
-        
+    
         
 class fig(Figure):
     def __init__(self):
         super(fig,self).__init__()
-#        self.x = 1000
-#        self.spanWidth = 300
-#        self.timeInterval = 10
-#        self.lengthPerMove = 3
-#        self.direction = 1
+        self.ax = None
         self.signal = freshSignal()
-        
-#        self.timer = QtCore.QTimer()
-#        self.timer.timeout.connect(self.timerFunction)
-#        
-#    def setSpanWidth(self,width):
-#        self.spanWidth = width
-#        self.span.set_xy(self.x, self.x+self.spanWidth)
-#    def move(self,dx):
-#        self.x = self.x + dx
-#        self.span.set_xy(self.x, self.x+self.spanWidth)
-#    def timerFunction(self):
-#        self.x = self.x + self.lengthPerMove*self.direction
-#        self.setX()
-
-#    @QtCore.Slot(int, int)
+ 
     def freshFromUpperPlot(self,left, width):
-        self.left = left
-        self.width = width
-        if self.left<0:
-            self.ax.set_xlim(self.left,self.dataLength)
-        elif self.left+self.width<self.dataLength:
-            self.ax.set_xlim(0,self.dataLength)
+        if self.ax == None:
+            return
+        if self.span == None:
+            return
         else:
-            self.ax.set_xlim(0,self.left+self.width)
+                        
+            self.left = left
+            self.width = width
+    #        if self.left<0:
+    #            self.ax.set_xlim(self.left,self.dataLength)
+    #        elif self.left+self.width<self.dataLength:
+    #            self.ax.set_xlim(0,self.dataLength)
+    #        else:
+    #            self.ax.set_xlim(0,self.left+self.width)
+                
+            right = self.left + self.width
+            xy = np.array([[self.left,0.],[self.left,1.],[right,1.],[right,0.],[self.left,0.]])
+            self.span.set_xy(xy)
+
+        
             
-        right = self.left + self.width
-        xy = np.array([[self.left,0.],[self.left,1.],[right,1.],[right,0.],[self.left,0.]])
-        self.span.set_xy(xy)
         self.vline.set_xdata(self.left+self.width/2.0)
         self.canvas.draw()
+        self.ax.redraw_in_frame()
+
     def fresh2(self):
         self.freshFromUpperPlot(self.left, self.width)
+        
     def drawImage(self,wave):
         self.clf()
         self.ax = self.add_axes([0.1,0.1,0.8,0.8])
         ax = self.ax
 #        
         if isinstance(wave, list):
-#            print 'wave=',wave
             dataOne = wave[0]
             dataTwo = wave[1]
-#            len = len(dataOne)
-            ax.plot(dataOne,'b',dataTwo,'y')
+            dataLength = len(dataOne)
+            chunksize = 20000
+            numchunks = dataLength // chunksize
+             
+            team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
+            team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
+            
+            max_1 = team_1.max(axis=1)
+            max_2 = team_2.max(axis=1)
+            max_1_2 = np.maximum(max_1,max_2)
+
+            min_1 = team_1.min(axis=1)
+            min_2 = team_2.min(axis=1)
+            min_1_2 = np.minimum(min_1,min_2)
+            
+            mean_1 = team_1.mean(axis=1)
+            mean_2 = team_2.mean(axis=1)
+            
+            xchunks = np.linspace(0, dataLength, numchunks)
+#            xcenters = xchunks.mean(axis=0)
+            xcenters = xchunks
+
+            ax.fill_between(xcenters, max_1_2, y2=min_1_2,color='0.6')
+            ax.plot(xcenters,mean_1,'b',xcenters,mean_2,'y')
+            
+            
         else:
 #            print 'wave=',wave
             dataOne = wave
             ax.plot(dataOne,'b')
         self.dataLength = len(dataOne)
-#        print 'length=',self.length
+        ax.set_xlim(0,self.dataLength)
         self.span = ax.axvspan(0, 0, facecolor='g', alpha=0.5,zorder=3)
         self.vline = ax.axvline(x=0,color='red')
         self.canvas.draw()
         self.connectMoveAction()
         
+    def deleteImage(self):
+        del self.ax
+        self.canvas.draw()
+        
     def connectMoveAction(self):
         self.pressX = None
         self.connect()
+        
+        
     def connect(self):
         'connect to all the events we need'
         self.cidpress = self.canvas.mpl_connect(

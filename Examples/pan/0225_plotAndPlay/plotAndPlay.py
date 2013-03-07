@@ -5,39 +5,54 @@ from PySide import QtGui,QtCore
 import sys
 
 import lowerPlotWidget,upperPlotWidget,player,waveForm
+import progressWidget
 
 class playAndPlotWidget(QtGui.QWidget):
     def __init__(self):
         super(playAndPlotWidget,self).__init__()
         self.setGeometry(100,100,1000,400)
-        self.plotControlWidget = upperPlotWidget.plotControlWidget(self)
+        self.upperPlotWidget = upperPlotWidget.plotControlWidget(self)
         self.lowerPlotWidget = lowerPlotWidget.plotWidget(self)
 #        self.lowerPlotWidget.resize(1000,200)
 
         self.playWidget = player.Player(self)
-        
-        self.playWidget.buttondisplay.clicked.connect(self.analyzewave)
-#        self.playWidget.buttondisplay.clicked.connect(self.plotControlWidget.plotWidget.figure.drawImage)
-        
+        self.path = None
+        self.playWidget.buttonPlay.clicked.connect(self.analyzewave)
+
         layout=QtGui.QVBoxLayout()
         layout.addWidget(self.playWidget)
-        layout.addWidget(self.plotControlWidget)
+        layout.addWidget(self.upperPlotWidget)
         layout.addWidget(self.lowerPlotWidget)
         
         self.setLayout(layout)
         
-        self.plotControlWidget.plotWidget.figure.signal.freshFunction.connect\
-        (self.lowerPlotWidget.figure.freshFromUpperPlot)
+#        self.playWidget.media.tick.connect(self.lowerPlotWidget.figure.freshFromUpperPlot)
         
-        self.lowerPlotWidget.figure.signal.freshFunction.connect\
-        (self.plotControlWidget.plotWidget.figure.freshFromLowerPlot)
+        self.upperPlotWidget.plotWidget.figure.signal.freshFunction.connect\
+        (self.lowerPlotWidget.figure.freshFromUpperPlot)
+#        
+#        self.lowerPlotWidget.figure.signal.freshFunction.connect\
+#        (self.upperPlotWidget.plotWidget.figure.freshFromLowerPlot)
+#        
+    def slotAdd(self):
+        pass
         
     def analyzewave(self):
+#        pass
+#        newThread_progressWindow = progressWidget.newThread(self)
+#        newThread_progressWindow.start()
+#        self.connect(self.newThread_progressWindow,SIGNAL('output(QString)'),self.slotAdd)
         form = waveForm.waveform(self.playWidget.fileEdit.text())
-        self.plotControlWidget.plotWidget.figure.drawImage(form.getWaveData())
-        self.lowerPlotWidget.figure.drawImage(form.getWaveData())
+        waveData = form.getWaveData()
+##        
+#        import sys
+#        print 'sizeof waveData', sys.getsizeof (waveData)
+#        del waveData
+        dataDict = dict(data=waveData, framerate=form.framerate,media=self.playWidget.media)
+#        print 'sizeof waveData',waveData[0].__sizeof__()
+        self.upperPlotWidget.plotWidget.figure.drawImage(dataDict)
+        self.lowerPlotWidget.figure.drawImage(waveData)
         
-
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     playAndPlot = playAndPlotWidget()
