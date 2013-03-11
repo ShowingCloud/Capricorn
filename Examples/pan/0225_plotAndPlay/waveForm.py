@@ -36,6 +36,7 @@ class waveform():
         
     def getWaveData(self):
         return self.waveData
+    
     def getTotalDataNumber(self):
         return self.nframes
 

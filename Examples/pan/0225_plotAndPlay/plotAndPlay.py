@@ -26,14 +26,10 @@ class playAndPlotWidget(QtGui.QWidget):
         
         self.setLayout(layout)
         
-#        self.playWidget.media.tick.connect(self.lowerPlotWidget.figure.freshFromUpperPlot)
         
-        self.upperPlotWidget.plotWidget.figure.signal.freshFunction.connect\
-        (self.lowerPlotWidget.figure.freshFromUpperPlot)
-#        
-#        self.lowerPlotWidget.figure.signal.freshFunction.connect\
-#        (self.upperPlotWidget.plotWidget.figure.freshFromLowerPlot)
-#        
+        self.upperPlotWidget.plotWidget.figure.signal.freshLowerPlotPanLeftAndWidth.connect\
+        (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
+
     def slotAdd(self):
         pass
         
@@ -44,10 +40,7 @@ class playAndPlotWidget(QtGui.QWidget):
 #        self.connect(self.newThread_progressWindow,SIGNAL('output(QString)'),self.slotAdd)
         form = waveForm.waveform(self.playWidget.fileEdit.text())
         waveData = form.getWaveData()
-##        
-#        import sys
-#        print 'sizeof waveData', sys.getsizeof (waveData)
-#        del waveData
+
         dataDict = dict(data=waveData, framerate=form.framerate,media=self.playWidget.media)
 #        print 'sizeof waveData',waveData[0].__sizeof__()
         self.upperPlotWidget.plotWidget.figure.drawImage(dataDict)

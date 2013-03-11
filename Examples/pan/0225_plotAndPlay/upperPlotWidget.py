@@ -64,9 +64,10 @@ class plotControlWidget(QtGui.QWidget):
         layout.addLayout(controlLayout2)
         self.setLayout(layout)
         
-        self.plotWidget.figure.signal.freshTimeNow.connect(timeNowLineEdit.setText)
-        self.plotWidget.figure.signal.freshTotalTime.connect(totalTimeLengthLabel.setText)
-        self.plotWidget.figure.signal.visionTimeLength.connect(visionTimeLineEdit.setText)
+    
+        self.plotWidget.figure.signal.freshTimeNowLabel.connect(timeNowLineEdit.setText)
+        self.plotWidget.figure.signal.freshMusicTotalTimeLabel.connect(totalTimeLengthLabel.setText)
+        self.plotWidget.figure.signal.freshVisionTimeLengthLabel.connect(visionTimeLineEdit.setText)
          
     def lineGo(self):
         pass

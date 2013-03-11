@@ -108,9 +108,10 @@ class Player(QtGui.QWidget):
 #            self.media.play()
             self.fileEdit.setText(self.path)
         dialog.deleteLater()
-#        self.path = 'C:/Users/pyroshow/Desktop/test.wav'
+#        self.path = 'C:\Users\pyroshow\Desktop\\test.wav'
+#        self.path = 'C:\Users\pyroshow\Desktop\Rossini.wav'
 #        self.media.setCurrentSource(Phonon.MediaSource(self.path))
-#        self.media.play()
+##        self.media.play()
 #        self.fileEdit.setText(self.path)
         
     def tick(self, time):
@@ -126,14 +127,20 @@ class Player(QtGui.QWidget):
 #        print 'total time',self.media.totalTime()
 #        print 'currentTime',self.media.currentTime()
         if self.media.state() == Phonon.PlayingState:
+            print '1'
             self.media.pause()
+            print '2'
         else:
+#            self.media.pause()
             self.media.play()
 
     def changeStop(self):
         self.media.stop()
 
     def stateChanged(self, newstate, oldstate):
+#        print '------'
+#        print 'newstate=',repr(newstate)
+#        print 'oldstate=',repr(oldstate)
         if newstate == Phonon.PlayingState:
             self.buttonPlay.setText('Pause')
             self.buttonPlay.setIcon(QtGui.QIcon('pause.ico'))
