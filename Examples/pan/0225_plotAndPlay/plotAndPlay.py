@@ -1,9 +1,7 @@
 # coding=utf-8
 import numpy as np
 from PySide import QtGui,QtCore
-
 import sys
-
 import lowerPlotWidget,upperPlotWidget,player,waveForm
 import progressWidget
 
@@ -18,7 +16,8 @@ class playAndPlotWidget(QtGui.QWidget):
         self.playWidget = player.Player(self)
         self.path = None
         self.playWidget.buttonPlay.clicked.connect(self.analyzewave)
-
+        self.playWidget.timeSignal.TimeNowChanged.connect(self.upperPlotWidget.plotWidget.figure.mediaTimeChanged)
+#        self.playWidget.timeSignal.TimeNowChanged.connect(self.lowerPlotWidget.figure.fresh333)
         layout=QtGui.QVBoxLayout()
         layout.addWidget(self.playWidget)
         layout.addWidget(self.upperPlotWidget)
@@ -26,25 +25,20 @@ class playAndPlotWidget(QtGui.QWidget):
         
         self.setLayout(layout)
         
-        
         self.upperPlotWidget.plotWidget.figure.signal.freshLowerPlotPanLeftAndWidth.connect\
         (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
-
-    def slotAdd(self):
-        pass
-        
+         
     def analyzewave(self):
-#        pass
-#        newThread_progressWindow = progressWidget.newThread(self)
-#        newThread_progressWindow.start()
-#        self.connect(self.newThread_progressWindow,SIGNAL('output(QString)'),self.slotAdd)
-        form = waveForm.waveform(self.playWidget.fileEdit.text())
-        waveData = form.getWaveData()
-
-        dataDict = dict(data=waveData, framerate=form.framerate,media=self.playWidget.media)
-#        print 'sizeof waveData',waveData[0].__sizeof__()
-        self.upperPlotWidget.plotWidget.figure.drawImage(dataDict)
-        self.lowerPlotWidget.figure.drawImage(waveData)
+        self.oldFilePath = ''
+        from PySide.phonon import Phonon
+        if self.playWidget.media.state() == Phonon.StoppedState and not self.oldFilePath == self.playWidget.media.currentSource():
+            self.oldFilePath = self.playWidget.media.currentSource()
+            form = waveForm.waveform(self.playWidget.fileEdit.text())
+            waveData = form.getWaveData()
+            print 'id(waveData)=',id(waveData)
+            dataDict = dict(data=waveData, framerate=form.framerate,media=self.playWidget.media)
+            self.upperPlotWidget.plotWidget.figure.drawImage(dataDict)
+            self.lowerPlotWidget.figure.drawImage(waveData)
         
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

@@ -28,14 +28,6 @@ class Player(QtGui.QWidget):
         self.color = QtGui.QColor(255, 255, 0)
         self.buttonPlay.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
         
-#        self.buttondisplay = QtGui.QPushButton('display Figure', self)
-#        self.color = QtGui.QColor(55, 155, 0)
-#        self.buttondisplay.setStyleSheet('QWidget {background-color: %s}' % self.color.name())
-        
-#        self.comboboxShowImage = QtGui.QComboBox(self)
-#        years = ["show two images","show only upper one","show only lower one"]
-#        self.comboboxShowImage.addItems(years)
-                
         self.buttonStop = QtGui.QPushButton('Stop', self)
         self.buttonStop.setIcon(QtGui.QIcon('stop.ico'))
         self.color = QtGui.QColor(100, 180, 0)
@@ -99,6 +91,8 @@ class Player(QtGui.QWidget):
         self.buttonStop.clicked.connect(self.changeStop)
         self.buttonOpen.clicked.connect(self.handleButtonChoose)
         
+        self.timeSignal = timeNowSignal()
+        
     def handleButtonChoose(self):
         dialog = QtGui.QFileDialog(self)
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
@@ -115,32 +109,20 @@ class Player(QtGui.QWidget):
 #        self.fileEdit.setText(self.path)
         
     def tick(self, time):
-##        print 'player'
-#        print 'time',time
-#        print 'currentTime',self.media.currentTime()
         displayTime = QtCore.QTime(0, (time / 60000) % 60, (time / 1000) % 60)
         self.lcdTimer.display(displayTime.toString('mm:ss'))
-
+        self.timeSignal.TimeNowChanged.emit(time)
     
     def changePlayPause(self):
-        
-#        print 'total time',self.media.totalTime()
-#        print 'currentTime',self.media.currentTime()
         if self.media.state() == Phonon.PlayingState:
-            print '1'
             self.media.pause()
-            print '2'
         else:
-#            self.media.pause()
             self.media.play()
 
     def changeStop(self):
         self.media.stop()
 
     def stateChanged(self, newstate, oldstate):
-#        print '------'
-#        print 'newstate=',repr(newstate)
-#        print 'oldstate=',repr(oldstate)
         if newstate == Phonon.PlayingState:
             self.buttonPlay.setText('Pause')
             self.buttonPlay.setIcon(QtGui.QIcon('pause.ico'))
@@ -150,6 +132,8 @@ class Player(QtGui.QWidget):
         if newstate == Phonon.ErrorState:
             print('ERROR: play is wrong: %s' % self.media.errorString())
             
+class timeNowSignal(QtCore.QObject):
+    TimeNowChanged = QtCore.Signal(int)
             
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

@@ -11,6 +11,7 @@ import matplotlib.patches as mpatches
 from matplotlib import mpl
 import waveForm
 import sys
+from PySide.phonon import Phonon
 
 class plotWidget(FigureCanvas):
     def __init__(self, parent=None):
@@ -26,6 +27,9 @@ class fig(Figure):
         self.ax = None
         self.signal = freshSignal()
  
+#    def fresh333(self,timeNow):
+#        self.freshLeftAndWidthFromUpperPlot(timeNow*40,20)
+        
     def freshLeftAndWidthFromUpperPlot(self,left, width):
         if self.ax == None:
             return
@@ -52,12 +56,12 @@ class fig(Figure):
             
         
         self.canvas.draw()
-        self.ax.redraw_in_frame()
+#        self.ax.redraw_in_frame()
 
     def fresh2(self):
         self.freshFromUpperPlot(self.left, self.width)
         
-    def drawImage(self,wave):
+    def drawImage(self,wave):   
         self.clf()
         self.ax = self.add_axes([0.1,0.1,0.8,0.8])
         ax = self.ax
@@ -66,9 +70,10 @@ class fig(Figure):
             dataOne = wave[0]
             dataTwo = wave[1]
             dataLength = len(dataOne)
-            chunksize = 20000
-            numchunks = dataLength // chunksize
-             
+#            chunksize = 20000
+#            numchunks = dataLength // chunksize
+            numchunks = 2000
+            chunksize = dataLength/numchunks
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
             
@@ -92,7 +97,21 @@ class fig(Figure):
             
         else:
             dataOne = wave
-            ax.plot(dataOne,'b')
+            dataLength = len(dataOne)
+#            chunksize = 20000
+            numchunks = 2000
+            chunksize = dataLength/numchunks
+            team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
+            max_1 = team_1.max(axis=1)
+            min_1 = team_1.min(axis=1)
+            mean_1 = team_1.mean(axis=1)
+            
+            xcenters = np.linspace(0, dataLength, numchunks)
+
+            ax.fill_between(xcenters, max_1, y2=min_1,color='0.6')
+            ax.plot(xcenters,mean_1,'b')
+            
+            
         self.dataLength = len(dataOne)
         ax.set_xlim(0,self.dataLength)
         self.span = ax.axvspan(0, 0, facecolor='g', alpha=0.5,zorder=3)
