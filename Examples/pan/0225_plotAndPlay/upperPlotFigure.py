@@ -55,8 +55,7 @@ class fig(Figure):
         self.fresh()
         
     def visionSeconds_2_ziprate(self, visionSeconds):
-#        ziprate = 50 * visionSeconds + 100
-        ziprate = int(visionSeconds*self.framerate/2000)
+        ziprate = 50 * visionSeconds + 100
         return ziprate
     
     def draw_1channel(self,zipRate=1000):

@@ -27,9 +27,6 @@ class fig(Figure):
         self.ax = None
         self.signal = freshSignal()
  
-#    def fresh333(self,timeNow):
-#        self.freshLeftAndWidthFromUpperPlot(timeNow*40,20)
-        
     def freshLeftAndWidthFromUpperPlot(self,left, width):
         if self.ax == None:
             return
@@ -70,10 +67,9 @@ class fig(Figure):
             dataOne = wave[0]
             dataTwo = wave[1]
             dataLength = len(dataOne)
-#            chunksize = 20000
-#            numchunks = dataLength // chunksize
-            numchunks = 2000
-            chunksize = dataLength/numchunks
+            chunksize = 20000
+            numchunks = dataLength // chunksize
+             
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
             
@@ -98,9 +94,9 @@ class fig(Figure):
         else:
             dataOne = wave
             dataLength = len(dataOne)
-#            chunksize = 20000
-            numchunks = 2000
-            chunksize = dataLength/numchunks
+            chunksize = 20000
+            numchunks = dataLength // chunksize
+             
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             max_1 = team_1.max(axis=1)
             min_1 = team_1.min(axis=1)

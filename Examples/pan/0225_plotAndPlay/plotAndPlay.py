@@ -17,7 +17,6 @@ class playAndPlotWidget(QtGui.QWidget):
         self.path = None
         self.playWidget.buttonPlay.clicked.connect(self.analyzewave)
         self.playWidget.timeSignal.TimeNowChanged.connect(self.upperPlotWidget.plotWidget.figure.mediaTimeChanged)
-#        self.playWidget.timeSignal.TimeNowChanged.connect(self.lowerPlotWidget.figure.fresh333)
         layout=QtGui.QVBoxLayout()
         layout.addWidget(self.playWidget)
         layout.addWidget(self.upperPlotWidget)
@@ -25,9 +24,13 @@ class playAndPlotWidget(QtGui.QWidget):
         
         self.setLayout(layout)
         
+        
+#        self.upperPlotWidget.plotWidget.figure.signal.freshTimeNowLabel.connect\
+#        (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
+        
         self.upperPlotWidget.plotWidget.figure.signal.freshLowerPlotPanLeftAndWidth.connect\
         (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
-         
+        
     def analyzewave(self):
         self.oldFilePath = ''
         from PySide.phonon import Phonon
