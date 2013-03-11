@@ -26,7 +26,7 @@ class fig(Figure):
         self.ax = None
         self.signal = freshSignal()
  
-    def freshFromUpperPlot(self,left, width):
+    def freshLeftAndWidthFromUpperPlot(self,left, width):
         if self.ax == None:
             return
         if self.span == None:
@@ -41,14 +41,16 @@ class fig(Figure):
     #            self.ax.set_xlim(0,self.dataLength)
     #        else:
     #            self.ax.set_xlim(0,self.left+self.width)
-                
+            
+            self.vline.set_xdata(self.left+self.width/2.0)
+            
             right = self.left + self.width
             xy = np.array([[self.left,0.],[self.left,1.],[right,1.],[right,0.],[self.left,0.]])
             self.span.set_xy(xy)
 
         
             
-        self.vline.set_xdata(self.left+self.width/2.0)
+        
         self.canvas.draw()
         self.ax.redraw_in_frame()
 
@@ -82,7 +84,6 @@ class fig(Figure):
             mean_2 = team_2.mean(axis=1)
             
             xchunks = np.linspace(0, dataLength, numchunks)
-#            xcenters = xchunks.mean(axis=0)
             xcenters = xchunks
 
             ax.fill_between(xcenters, max_1_2, y2=min_1_2,color='0.6')
@@ -90,7 +91,6 @@ class fig(Figure):
             
             
         else:
-#            print 'wave=',wave
             dataOne = wave
             ax.plot(dataOne,'b')
         self.dataLength = len(dataOne)
@@ -98,38 +98,39 @@ class fig(Figure):
         self.span = ax.axvspan(0, 0, facecolor='g', alpha=0.5,zorder=3)
         self.vline = ax.axvline(x=0,color='red')
         self.canvas.draw()
-        self.connectMoveAction()
+#        self.connectMoveAction()
         
-    def deleteImage(self):
-        del self.ax
-        self.canvas.draw()
-        
-    def connectMoveAction(self):
-        self.pressX = None
-        self.connect()
-        
-        
-    def connect(self):
-        'connect to all the events we need'
-        self.cidpress = self.canvas.mpl_connect(
-        'button_press_event', self.on_press)
-        self.cidrelease = self.canvas.mpl_connect(
-        'button_release_event', self.on_release)
-    def on_press(self, event):
-        if event.inaxes != self.ax: return
-        contains, attrd = self.span.contains(event)
-        if not contains: return
-        self.pressX =event.xdata
-        
-    def on_release(self, event):
-        if self.pressX is None: return
-        if event.inaxes != self.ax: return
-        dx = event.xdata - self.pressX
-        self.left += dx
-        self.fresh2()
-        self.signal.freshFunction.emit(self.left, self.width)        
-        self.pressX = None
-        
+#    def deleteImage(self):
+#        del self.ax
+#        self.canvas.draw()
+#        
+#    def connectMoveAction(self):
+#        self.pressX = None
+#        self.connect()
+#        
+#        
+#    def connect(self):
+#        'connect to all the events we need'
+#        self.cidpress = self.canvas.mpl_connect(
+#        'button_press_event', self.on_press)
+#        self.cidrelease = self.canvas.mpl_connect(
+#        'button_release_event', self.on_release)
+#    def on_press(self, event):
+#        if event.inaxes != self.ax: return
+#        contains, attrd = self.span.contains(event)
+#        if not contains: return
+#        self.pressX =event.xdata
+#        
+#    def on_release(self, event):
+#        if self.pressX is None: return
+#        if event.inaxes != self.ax: return
+#        dx = event.xdata - self.pressX
+#        self.left += dx
+#        self.fresh2()
+#        self.signal.freshFunction.emit(self.left, self.width)        
+#        self.pressX = None
+#        
+
 class freshSignal(QtCore.QObject):
     freshFunction = QtCore.Signal(int, int)
     
