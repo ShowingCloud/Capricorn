@@ -1,31 +1,26 @@
 from PySide import QtCore
 from matplotlib.figure import Figure
-from PySide.phonon import Phonon
 import numpy as np
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import matplotlib.ticker as ticker
 
 class fig(Figure):
+    
     def __init__(self):
         super(fig,self).__init__()
-#        self.visionSeconds = 0
-        
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.freshOrNot)
+
         self.signal = freshSignal()
         
-    def freshOrNot(self):
-        if self.media.state() == Phonon.PlayingState:
-            self.fresh()
-        else:
-            return
+    def mediaTimeChanged(self,time):
+        self.currentTime_ms = time
+        self.fresh()
         
     def fresh(self):
         if not hasattr(self, 'ax'):
             return
         if not hasattr(self, 'vline'):
             return
-        currentFrame = self.getPlayerTime() * self.framerate * 1.0 / 1000
+        currentFrame = self.currentTime_ms * self.framerate * 1.0 / 1000
         zoomWidth = self.framerate * self.visionSeconds
         zoomLeft = currentFrame - zoomWidth/2.0
         zoomRigt = currentFrame + zoomWidth/2.0
@@ -37,39 +32,15 @@ class fig(Figure):
         self.signal.freshTimeNowLabel.emit('%d:%02d'%(divmod(currentFrame/self.framerate,60)))
         self.signal.freshVisionTimeLengthLabel.emit(str('%d'%(zoomWidth/self.framerate))+'s')
         
-#    def freshFromLowerPlot(self,left,width):
-#        pass
-##        self.x = left
-##        self.zoomWidth = width
-##        self.ax.set_xlim(self.x,self.x+self.zoomWidth)
-##        self.vline.set_xdata(self.x+self.zoomWidth/2.0)
-##        self.canvas.draw()
-    
-
     def drawImage(self,dataDict):
-        self.media = dataDict['media']
-        if self.media.state() == Phonon.PausedState:
-            return
-#        sourcePath = dataDict['path']
-#        if self.media.currentSource().url().path() == unicode(sourcePath):
-#            print 'self.media.currentSource().url().path() == unicode(sourcePath):'
-#            return
-#        print 'self.media.currentSource().url().path() == ',self.media.currentSource().url().path()
-#        print 'sourcePath == ',sourcePath
-#        print 'sourcePath == self.media.currentSource().url().path():',sourcePath == self.media.currentSource().url().path()
-        if hasattr(self,'oldMediaPath') and self.oldMediaPath==self.media.currentSource():
-            return
-        
-        self.oldMediaPath = self.media.currentSource()
-        
+        self.media = dataDict['media']     
+        self.clf()        
         self.waveData = dataDict['data']
         self.framerate = dataDict['framerate']
         interval = self.media.tickInterval ()
-        self.getPlayerTime = self.media.currentTime
-        self.visionSeconds = 20
+        self.visionSeconds = 10
         
         self.ax = self.add_axes([0.1,0.1,0.8,0.8])
-#        print dir(self.ax)
         if isinstance(self.waveData, list):
             self.draw_2channel(zipRate=self.visionSeconds_2_ziprate(self.visionSeconds))
             self.signal.freshMusicTotalTimeLabel.emit(str('%d'%(len(self.waveData[0])/self.framerate))+'s')
@@ -80,9 +51,8 @@ class fig(Figure):
 #        self.connectMoveAction()
         self.ax.axhline(y=0,color='0.8')
         self.vline = self.ax.axvline(x=0,color='red')
-        
+        self.currentTime_ms = 0
         self.fresh()
-        self.timer.start(interval)
         
     def visionSeconds_2_ziprate(self, visionSeconds):
         ziprate = 50 * visionSeconds + 100
@@ -101,7 +71,9 @@ class fig(Figure):
             xcenters = np.linspace(0, dataLength, numchunks)
             self.ax.clear()
             ax = self.ax
+            
             ax.fill_between(xcenters, max_1, y2=min_1,color='0.6')
+            
             ax.plot(xcenters,mean_1,'b')
             
             majorLocator   = MultipleLocator(self.framerate*self.visionSeconds/6)
@@ -110,17 +82,19 @@ class fig(Figure):
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
             ax.xaxis.set_major_locator(majorLocator)
             
-            interval = self.media.tickInterval ()
-            self.timer.start(interval)
-            
     def draw_2channel(self,zipRate=1000):
             dataOne = self.waveData[0]
             dataTwo = self.waveData[1]
             dataLength = len(dataOne)
-            chunksize = zipRate
+            chunksize = int(zipRate)
             numchunks = dataLength // chunksize
+            print '-----------------'
             print 'dotsInScreen=',self.framerate*self.visionSeconds/chunksize
-            
+            print 'chunksize=',chunksize
+            print 'numchunks=',numchunks
+            print 'chunksize*numchunks=',chunksize*numchunks
+            print 'dataLength=',dataLength
+            print '-----------------'
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
             
@@ -148,8 +122,8 @@ class fig(Figure):
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
             ax.xaxis.set_major_locator(majorLocator)
             
-            interval = self.media.tickInterval()
-            self.timer.start(interval)
+#            interval = self.media.tickInterval()
+#            self.timer.start(interval)
             
     def zoomIn(self):
         self.visionSeconds = self.visionSeconds/2.0

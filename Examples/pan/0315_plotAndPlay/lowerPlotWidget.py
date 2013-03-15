@@ -27,15 +27,21 @@ class fig(Figure):
         self.ax = None
         self.signal = freshSignal()
  
-    def freshLeftAndWidthFromUpperPlot(self,left, width):
+#    def fresh333(self,timeNow):
+#        self.freshLeftAndWidthFromUpperPlot(timeNow*40,20)
+        
+    def freshLeftAndWidthFromUpperPlot(self,originalCurrentFrame, widthPercent):
         if self.ax == None:
             return
         if self.span == None:
             return
         else:
-                        
-            self.left = left
-            self.width = width
+            width = widthPercent
+            currentFrame = originalCurrentFrame
+            left = int(currentFrame - width/2)
+            right = int(currentFrame + width/2)
+#            print 'left=',left
+#            print 'right=',right
     #        if self.left<0:
     #            self.ax.set_xlim(self.left,self.dataLength)
     #        elif self.left+self.width<self.dataLength:
@@ -43,20 +49,15 @@ class fig(Figure):
     #        else:
     #            self.ax.set_xlim(0,self.left+self.width)
             
-            self.vline.set_xdata(self.left+self.width/2.0)
+            self.vline.set_xdata(currentFrame)
             
-            right = self.left + self.width
-            xy = np.array([[self.left,0.],[self.left,1.],[right,1.],[right,0.],[self.left,0.]])
+            xy = np.array([[left,0.],[left,1.],[right,1.],[right,0.],[left,0.]])
             self.span.set_xy(xy)
 
-        
-            
         
         self.canvas.draw()
 #        self.ax.redraw_in_frame()
 
-    def fresh2(self):
-        self.freshFromUpperPlot(self.left, self.width)
         
     def drawImage(self,wave):   
         self.clf()
@@ -66,10 +67,11 @@ class fig(Figure):
         if isinstance(wave, list):
             dataOne = wave[0]
             dataTwo = wave[1]
-            dataLength = len(dataOne)
-            chunksize = 20000
-            numchunks = dataLength // chunksize
-             
+            self.dataLength = len(dataOne)
+#            chunksize = 20000
+#            numchunks = dataLength // chunksize
+            numchunks = 2000
+            chunksize = self.dataLength/numchunks
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             team_2 = dataTwo[:chunksize*numchunks].reshape((-1, chunksize))
             
@@ -84,32 +86,28 @@ class fig(Figure):
             mean_1 = team_1.mean(axis=1)
             mean_2 = team_2.mean(axis=1)
             
-            xchunks = np.linspace(0, dataLength, numchunks)
+            xchunks = np.linspace(0, self.dataLength, numchunks)
             xcenters = xchunks
 
             ax.fill_between(xcenters, max_1_2, y2=min_1_2,color='0.6')
-            ax.plot(xcenters,mean_1,'b',xcenters,mean_2,'y')
-            
-            
+#            ax.plot(xcenters,mean_1,'b',xcenters,mean_2,'y')            
         else:
             dataOne = wave
-            dataLength = len(dataOne)
-            chunksize = 20000
-            numchunks = dataLength // chunksize
-             
+            self.dataLength = len(dataOne)
+#            chunksize = 20000
+            numchunks = 2000
+            chunksize = self.dataLength/numchunks
             team_1 = dataOne[:chunksize*numchunks].reshape((-1, chunksize))
             max_1 = team_1.max(axis=1)
             min_1 = team_1.min(axis=1)
             mean_1 = team_1.mean(axis=1)
             
-            xcenters = np.linspace(0, dataLength, numchunks)
+            xcenters = np.linspace(0, self.dataLength, numchunks)
 
             ax.fill_between(xcenters, max_1, y2=min_1,color='0.6')
             ax.plot(xcenters,mean_1,'b')
-            
-            
-        self.dataLength = len(dataOne)
         ax.set_xlim(0,self.dataLength)
+            
         self.span = ax.axvspan(0, 0, facecolor='g', alpha=0.5,zorder=3)
         self.vline = ax.axvline(x=0,color='red')
         self.canvas.draw()
