@@ -4,6 +4,7 @@ from Device import protocol
 from Models.EngineeringDB import ScriptData,IgnitorsData
 import struct
 import Queue
+import time
 from Device import ftdi2 as ft
 from config import appdata
 import tarfile, os, sys, subprocess, shutil
@@ -14,16 +15,29 @@ from Frontend.PrintPDF import PrintTable, TABLEFields, TABLEProductList, TABLEFi
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
     def __init__(self, q, parent = None):
-        print 'thread1'
+
         QtCore.QObject.__init__ (self, parent)
-        print 'thread2'
+
         self.signalRead.connect(self.readFun)
         self.q = q
     def readFun(self):
-        dev = ft.list_devices()
-        print dev[0]
+        try:
+            dev = ft.list_devices()
+        except:
+            dev = []
+
+        while len (dev) == 0:
+            
+            time.sleep (5)
+            print "Rechecking hardware connection..."
+            try:
+                dev = ft.list_devices()
+            except:
+                dev = []
+            print dev
+
         self.f = ft.open_ex(dev[0])
-        
+        print self.f
         while True:
             datalistR = [None]*14
             datalistW = [None]*14
@@ -63,7 +77,6 @@ class getMessage(QtCore.QObject):
                         for i in range(14):
                             if datalistR[i]!=datalistW[i]:
                                 confirmFlag = False
-                                
             if confirmFlag == False:
                 print 'Connect error'
                 return 
