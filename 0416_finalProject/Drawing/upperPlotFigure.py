@@ -72,9 +72,11 @@ class fig(Figure):
             self.clearAxes()
             self.plotFunc(npSlice)
             self.leftDot += self.dotsInScreen
+            
         for timeOne in self.igniteTimes:
             doti = timeOne*self.framerate/self.zipRate
-            if dotNow < doti and dotNow + 10 > doti:
+            
+            if dotNow <= doti and dotNow + 20 > doti:
                 self.bombMedia.play()
                 
        
