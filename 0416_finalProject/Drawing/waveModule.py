@@ -42,7 +42,7 @@ class WaveWidget(QtGui.QWidget):
         player.ui.pushButton_goRight.clicked.connect(upAndDownWaveWidget.plotWidget.figure.toPreviousScreen)
         player.ui.pushButton_musicPlay.clicked.connect(self.getData)
         
-        self.getData()
+#        self.getData()
             
             
 

@@ -6,6 +6,8 @@ import matplotlib.ticker as ticker
 import thread
 import threading
 import matplotlib.ticker as ticker
+from PySide.phonon import Phonon
+
 
 class fig(Figure):
     
@@ -14,6 +16,18 @@ class fig(Figure):
         self.signal = freshSignal()
         self.dotsInScreen = 2000
         self.secondsInScreen = 20
+        
+        self.lineDataList = []
+        self.lineDataList2 = []
+        self.igniteTimeLines = []
+        
+        self.bombMedia = Phonon.MediaObject()
+        self.bombMedia.setCurrentSource(Phonon.MediaSource())
+        output = Phonon.AudioOutput(Phonon.MusicCategory)
+        Phonon.createPath(self.bombMedia, output)
+        path = 'C:/Users/pyroshow/Documents/GitHub/Capricorn/src/WaveModule/0416_finalProject/2633_0.3s.wav'
+#        self.bombMedia.stateChanged.connect(self.stateChanged)
+        self.bombMedia.setCurrentSource(Phonon.MediaSource(path))
         
     def mediaTimeChanged(self,time):
         self.currentTime_ms = int(time)
@@ -37,7 +51,9 @@ class fig(Figure):
         
         dotNow = frameNow/self.zipRate
         self.signal.freshLowerPlotCurrentTime.emit(frameNow)
+        print 'dotNow=',dotNow
          
+        
 #        print 'screenTime',self.getScreenTime()
         if dotNow >= self.leftDot + self.dotsInScreen*3/2 or dotNow <= self.leftDot - self.dotsInScreen/2:
             print 'or'
@@ -56,54 +72,56 @@ class fig(Figure):
             self.clearAxes()
             self.plotFunc(npSlice)
             self.leftDot += self.dotsInScreen
-            
-            
-        self.ax.set_xlim(dotNow-self.dotsInScreen/2,dotNow+self.dotsInScreen/2)  
+        for timeOne in self.igniteTimes:
+            doti = timeOne*self.framerate/self.zipRate
+            if dotNow < doti and dotNow + 10 > doti:
+                self.bombMedia.play()
+                
+       
+        self.ax.set_xlim(dotNow-self.dotsInScreen/2,dotNow+self.dotsInScreen/2) 
         self.vline.set_xdata(dotNow)
         
         self.signal.freshLowerPlotPanLeftAndWidth.emit(frameNow-framesInScreen/2,frameNow+framesInScreen/2)
-                
-        self.canvas.draw()
+        self.drawIgniteLines()
+#        self.canvas.draw()
         
     def setIgniteTimes(self,times):
         self.igniteTimes = times
         
     def drawIgniteLines(self):
-        print 'drawIgniteLines'
-        igniteTimeList = self.igniteTimes
+
+        
+        igniteTimes = self.igniteTimes
         if not hasattr(self, 'ax'):
             return
-##        for i in xrange(2,len(self.ax.lines)):
-##            del self.ax.lines[i]
-#        print 'igniteTimeList=',igniteTimeList
-#        length = len(self.igniteTimeLines)
         for line in self.igniteTimeLines:
-            line.remove()
-            self.igniteTimeLines.remove(line)
-#            print 'igniteTimeLines=',self.igniteTimeLines
-#            print 'i=',i
-#            print self.igniteTimeLines[i]
-#            self.igniteTimeLines.pop(i)
-#for i in xrange(length-1):
-#    self.lineDataList[i].remove()
-#    self.lineDataList.pop(i)
-                    
-#        for line in self.igniteTimeLines:
-#            self.igniteTimeLines.remove(line)
-            
-            
-        for igniteTime in  igniteTimeList:
+#            print 'line=',repr(line),dir(line)
+            self.ax.lines.remove(line)
+        self.igniteTimeLines = []
+#        print '-------------------'
+#        print 'self.igniteTimes =',self.igniteTimes
+#        print 'self.igniteTimeLines =',self.igniteTimeLines
+        
+        for igniteTime in  igniteTimes:
             igniteDot = igniteTime*self.framerate/self.zipRate
-#            
-#            print 'igniteTime=',igniteTime
-#            print 'igniteDot=',igniteDot
-#            print 'leftDot=',self.leftDot
-#            print 'leftDot 2=',self.leftDot + 2*self.dotsInScreen
             if self.leftDot - self.dotsInScreen <= igniteDot < self.leftDot + self.dotsInScreen:
-                line = self.ax.axvline(x=igniteDot,color='#0249ee',zorder=4)
+                print 'igniteDot=',igniteDot
+                line = self.ax.axvline(x=igniteDot,color='#0249ee',zorder=5)
                 self.igniteTimeLines.append(line)
-#                
         self.canvas.draw()
+        
+        
+        frameNow = self.currentTime_ms*self.framerate/1000
+        dotNow = frameNow/self.zipRate
+        
+#        print '------'
+#        print 'dotNow=',dotNow
+#        print 'dotNow-self.dotsInScreen/2=',dotNow-self.dotsInScreen/2
+#        print 'dotNow+self.dotsInScreen/2=',dotNow+self.dotsInScreen/2
+#        print 'self.igniteTimes =',self.igniteTimes
+#        print 'self.igniteTimeLines =',self.igniteTimeLines
+#        print '-------------------'
+        
         
     def drawInit(self,dataDict):
         self.clf()
@@ -127,9 +145,9 @@ class fig(Figure):
         npSlice = np.arange(self.leftDot, self.leftDot+self.dotsInScreen)
         self.plotFunc(npSlice)
         self.mediaTimeChanged(0)
+        self.drawIgniteLines()
         
     def plotFunc(self,npSlice):
-        
         if npSlice[0] < 0:
             return
         if npSlice[0] > self.waveDataLength:
@@ -154,6 +172,17 @@ class fig(Figure):
 #            print 'yean.size=',ymean.size
             line,  = self.ax.plot(npSlice,ymean,'pink',zorder=1)
             self.lineDataList.append(line)
+            
+        
+        majorLocator   = MultipleLocator(self.dotsInScreen/20)
+        def format_time(x, pos=None):
+            if x < 0:
+                return ''
+            y = x*self.zipRate/self.framerate
+            tupleTime = divmod(y, 60)
+            return '%d:%04.1f'%(tupleTime[0],tupleTime[1])
+        self.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_time))
+        self.ax.xaxis.set_major_locator(majorLocator)
         
                 
     def clearAxes(self):
@@ -258,7 +287,9 @@ class fig(Figure):
         if self.currentTime_ms<0:
             self.currentTime_ms = 0
         self.mediaTimeChanged(self.currentTime_ms)
-        
+    
+
+            
 
 class freshSignal(QtCore.QObject):
     freshLowerPlotPanLeftAndWidth = QtCore.Signal(int, int)
@@ -267,6 +298,8 @@ class freshSignal(QtCore.QObject):
     freshMusicTotalTimeLabel = QtCore.Signal(str)
     freshVisionTimeLengthLabel = QtCore.Signal(str)
     freshScreenTime = QtCore.Signal(int)
+    
+    bomb = QtCore.Signal()
     
 def main():
     import plotAndPlay
@@ -280,3 +313,6 @@ def main():
 if __name__ == "__main__":
     from waveModule import main
     main()
+    
+#    from Frontend.LoginShow import main
+#    main()

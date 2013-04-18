@@ -52,6 +52,7 @@ class Player(QtGui.QWidget):
 #            time = QtCore.QTime(0, (totalTime / 60000) % 60, (totalTime / 1000) % 60)
 #            self.ui.timeEdit_music.setMaximumTime (time)
             self.ui.lineEdit_musicFilePath.setText(self.path)
+            print self.path
         dialog.deleteLater()
         
         

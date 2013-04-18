@@ -10,70 +10,70 @@ try:
 except:
     pass
 #from UI.mainWidget import MainWidget
-
-class getMessage(QtCore.QObject):
-    signalRead = QtCore.Signal()
-    def __init__(self, q, parent = None):
-        print 'thread1'
-        QtCore.QObject.__init__ (self, parent)
-        print 'thread2'
-        self.signalRead.connect(self.readFun)
-        self.q = q
-    def readFun(self):
-        try:
-            dev = ft.list_devices()
-            print dev[0]
-            self.f = ft.open_ex(dev[0])
-        except:
-            return
-        
-        while True:
-            datalistR = [None]*14
-            datalistW = [None]*14
-            item = self.q.get()
-            self.f.write(item)
-            while self.f.get_queue_status() < 13:
-                pass
-            readData = self.f.read(self.f.get_queue_status())
-            fmtR = '@13B'
-            datalistR[0] = 0xAA
-            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-            fmtW = '@14B'
-            (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-            datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-            confirmFlag = True
-            for i in range(14):
-#                print datalistW[i],' ',datalistR[i]
-                if datalistR[i]!=datalistW[i]:
-                    confirmFlag = False
-                    for j in range(2):
-                        self.f.write(item)
-                        while self.f.get_queue_status() < 13:
-                            pass
-                        readData = self.f.read(self.f.get_queue_status())
-                        fmtR = '@13B'
-                        datalistR[0] = 0xAA
-                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-                        datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-                        fmtW = '@14B'
-                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-                        datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-                        for i in range(14):
-                            if datalistR[i]!=datalistW[i]:
-                                confirmFlag = False
-            if confirmFlag == False:
-                print 'Connect error'
-                return 
-                     
-            print repr(item),'\n',repr(readData)
-
-
-        
+#
+#class getMessage(QtCore.QObject):
+#    signalRead = QtCore.Signal()
+#    def __init__(self, q, parent = None):
+#        print 'thread1'
+#        QtCore.QObject.__init__ (self, parent)
+#        print 'thread2'
+#        self.signalRead.connect(self.readFun)
+#        self.q = q
+#    def readFun(self):
+#        try:
+#            dev = ft.list_devices()
+#            print dev[0]
+#            self.f = ft.open_ex(dev[0])
+#        except:
+#            return
+#        
+#        while True:
+#            datalistR = [None]*14
+#            datalistW = [None]*14
+#            item = self.q.get()
+#            self.f.write(item)
+#            while self.f.get_queue_status() < 13:
+#                pass
+#            readData = self.f.read(self.f.get_queue_status())
+#            fmtR = '@13B'
+#            datalistR[0] = 0xAA
+#            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
+#            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
+#            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
+#            fmtW = '@14B'
+#            (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
+#            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
+#            datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
+#            confirmFlag = True
+#            for i in range(14):
+##                print datalistW[i],' ',datalistR[i]
+#                if datalistR[i]!=datalistW[i]:
+#                    confirmFlag = False
+#                    for j in range(2):
+#                        self.f.write(item)
+#                        while self.f.get_queue_status() < 13:
+#                            pass
+#                        readData = self.f.read(self.f.get_queue_status())
+#                        fmtR = '@13B'
+#                        datalistR[0] = 0xAA
+#                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
+#                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
+#                        datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
+#                        fmtW = '@14B'
+#                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
+#                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
+#                        datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
+#                        for i in range(14):
+#                            if datalistR[i]!=datalistW[i]:
+#                                confirmFlag = False
+#            if confirmFlag == False:
+#                print 'Connect error'
+#                return 
+#                     
+#            print repr(item),'\n',repr(readData)
+#
+#
+#        
 class MainShow(QtGui.QMainWindow):
     def __init__(self, sess, session, fieldUUID,musicPath, parent=None):
         QtGui.QMainWindow.__init__(self)
@@ -89,15 +89,15 @@ class MainShow(QtGui.QMainWindow):
         self.ui.actionProjectExport.triggered.connect(self.projectExport)
 
         
-        self.q = Queue.Queue()
-        self.c = getMessage(self.q)
-        thread = QtCore.QThread()
-        self.c.moveToThread(thread)
-        thread.start()
-        print 'before emit'
-        self.c.signalRead.emit()
-        print 'after emit'
-        
+#        self.q = Queue.Queue()
+#        self.c = getMessage(self.q)
+#        thread = QtCore.QThread()
+#        self.c.moveToThread(thread)
+#        thread.start()
+#        print 'before emit'
+#        self.c.signalRead.emit()
+#        print 'after emit'
+#        
     def downloadToDevice(self):
         with self.session.begin():
             tableFire = self.session.query(ScriptData).all()
