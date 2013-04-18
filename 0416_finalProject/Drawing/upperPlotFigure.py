@@ -75,8 +75,7 @@ class fig(Figure):
             
         for timeOne in self.igniteTimes:
             doti = timeOne*self.framerate/self.zipRate
-#            adfadsfad
-            if dotNow <= doti and dotNow + 20 > doti:
+            if dotNow <= doti and dotNow + 10 >= doti:
                 self.bombMedia.play()
                 
        
