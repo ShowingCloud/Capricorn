@@ -9,7 +9,7 @@ import lowerPlotWidget,upperPlotWidget,player,waveForm
 class playAndPlotWidget(QtGui.QWidget):
     def __init__(self):
         super(playAndPlotWidget,self).__init__()
-        self.setGeometry(100,100,1000,400)
+        self.setGeometry(100,100,1000,500)
         self.plotControlWidget = upperPlotWidget.plotControlWidget(self)
         self.lowerPlotWidget = lowerPlotWidget.plotWidget(self)
 #        self.lowerPlotWidget.resize(1000,200)

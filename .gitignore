@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.py[cod]
 
 # C extensions
@@ -37,3 +38,6 @@ nosetests.xml
 # Vim
 *.swp
 *.swo
+=======
+/deviceTest1.pyc
+>>>>>>> 96e1a71e5248c29c0c94df0fc814e867d1f1d923
