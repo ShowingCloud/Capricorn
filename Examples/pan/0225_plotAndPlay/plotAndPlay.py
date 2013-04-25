@@ -1,43 +1,53 @@
 # coding=utf-8
 import numpy as np
 from PySide import QtGui,QtCore
-
 import sys
-
 import lowerPlotWidget,upperPlotWidget,player,waveForm
+import progressWidget
 
 class playAndPlotWidget(QtGui.QWidget):
     def __init__(self):
         super(playAndPlotWidget,self).__init__()
+<<<<<<< HEAD
         self.setGeometry(100,100,1000,500)
         self.plotControlWidget = upperPlotWidget.plotControlWidget(self)
+=======
+        self.setGeometry(100,100,1000,400)
+        self.upperPlotWidget = upperPlotWidget.plotControlWidget(self)
+>>>>>>> 510166365caee0b420cd94fd7a130162cedf9d57
         self.lowerPlotWidget = lowerPlotWidget.plotWidget(self)
 #        self.lowerPlotWidget.resize(1000,200)
 
         self.playWidget = player.Player(self)
-        
-        self.playWidget.buttondisplay.clicked.connect(self.analyzewave)
-#        self.playWidget.buttondisplay.clicked.connect(self.plotControlWidget.plotWidget.figure.drawImage)
-        
+        self.path = None
+        self.playWidget.buttonPlay.clicked.connect(self.analyzewave)
+        self.playWidget.timeSignal.TimeNowChanged.connect(self.upperPlotWidget.plotWidget.figure.mediaTimeChanged)
         layout=QtGui.QVBoxLayout()
         layout.addWidget(self.playWidget)
-        layout.addWidget(self.plotControlWidget)
+        layout.addWidget(self.upperPlotWidget)
         layout.addWidget(self.lowerPlotWidget)
         
         self.setLayout(layout)
         
-        self.plotControlWidget.plotWidget.figure.signal.freshFunction.connect\
-        (self.lowerPlotWidget.figure.freshFromUpperPlot)
         
-        self.lowerPlotWidget.figure.signal.freshFunction.connect\
-        (self.plotControlWidget.plotWidget.figure.freshFromLowerPlot)
+#        self.upperPlotWidget.plotWidget.figure.signal.freshTimeNowLabel.connect\
+#        (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
+        
+        self.upperPlotWidget.plotWidget.figure.signal.freshLowerPlotPanLeftAndWidth.connect\
+        (self.lowerPlotWidget.figure.freshLeftAndWidthFromUpperPlot)
         
     def analyzewave(self):
-        form = waveForm.waveform(self.playWidget.fileEdit.text())
-        self.plotControlWidget.plotWidget.figure.drawImage(form.getWaveData())
-        self.lowerPlotWidget.figure.drawImage(form.getWaveData())
+        self.oldFilePath = ''
+        from PySide.phonon import Phonon
+        if self.playWidget.media.state() == Phonon.StoppedState and not self.oldFilePath == self.playWidget.media.currentSource():
+            self.oldFilePath = self.playWidget.media.currentSource()
+            form = waveForm.waveform(self.playWidget.fileEdit.text())
+            waveData = form.getWaveData()
+            print 'id(waveData)=',id(waveData)
+            dataDict = dict(data=waveData, framerate=form.framerate,media=self.playWidget.media)
+            self.upperPlotWidget.plotWidget.figure.drawImage(dataDict)
+            self.lowerPlotWidget.figure.drawImage(waveData)
         
-
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     playAndPlot = playAndPlotWidget()
