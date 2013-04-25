@@ -1,0 +1,15 @@
+eclipse.preferences.version=1
+encoding//Delegate/chooseFieldDelegate.py=utf-8
+encoding//Delegate/scriptDelegate.py=utf-8
+encoding//Drawing/lowerPlotWidget.py=utf-8
+encoding//Drawing/upAndDownWaveWidget.py=utf-8
+encoding//Drawing/upperPlotFigure.py=utf-8
+encoding//Drawing/waveForm.py=utf-8
+encoding//Frontend/LoginShow.py=utf-8
+encoding//Models/EngineeringDB.py=utf-8
+encoding//Models/LocalDB.py=utf-8
+encoding//UI/mainWidget.py=utf-8
+encoding//UI/ui_chooseIgnitionBox.py=utf-8
+encoding//UI/ui_combinationFireworks.py=utf-8
+encoding//UI/ui_fireworks.py=utf-8
+encoding//UI/ui_mainWindow.py=utf-8
