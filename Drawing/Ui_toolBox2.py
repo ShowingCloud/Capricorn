@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'I:\9717\python_work\plotWav\toolBox.ui'
+# Form implementation generated from reading ui file 'H:\python_work\plotWav\0330_waveModule\toolBox.ui'
 #
-# Created: Fri Apr 26 17:15:36 2013
+# Created: Tue Apr 02 14:18:32 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,7 +68,7 @@ class Ui_toolBoxWidget(object):
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/Image/Image/play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_musicPlay.setIcon(icon1)
-        self.pushButton_musicPlay.setIconSize(QtCore.QSize(33, 30))
+        self.pushButton_musicPlay.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_musicPlay.setObjectName("pushButton_musicPlay")
         self.horizontalLayout.addWidget(self.pushButton_musicPlay)
         self.pushButton_musicStop = QtGui.QPushButton(toolBoxWidget)
@@ -77,7 +77,7 @@ class Ui_toolBoxWidget(object):
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/Image/Image/stop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_musicStop.setIcon(icon2)
-        self.pushButton_musicStop.setIconSize(QtCore.QSize(30, 30))
+        self.pushButton_musicStop.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_musicStop.setObjectName("pushButton_musicStop")
         self.horizontalLayout.addWidget(self.pushButton_musicStop)
         self.volumeSlider_music = phonon.Phonon.VolumeSlider(toolBoxWidget)
@@ -89,10 +89,6 @@ class Ui_toolBoxWidget(object):
         self.label_5.setText("")
         self.label_5.setObjectName("label_5")
         self.horizontalLayout.addWidget(self.label_5)
-        self.volumeSlider_bombMusic = phonon.Phonon.VolumeSlider(toolBoxWidget)
-        self.volumeSlider_bombMusic.setMaximumSize(QtCore.QSize(120, 16777215))
-        self.volumeSlider_bombMusic.setObjectName("volumeSlider_bombMusic")
-        self.horizontalLayout.addWidget(self.volumeSlider_bombMusic)
         self.label_2 = QtGui.QLabel(toolBoxWidget)
         self.label_2.setMinimumSize(QtCore.QSize(20, 0))
         self.label_2.setMaximumSize(QtCore.QSize(20, 16777215))
