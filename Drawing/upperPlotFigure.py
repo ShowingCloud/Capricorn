@@ -452,7 +452,7 @@ class IgniteLine():
         if not self.text==None:
             self.text.remove()
         
-#信息类
+#信号类
 class freshSignal(QtCore.QObject):
     #刷新lowerPlot 图像的中矩形条宽度和高度
     freshLowerPlotPanLeftAndWidth = QtCore.Signal(int, int)
