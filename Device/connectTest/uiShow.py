@@ -1,8 +1,10 @@
 from PySide import QtCore,QtGui
 import Queue, time
 from ui_connectTest import Ui_Dialog
+import ftdi2 as ft
 import sys
 from protocol import dataPack
+import struct
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
@@ -13,9 +15,17 @@ class getMessage(QtCore.QObject):
         self.signalRead.connect(self.readFun)
         self.p = p
         self.q = q
-##        list1 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
-##        for i in list1:
-##            self.p.put(i)
+##        listHead = [0]*16
+##        allHead = 0xffff
+##        a = 1
+##        for i in range(16):
+##            if a & allHead :
+##                listHead[i]=1
+##            a  = a << 1
+##        for i in listHead:
+##            print i
+##        self.p.put(listHead)
+
     def readFun(self):
         try:
             dev = ft.list_devices()
@@ -74,11 +84,16 @@ class getMessage(QtCore.QObject):
                                 confirmFlag = False
             if confirmFlag == False:
                 print 'Connect error'
+                
             else:
-                head = dataListR[10]*256+dataListR[11]
-                self.p.put(head)
-                print head
-                print repr(item),'\n',repr(readData)
+                listHead = [0]*16
+                allHead = datalistR[10]*256+datalistR[11]
+                a = 1
+                for i in range(16):
+                    if a & allHead :
+                        listHead[i]=1
+                    a  = a * 2
+                self.p.put(listHead)
 
 
 class uiShow(QtGui.QDialog):
@@ -87,7 +102,7 @@ class uiShow(QtGui.QDialog):
         self.ui=Ui_Dialog()
         self.ui.setupUi(self)
         self.buttonConnect()
-        self.data = {'head':0xAAF0,'length':0x0E,'function':0x02,
+        self.data = {'head':0xAAF0,'length':0x0E,'function':0x03,
                      'ID':0xAABBCCDD,'fireBox':None,'firePoint':None,
                      'crc':0,'tail':0xDD}
         
@@ -102,12 +117,19 @@ class uiShow(QtGui.QDialog):
         self.timer = QtCore.QTimer()
         QtCore.QObject.connect(self.timer,QtCore.SIGNAL("timeout()"), self.timerEvent)
         self.timer.start(1000)
-        
+        intVal = QtGui.QIntValidator()
+        self.ui.lineEditBoxID.setValidator(intVal)
     def timerEvent(self):
-#        print "get message...."
+        print "get message...."
         if self.p.empty():
             return
-        head = self.p.get()
+        headList = self.p.get()
+        for i in range(16):
+            if headList[i]:
+                self.setButton(i+1)
+     
+    def setButton(self,head):
+        print "head = " ,head
         if head == 1 :
             self.ui.radioButton_1.setChecked(True)
         elif head == 2 :
@@ -140,19 +162,18 @@ class uiShow(QtGui.QDialog):
             self.ui.radioButton_15.setChecked(True)
         elif head == 16 :
             self.ui.radioButton_16.setChecked(True)
-     
-        
     def buttonConnect(self):
         self.ui.pushButtonTest.clicked.connect(self.buttonTest)
         self.ui.pushButtonReset.clicked.connect(self.buttonReset)
                          
     def buttonTest(self):
+        if self.ui.lineEditBoxID.text() == '':
+            return
         self.data['fireBox'] = int(self.ui.lineEditBoxID.text())
-        for i in range(16):
-            self.data['firePoint'] = i+1
-            dataPackage = dataPack(self.data)
-            print repr(dataPackage.package)
-            self.q.put (dataPackage.package)
+        self.data['firePoint'] = 0
+        dataPackage = dataPack(self.data)
+        print repr(dataPackage.package)
+        self.q.put(dataPackage.package)
 
     def buttonReset(self):
         self.ui.radioButton_1.setChecked(False)
