@@ -1,8 +1,10 @@
 from PySide import QtCore,QtGui
 import Queue, time
 from ui_connectTest import Ui_Dialog
+import ftdi2 as ft
 import sys
 from protocol import dataPack
+import struct
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
@@ -75,7 +77,7 @@ class getMessage(QtCore.QObject):
             if confirmFlag == False:
                 print 'Connect error'
             else:
-                head = dataListR[10]*256+dataListR[11]
+                head = datalistR[10]*256+datalistR[11]
                 self.p.put(head)
                 print head
                 print repr(item),'\n',repr(readData)
@@ -87,7 +89,7 @@ class uiShow(QtGui.QDialog):
         self.ui=Ui_Dialog()
         self.ui.setupUi(self)
         self.buttonConnect()
-        self.data = {'head':0xAAF0,'length':0x0E,'function':0x02,
+        self.data = {'head':0xAAF0,'length':0x0E,'function':0x03,
                      'ID':0xAABBCCDD,'fireBox':None,'firePoint':None,
                      'crc':0,'tail':0xDD}
         
@@ -102,7 +104,8 @@ class uiShow(QtGui.QDialog):
         self.timer = QtCore.QTimer()
         QtCore.QObject.connect(self.timer,QtCore.SIGNAL("timeout()"), self.timerEvent)
         self.timer.start(1000)
-        
+        intVal = QtGui.QIntValidator()
+        self.ui.lineEditBoxID.setValidator(intVal)
     def timerEvent(self):
 #        print "get message...."
         if self.p.empty():
@@ -147,6 +150,8 @@ class uiShow(QtGui.QDialog):
         self.ui.pushButtonReset.clicked.connect(self.buttonReset)
                          
     def buttonTest(self):
+        if self.ui.lineEditBoxID.text() == '':
+            return
         self.data['fireBox'] = int(self.ui.lineEditBoxID.text())
         for i in range(16):
             self.data['firePoint'] = i+1
