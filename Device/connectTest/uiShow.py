@@ -6,6 +6,11 @@ import sys
 from protocol import dataPack
 import struct
 
+try:
+    from Device import ftdi2 as ft
+except:
+    pass
+
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
     def __init__(self, q,p,parent = None):
