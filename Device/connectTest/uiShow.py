@@ -1,7 +1,7 @@
 from PySide import QtCore,QtGui
 import Queue, time
 from ui_connectTest import Ui_Dialog
-import ftdi2 as ft
+#import ftdi2 as ft
 import sys
 from protocol import dataPack
 import struct
@@ -16,7 +16,7 @@ class getMessage(QtCore.QObject):
         self.p = p
         self.q = q
 ##        listHead = [0]*16
-##        allHead = 0xffff
+##        allHead = 0xfff1
 ##        a = 1
 ##        for i in range(16):
 ##            if a & allHead :
@@ -130,37 +130,37 @@ class uiShow(QtGui.QDialog):
      
     def setButton(self,head):
         print "head = " ,head
-        if head == 1 :
+        if head == 16 :
             self.ui.radioButton_1.setChecked(True)
-        elif head == 2 :
-            self.ui.radioButton_2.setChecked(True)
-        elif head == 3:
-            self.ui.radioButton_3.setChecked(True)
-        elif head == 4 :
-            self.ui.radioButton_4.setChecked(True)
-        elif head == 5 :
-            self.ui.radioButton_5.setChecked(True)
-        elif head == 6 :
-            self.ui.radioButton_6.setChecked(True)
-        elif head == 7 :
-            self.ui.radioButton_7.setChecked(True)
-        elif head == 8 :
-            self.ui.radioButton_8.setChecked(True)
-        elif head == 9 :
-            self.ui.radioButton_9.setChecked(True)
-        elif head == 10 :
-            self.ui.radioButton_10.setChecked(True)
-        elif head == 11 :
-            self.ui.radioButton_11.setChecked(True)
-        elif head == 12 :
-            self.ui.radioButton_12.setChecked(True)
-        elif head == 13 :
-            self.ui.radioButton_13.setChecked(True)
-        elif head == 14 :
-            self.ui.radioButton_14.setChecked(True)
         elif head == 15 :
+            self.ui.radioButton_2.setChecked(True)
+        elif head == 14:
+            self.ui.radioButton_3.setChecked(True)
+        elif head == 13 :
+            self.ui.radioButton_4.setChecked(True)
+        elif head == 12 :
+            self.ui.radioButton_5.setChecked(True)
+        elif head == 11 :
+            self.ui.radioButton_6.setChecked(True)
+        elif head == 10 :
+            self.ui.radioButton_7.setChecked(True)
+        elif head == 9 :
+            self.ui.radioButton_8.setChecked(True)
+        elif head == 8 :
+            self.ui.radioButton_9.setChecked(True)
+        elif head == 7 :
+            self.ui.radioButton_10.setChecked(True)
+        elif head == 6 :
+            self.ui.radioButton_11.setChecked(True)
+        elif head == 5 :
+            self.ui.radioButton_12.setChecked(True)
+        elif head == 4 :
+            self.ui.radioButton_13.setChecked(True)
+        elif head == 3 :
+            self.ui.radioButton_14.setChecked(True)
+        elif head == 2 :
             self.ui.radioButton_15.setChecked(True)
-        elif head == 16 :
+        elif head == 1 :
             self.ui.radioButton_16.setChecked(True)
     def buttonConnect(self):
         self.ui.pushButtonTest.clicked.connect(self.buttonTest)
