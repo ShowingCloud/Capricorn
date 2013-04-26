@@ -7,7 +7,6 @@ import matplotlib.ticker as ticker
 from PySide.phonon import Phonon
 import matplotlib.lines as lines
 
-#波形图类
 class fig(Figure):
     
     def __init__(self):
@@ -22,7 +21,7 @@ class fig(Figure):
         self.lineDataList2 = []
         self.igniteDataList = []
         self.ingiteLines = []
-        #爆破音类
+        #爆破单类
         self.mo = mediaObject()
         self.bombMedia = self.mo.media2
         

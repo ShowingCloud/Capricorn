@@ -1,4 +1,3 @@
-# coding=utf-8
 from Models.EngineeringDB import ScriptData ,IgnitorsData
 from PySide import QtCore, QtGui
 from PySide.QtCore import Slot
@@ -13,7 +12,6 @@ class WaveWidget(QtGui.QWidget):
     def __init__(self, session=None ,musicPath=None, sess=None, parent=None):
         self.show = False
         QtGui.QWidget.__init__(self,parent)
-        #建立用
         self.ui=Ui_widget_waveModule()
         self.ui.setupUi(self)
         self.sess = sess
