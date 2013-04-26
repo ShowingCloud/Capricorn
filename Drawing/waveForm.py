@@ -7,12 +7,16 @@ import time
 from PySide.phonon import Phonon
 import datetime
 
+#解析音乐文件类
 class waveform():
     def __init__(self, path):
         self.waveData = []
+        #读取音频文件
         self.audio = wave.open(path, 'r')
+        #得到音频文件的相关参数
         self.nchannels, self.sampwidth, self.framerate, self.nframes, self.comptype, self.compname \
                  = self.audio.getparams()
+        #得到解析数据
         self.waveform()
         
     def read (self, size):
@@ -34,10 +38,12 @@ class waveform():
 
     def waveform (self):
         self.waveData = self.read (self.audio.getnframes())
-        
+
+    #返回解析后的数据，为数组类型
     def getWaveData(self):
         return self.waveData
-    
+
+    #返回音频文件的总的帧数
     def getTotalDataNumber(self):
         return self.nframes
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PySide import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from upperPlotFigure import fig
@@ -8,13 +9,17 @@ class plotWidget(FigureCanvas):
         self.setWindowTitle("pyside test_plot fig FigureCanvas")
 #        self.resize(1000, 250)
 
+    #放大
     def zoomIn(self):
         self.figure.zoomIn()
+    #缩小
     def zoomOut(self):
         self.figure.zoomOut()
+    #暂停
     def pauseMove(self):
         self.figure.pauseMove()
-        
+
+    #右键
     def contextMenuEvent(self, event):
         actionzoomIn = QtGui.QAction('x zoomIn',self)
         actionzoomOut = QtGui.QAction('x zoomOut',self)
