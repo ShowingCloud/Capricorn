@@ -65,15 +65,15 @@ class Script(QWidget):
 #        self.timer.start(500)
     @Slot(str)
     def setCurrentFireworksTop(self, scriptUUID):
-        print 'scriptUUID-=====',scriptUUID
+#        print 'scriptUUID-=====',scriptUUID
         model = self.view.model()
         proxy = QSortFilterProxyModel()
         proxy.setSourceModel(model)
         proxy.setFilterKeyColumn(0)
         proxy.setFilterFixedString(scriptUUID)
         matchIndex = proxy.mapToSource(proxy.index(0,0))
-        print matchIndex
-        print model.data(matchIndex)
+#        print matchIndex
+#        print model.data(matchIndex)
         self.view.scrollTo (model.index(matchIndex.row(),3),hint = QAbstractItemView.PositionAtTop)
 #        self.view.keyboardSearch(scriptUUID)
         

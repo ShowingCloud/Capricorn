@@ -3,17 +3,20 @@ from UI import ui_mainWindow
 from Device import protocol
 from Models.EngineeringDB import ScriptData,IgnitorsData,ParametersData,FieldsData
 from Models.LocalDB import ProjectsData
-import struct
 import Queue
 import time
 from datetime import datetime
-from Device import ftdi2 as ft
+#from Device import ftdi2 as ft
 from config import appdata
 import tarfile, os, sys, subprocess, shutil
 from Frontend.PrintPDF import PrintTable, TABLEFields, TABLEProductList, TABLEFireSequence
 import json
 
 #from UI.mainWidget import MainWidget
+try:
+    from Device import ftdi2 as ft
+except:
+    pass
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
@@ -44,44 +47,14 @@ class getMessage(QtCore.QObject):
         self.f = ft.open_ex(dev[0])
         print self.f
         while True:
-            datalistR = [None]*14
-            datalistW = [None]*14
+            
             item = self.q.get()
             self.f.write(item)
-            while self.f.get_queue_status() < 13:
+            while self.f.get_queue_status() < 19:
                 pass
             readData = self.f.read(self.f.get_queue_status())
-            fmtR = '@13B'
-            datalistR[0] = 0xAA
-            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-            fmtW = '@14B'
-            (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-            datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-            confirmFlag = True
-            for i in range(14):
-#                print datalistW[i],' ',datalistR[i]
-                if datalistR[i]!=datalistW[i]:
-                    confirmFlag = False
-                    for j in range(2):
-                        self.f.write(item)
-                        while self.f.get_queue_status() < 13:
-                            pass
-                        readData = self.f.read(self.f.get_queue_status())
-                        fmtR = '@13B'
-                        datalistR[0] = 0xAA
-                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-                        datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-                        fmtW = '@14B'
-                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-                        datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-                        for i in range(14):
-                            if datalistR[i]!=datalistW[i]:
-                                confirmFlag = False
+           
+            confirmFlag = False
             if confirmFlag == False:
                 print 'Connect error'
                 return 
@@ -103,20 +76,20 @@ class MainShow(QtGui.QMainWindow):
         self.ui.actionDownload.triggered.connect(self.downloadToDevice)
         self.ui.actionExportPDF.triggered.connect(self.exportPDF)
         self.ui.actionProjectExport.triggered.connect(self.projectExport)
-#        self.ui.widget_wave.upAndDownWaveWidget.analyzeWaveAndDrawInit()
-        
+        self.ui.widget_wave.upAndDownWaveWidget.analyzeWaveAndDrawInit()
+        self.ui.actionMinimize.triggered.connect(self.showMinimized)
         self.q = Queue.Queue()
         self.c = getMessage(self.q)
-        thread = QtCore.QThread()
-        self.c.moveToThread(thread)
+        self.thread = QtCore.QThread()
+        self.c.moveToThread(self.thread)
         self.getLocalData()
-#        thread.start()
+        self.thread.start()
+        self.showMaximized()
         print 'Read signal emit'
-        
+        self.c.signalRead.emit()
 
         
-    def downloadToDevice(self):
-#        self.c.signalRead.emit()
+    def downloadToDevice(self):       
         with self.session.begin():
             tableFire = self.session.query(ScriptData).all()
         node = {'head':0xAAF0,'length':0x0E,'function':0x02,'ID':0xAABBCCDD,'fireBox':None,
@@ -192,7 +165,9 @@ class MainShow(QtGui.QMainWindow):
             
     def closeEvent(self,event):
         self.getLocalData()
-        print 'closeEvent  '
+        self.thread.quit()
+        self.thread.exit()
+        print 'closeEvent'
         event.accept()
 
     def projectExport(self):

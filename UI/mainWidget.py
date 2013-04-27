@@ -27,6 +27,8 @@ class MainWidget(QWidget):
         self.setWindowIcon(QIcon(":/images/title.png"))
         
         self.fireworksGroup = QGroupBox("Database")
+        self.fireworksGroup.setContentsMargins(-10,0,-10,-10)
+        
         self.sess = sess
         self.session = session
         self.fieldUUID = fieldUUID
@@ -56,12 +58,14 @@ class MainWidget(QWidget):
         self.fireworksStack.addWidget(self.customFireworks)
         
         hbox1 = QHBoxLayout()
+        hbox1.setSpacing(0)
         hbox1.addWidget(self.typeList)
         hbox1.addWidget(self.fireworksStack, 1)
         
         self.fireworksGroup.setLayout(hbox1)
         
         self.scriptGroup = QGroupBox("Project")
+        self.scriptGroup.setContentsMargins(-10,0,-10,-10)
         
         self.fieldList = FieldDirectory(self.session, self.fieldUUID)
         
@@ -73,6 +77,7 @@ class MainWidget(QWidget):
         hbox2 = QHBoxLayout()
         hbox2.addWidget(self.fieldList)
         hbox2.addWidget(self.script, 1)
+        hbox2.setSpacing(0)
         self.scriptGroup.setLayout(hbox2)
         
         mainLayout = QVBoxLayout()

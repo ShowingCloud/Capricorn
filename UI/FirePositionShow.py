@@ -162,8 +162,22 @@ class FirePositionShow(QtGui.QDialog):
         newRow.append (QStandardItem (boxDict['BoxID']))
         newRow.append (QStandardItem (boxDict['Heads']))      
         self.model.appendRow(newRow)
-#         if self.addBoxFlag == True:
-#             with self.session.begin():
+        if self.addBoxFlag == True:
+            with self.session.begin():
+                data = self.session.query(FieldsData).filter_by(FieldID = self.ui.lineEditName.text()).first()
+            if data == None:
+                return
+            with self.session.begin():
+                ignitor = IgnitorsData()
+                ignitor.UUID = str(uuid.uuid1())
+                ignitor.CTime = datetime.utcnow()
+                ignitor.MTime = datetime.utcnow()
+                ignitor.FieldID = data.UUID
+#            ignitor.IgnitorID = 
+                ignitor.BoxID = boxDict['BoxID']
+                ignitor.TotalHeads = int(boxDict['Heads'])
+                ignitor.SurplusHeads = int(boxDict['Heads'])
+                self.session.add(ignitor)
                 
 
     @Slot(QPoint)
@@ -185,6 +199,10 @@ class FirePositionShow(QtGui.QDialog):
             self.model.takeRow(self.row)
             if record:
                 self.session.delete(record)
+        for node in self.boxList:
+            if node['BoxID'] == item.text():
+                self.boxList.remove(node)
+            
         
     def addField(self):
         if len(self.boxList) == 0:
@@ -231,7 +249,8 @@ class FirePositionShow(QtGui.QDialog):
         self.boxList = []
         self.model.clear()
         self.setIgnitorTable()
-
+#         self.ui.lineEditName.setText('')
+#         self.ui.lineEditIgnitionBox.setText('')
     def showDetail(self):
         itemSelect = self.ui.listWidgetPosition.currentItem().text()
         with self.session.begin():

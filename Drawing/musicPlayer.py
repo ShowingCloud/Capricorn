@@ -9,11 +9,10 @@ class Player(QtGui.QWidget):
         QtGui.QWidget.__init__(self,parent)
         self.ui=Ui_toolBoxWidget()
         self.ui.setupUi(self)
-#        volumeSlider_bombMusic
+        
         self.media = Phonon.MediaObject(self)
         self.media.setCurrentSource(Phonon.MediaSource())
         self.media.setTickInterval(10)
-        
         self.output = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.media, self.output)
         
@@ -33,9 +32,6 @@ class Player(QtGui.QWidget):
         
         self.path = None
         self.signal = FileChoosedSignal()
-        
-    def setBombMusicAudioOutput(self,outPut):
-        self.ui.volumeSlider_bombMusic.setAudioOutput(outPut)
         
     def timeEditTimeChanged(self, time):
         miliSec = (((time.hour()*60+time.minute())*60)+time.second())*1000

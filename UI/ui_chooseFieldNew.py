@@ -153,17 +153,18 @@ class ChooseField(QDialog):
                 self.session.add(record)
             if UUID[i]['BoxID'] != "Not chosen":
                 self.assignIgnitionHead(record.UUID)
-        
+                print 'assignIgnitionHead fun'
     def assignIgnitionHead(self,scriptUUID):    
         with self.session.begin():
             other = self.session.query (ScriptData).filter_by(UUID = scriptUUID).first()
             data = self.session.query(IgnitorsData).filter_by(UUID = other.IgnitorID).first()
                 ##点火头分配
-        if data.TotalHeads == data.SurplusHeads:
-            other.ConnectorID = 1
-        else:
-            with self.session.begin():
-                Box = self.session.query (ScriptData).filter_by(IgnitorID = data.UUID)
+            if data.TotalHeads == data.SurplusHeads:
+                other.ConnectorID = 1
+                data.SurplusHeads = data.SurplusHeads -1
+                return
+        with self.session.begin():
+            Box = self.session.query (ScriptData).filter_by(IgnitorID = data.UUID)
             headList = [0]*data.TotalHeads
             for row in Box:
                 if row.ConnectorID !=None:
@@ -173,9 +174,9 @@ class ChooseField(QDialog):
                     other.ConnectorID = i+1
                     break
             print 'Ignition head is ',other.ConnectorID
-            with self.session.begin():
-                data1 = self.session.query(IgnitorsData).filter_by(UUID = other.IgnitorID).first()
-                data1.SurplusHeads = data1.SurplusHeads-1
+        with self.session.begin():
+            data1 = self.session.query(IgnitorsData).filter_by(UUID = other.IgnitorID).first()
+            data1.SurplusHeads = data1.SurplusHeads-1
         with self.session.begin():
             other = self.session.query (ScriptData).filter_by(UUID = scriptUUID).first()
         print 'other.ConnectorID = ',other.ConnectorID

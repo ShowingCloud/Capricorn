@@ -6,6 +6,8 @@ from UI.ui_loginWin import Ui_Dialog
 from Models.LocalDB import *
 from datetime import datetime, timedelta, date
 import sys, uuid
+from singleton import SingleInstance
+ 
 #from Translations.tr_rc import *
 
 
@@ -29,7 +31,7 @@ class uiShow(QtGui.QDialog):
         self.ui.checkBoxMusic.clicked.connect(self.setMusicTime)
         self.ui.lineEditDurationMin.setText('5')
         self.ui.lineEditDurationSec.setText('0')
-        
+
     def addComboData(self):
         with self.sess.begin():
             data = self.sess.query(L_ScenesData).all()
@@ -125,6 +127,7 @@ class uiShow(QtGui.QDialog):
             QtGui.QMessageBox.information(self, "Information", " Username or password error, please login again!")
             
 def main():
+    me = SingleInstance()
     app = QtGui.QApplication(sys.argv)
     locale = QtCore.QLocale.system().name()
 ##    appTranslator = QtCore.QTranslator()
