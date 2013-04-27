@@ -47,18 +47,24 @@ class getMessage(QtCore.QObject):
         self.f = ft.open_ex(dev[0])
         print self.f
         while True:
-            
             item = self.q.get()
             self.f.write(item)
             while self.f.get_queue_status() < 19:
                 pass
             readData = self.f.read(self.f.get_queue_status())
-           
-            confirmFlag = False
+            confirmFlag = True
+            if item[1:20:1] != readData :
+                confirmFlag = False
+                for i in range(2):
+                    self.f.write(item)
+                    while self.f.get_queue_status() < 19:
+                        pass
+                    readData = self.f.read(self.f.get_queue_status())
+                    if item[1:20:1] == readData:
+                        confirmFlag = True
+                        break
             if confirmFlag == False:
-                print 'Connect error'
-                return 
-                     
+                print 'Connect error,please check device'
             print repr(item),'\n',repr(readData)
 
 
@@ -87,12 +93,12 @@ class MainShow(QtGui.QMainWindow):
         self.showMaximized()
         print 'Read signal emit'
         self.c.signalRead.emit()
-
+#        self.ui.widgetDatabase.musicSignal.emit()
         
     def downloadToDevice(self):       
         with self.session.begin():
             tableFire = self.session.query(ScriptData).all()
-        node = {'head':0xAAF0,'length':0x0E,'function':0x02,'ID':0xAABBCCDD,'fireBox':None,
+        node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
                 'firePoint':None,'seconds':None,'offsetSec':None,'crc':0,'tail':0xDD}
         for row in tableFire:
             if  row.ConnectorID == None:
@@ -100,19 +106,20 @@ class MainShow(QtGui.QMainWindow):
                                            QtGui.QMessageBox.Ok)
                 if reply == QtGui.QMessageBox.Ok:
                     return
-            else:
-                print 'fire head',row.IgnitorID
+                
         for row in tableFire:
             with self.session.begin():
                 ignitorBoxRow = self.session.query(IgnitorsData).filter_by(UUID = row.IgnitorID).first()
             node['fireBox'] = int(ignitorBoxRow.BoxID)
             node['firePoint'] = row.ConnectorID
-            node['seconds'] = row.IgnitionTime.seconds
-            node['offsetSec'] = row.IgnitionTime.microseconds/1000
+            node['seconds'] = int(row.IgnitionTime.seconds)
+            node['offsetSec'] = int(row.IgnitionTime.microseconds/1000)
             package = protocol.dataPack(node)
             package.pack()
             self.q.put (package.package)
-        reply = QtGui.QMessageBox.question(None,'message','DownLoad Finish',
+            print 'fire head',node['firePoint'],'fire Box ',node['fireBox']
+            print repr(package.package)
+        QtGui.QMessageBox.question(None,'message','DownLoad Finish',
                                            QtGui.QMessageBox.Ok)
         
         
