@@ -2,10 +2,13 @@ from PySide import QtCore,QtGui
 from fireDelayed import Ui_Dialog
 from protocol import dataPack
 import sys
-import ftdi2 as ft
-import struct
 import Queue
 import time
+from PySide.QtCore import Qt,QPoint,Slot,SIGNAL
+try:
+    import ftdi2 as ft
+except:
+    pass
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
@@ -35,52 +38,25 @@ class getMessage(QtCore.QObject):
         self.f = ft.open_ex(dev[0])
         print self.f
         while True:
-            datalistR = [None]*20
-            datalistW = [None]*20
             item = self.q.get()
             self.f.write(item)
             while self.f.get_queue_status() < 19:
                 pass
             readData = self.f.read(self.f.get_queue_status())
-            fmtR = '@19B'
-            datalistR[0] = 0xAA
-            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-            datalistR[12],datalistR[13],datalistR[14],datalistR[15],datalistR[16],
-            datalistR[17],datalistR[18],datalistR[19]) = struct.unpack(fmtR,readData)
-            fmtW = '@20B'
-            (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-            datalistW[12],datalistW[13],datalistW[14],datalistW[15],datalistW[16],
-            datalistW[17],datalistW[18],datalistW[19]) = struct.unpack(fmtW,item)
             confirmFlag = True
-            for i in range(20):
-#                print datalistW[i],' ',datalistR[i]
-                if datalistR[i]!=datalistW[i]:
-                    confirmFlag = False
-                    for j in range(2):
-                        self.f.write(item)
-                        while self.f.get_queue_status() < 19:
-                            pass
-                        readData = self.f.read(self.f.get_queue_status())
-                        fmtR = '@19B'
-                        datalistR[0] = 0xAA
-                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-                        datalistR[12],datalistR[13],datalistR[14],datalistR[15],datalistR[16],
-                        datalistR[17],datalistR[18],datalistR[19]) = struct.unpack(fmtR,readData)
-                        fmtW = '@20B'
-                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-                        datalistW[12],datalistW[13],datalistW[14],datalistW[15],datalistW[16],
-                        datalistW[17],datalistW[18],datalistW[19]) = struct.unpack(fmtW,item)
-                        for i in range(20):
-                            if datalistR[i]!=datalistW[i]:
-                                confirmFlag = False
+            if item[1:20:1] != readData :
+                confirmFlag = False
+                for i in range(2):
+                    self.f.write(item)
+                    while self.f.get_queue_status() < 19:
+                        pass
+                    readData = self.f.read(self.f.get_queue_status())
+                    if item[1:20:1] == readData:
+                        confirmFlag = True
+                        break
             if confirmFlag == False:
-                print 'Connect error'
-                return 
-                     
+                print 'Data damaged ,please check device'
+                
             print repr(item),'\n',repr(readData)
 
 
@@ -101,6 +77,7 @@ class uiShow(QtGui.QDialog):
                          'ID':0xAABBCCDD,'seconds':None,'crc':0,'tail':0xDD}
         self.ExistList = []
         
+        
         self.q = Queue.Queue()
         self.c = getMessage(self.q)
         thread = QtCore.QThread()
@@ -108,9 +85,8 @@ class uiShow(QtGui.QDialog):
         thread.start()
         print 'signal emit'
         self.c.signalRead.emit()
-        self.PauseFlag = True
-        self.startFlag = False
-        self.downloadFlag = False
+        self.pauseFlag = True
+        self.deleteFlag = True
         self.ui.tableView.setAlternatingRowColors(True)
         self.model = QtGui.QStandardItemModel(0, 2, self)
         self.model.setHorizontalHeaderLabels(['BoxID','Heads','Time'])
@@ -123,55 +99,71 @@ class uiShow(QtGui.QDialog):
         self.proxyModel.setSourceModel(self.model)
         self.ui.tableView.setModel(self.proxyModel)
         self.ui.tableView.setSortingEnabled(True)
+        self.ui.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableView.customContextMenuRequested.connect(self.deleteBoxAction)
         self.ui.pushButtonAdd.clicked.connect(self.addFun)
         self.ui.pushButtonDownload.clicked.connect(self.downloadFun)
         self.ui.pushButtonStart.clicked.connect(self.startFun)
         self.ui.pushButtonPause.clicked.connect(self.pauseFun)
-
+        self.ui.pushButtonDownload.setEnabled(False)
+        self.ui.pushButtonStart.setEnabled(False)
+        self.ui.pushButtonPause.setEnabled(False)
+    @Slot(QPoint)
+    def deleteBoxAction(self,point):
+        if self.deleteFlag == False:
+            return
+        rightMenu = QtGui.QMenu(self)
+        deleteAction = QtGui.QAction("Delete", self)
+        self.row = self.ui.tableView.rowAt(point.y())
+        deleteAction.connect(SIGNAL("triggered()"), self.deleteRecord)
+        rightMenu.addAction(deleteAction)
+        rightMenu.exec_(QtGui.QCursor.pos())
+        
+    def deleteRecord(self):
+        print 'deleted'
+        node = {'Box':None,'Head':None,'Time':None}
+        node['Box'] = self.model.item(self.row,0).text()
+        node['Head'] = self.model.item(self.row,1).text()
+        node['Time'] = self.model.item(self.row,2).text()
+        self.model.takeRow(self.row)
+        for row in self.ExistList:
+            if row['Box'] == node['Box'] and row['Head'] == node['Head']:
+                self.ExistList.remove(row)
+                
     def startFun(self):
-        if self.downloadFlag == False:
-            print 'Please download first'
-            return
-        self.startFlag = True
-        if self.PauseFlag == False:
-            return
         self.timer = QtCore.QTimer()
-        QtCore.QObject.connect(self.timer,QtCore.SIGNAL("timeout()"), self.timerEvent)
+        QtCore.QObject.connect(self.timer,SIGNAL("timeout()"), self.timerEvent)
         self.timer.start(1000)
         self.timeCount = 0
         self.downloadFlag = False
+        self.ui.pushButtonPause.setEnabled(True)
+        self.ui.pushButtonStart.setEnabled(False)
         
     def pauseFun(self):
-        if self.startFlag == False:
-            print 'please start first'
-            return
-        if self.PauseFlag == True:
+        
+        if self.pauseFlag == True:
             self.timer.stop()
-            self.PauseFlag = False
+            self.pauseFlag = False
             self.ui.pushButtonPause.setText('Continue')
         else:
             self.timer.start(1000)
-            self.PauseFlag = True
+            self.pauseFlag = True
             self.ui.pushButtonPause.setText('Pause')
         
     def timerEvent(self):
         self.sync()
         
     def sync(self):
+        print 'seconds' , self.timeCount
         self.dataSync['seconds'] = self.timeCount
         dataPacks = dataPack(self.dataSync)
         self.q.put(dataPacks.package)
         self.timeCount = self.timeCount + 1
-        print 'seconds' , self.timeCount
         if self.timeCount > self.maxTime:
             self.timer.stop()
-            self.startFlag = False
-            self.model.clear()
-            self.model.setHorizontalHeaderLabels(['BoxID','Heads','Time'])
-            self.ui.tableView.setModel(self.model)
-            self.ui.tableView.setColumnWidth(0,100)
-            self.ui.tableView.setColumnWidth(1,100)
-            self.ui.tableView.setColumnWidth(2,100)
+            self.deleteFlag = True
+            self.ui.pushButtonPause.setEnabled(False)
+            self.ui.pushButtonAdd.setEnabled(True)
             print "*******************"
             print '   Fire finished'
             print "*******************"
@@ -187,23 +179,29 @@ class uiShow(QtGui.QDialog):
         node = {'Box':None,'Head':None,'Time':None}
         node['Box'] =self.ui.lineEditBoxID.text()
         node['Head'] = self.ui.lineEditHead.text()
-        node['Time'] = self.ui.lineEditTime.text()
+        node['Time'] = float(self.ui.lineEditTime.text())
         self.ExistList.append(node)
-        
-        newRow = []
-        newRow.append (QtGui.QStandardItem (self.ui.lineEditBoxID.text()))
-        newRow.append (QtGui.QStandardItem (self.ui.lineEditHead.text()))
-        newRow.append (QtGui.QStandardItem (self.ui.lineEditTime.text()))
-        
-        self.model.appendRow(newRow)
-
+        sortedList = sorted(self.ExistList,key = lambda k:k['Time'])
+        self.model.clear()
+        self.model.setHorizontalHeaderLabels(['BoxID','Heads','Time'])
+        self.ui.tableView.setModel(self.model)
+        self.ui.tableView.setColumnWidth(0,100)
+        self.ui.tableView.setColumnWidth(1,100)
+        self.ui.tableView.setColumnWidth(2,100)
+        for node in sortedList:
+            newRow = []
+            newRow.append (QtGui.QStandardItem (node['Box']))
+            newRow.append (QtGui.QStandardItem (node['Head']))
+            newRow.append (QtGui.QStandardItem (str(node['Time'])))
+            self.model.appendRow(newRow)
+        self.ui.pushButtonDownload.setEnabled(True)
     def downloadFun(self):
         if len(self.ExistList)== 0:
             print 'Please add first'
             return
         self.maxTime = 0.0
         for node in self.ExistList:
-            sec = float(node['Time'])
+            sec = node['Time']
             if sec>self.maxTime:
                 self.maxTime = sec
             self.data['fireBox'] = int(node['Box'])
@@ -216,8 +214,10 @@ class uiShow(QtGui.QDialog):
             self.q.put (dataPackage.package)
         self.ExistList = []
         self.downloadFlag = True
-
-        
+        self.ui.pushButtonStart.setEnabled(True)
+        self.ui.pushButtonAdd.setEnabled(False)
+        self.ui.pushButtonDownload.setEnabled(False)
+        self.deleteFlag = False
 def main():
     app = QtGui.QApplication(sys.argv)
     window = uiShow()
