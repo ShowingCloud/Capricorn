@@ -1,5 +1,5 @@
 from PySide import QtCore,QtGui
-from fireDelayed import Ui_Dialog
+from ui_fireDelayed import Ui_Dialog
 from protocol import dataPack
 import sys
 import Queue
@@ -140,7 +140,6 @@ class uiShow(QtGui.QDialog):
         self.ui.pushButtonStart.setEnabled(False)
         
     def pauseFun(self):
-        
         if self.pauseFlag == True:
             self.timer.stop()
             self.pauseFlag = False
@@ -195,11 +194,14 @@ class uiShow(QtGui.QDialog):
             newRow.append (QtGui.QStandardItem (str(node['Time'])))
             self.model.appendRow(newRow)
         self.ui.pushButtonDownload.setEnabled(True)
+        
     def downloadFun(self):
         if len(self.ExistList)== 0:
             print 'Please add first'
             return
+        
         self.maxTime = 0.0
+        
         for node in self.ExistList:
             sec = node['Time']
             if sec>self.maxTime:
@@ -212,6 +214,7 @@ class uiShow(QtGui.QDialog):
             dataPackage = dataPack(self.data)
             print repr(dataPackage.package)
             self.q.put (dataPackage.package)
+            
         self.ExistList = []
         self.downloadFlag = True
         self.ui.pushButtonStart.setEnabled(True)

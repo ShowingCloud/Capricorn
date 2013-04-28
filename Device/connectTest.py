@@ -1,13 +1,12 @@
 from PySide import QtCore,QtGui
 import Queue, time
 from ui_connectTest import Ui_Dialog
-#import ftdi2 as ft
 import sys
 from protocol import dataPack
 import struct
 
 try:
-    from Device import ftdi2 as ft
+    import ftdi2 as ft
 except:
     pass
 
@@ -20,16 +19,16 @@ class getMessage(QtCore.QObject):
         self.signalRead.connect(self.readFun)
         self.p = p
         self.q = q
-##        listHead = [0]*16
-##        allHead = 0xfff1
-##        a = 1
-##        for i in range(16):
-##            if a & allHead :
-##                listHead[i]=1
-##            a  = a << 1
-##        for i in listHead:
-##            print i
-##        self.p.put(listHead)
+        listHead = [0]*16
+        allHead = 0xffff
+        a = 1
+        for i in range(16):
+            if a & allHead :
+                listHead[i]=1
+            a  = a << 1
+        for i in listHead:
+            print i
+        self.p.put(listHead)
 
     def readFun(self):
         try:
@@ -134,7 +133,7 @@ class uiShow(QtGui.QDialog):
                 self.setButton(i+1)
      
     def setButton(self,head):
-        print "head = " ,head
+        print "head = " ,17-head
         if head == 16 :
             self.ui.radioButton_1.setChecked(True)
         elif head == 15 :

@@ -1,5 +1,5 @@
-from PySide import QtCore,QtGui
-from fireNow import Ui_Dialog
+from PySide import QtCore, QtGui
+from ui_fireNow import Ui_Dialog
 from protocol import dataPack
 import sys
 import ftdi2 as ft
@@ -7,8 +7,10 @@ import struct
 import Queue
 import time
 
+
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
+
     def __init__(self, q, parent = None):
 
         QtCore.QObject.__init__ (self, parent)
@@ -16,7 +18,9 @@ class getMessage(QtCore.QObject):
         self.signalRead.connect(self.readFun)
         
         self.q = q
+        
     def readFun(self):
+        
         try:
             dev = ft.list_devices()
         except:
@@ -31,52 +35,61 @@ class getMessage(QtCore.QObject):
             except:
                 dev = []
             print dev
+            
         self.f = ft.open_ex(dev[0])
         print self.f
+        
         while True:
-            datalistR = [None]*14
-            datalistW = [None]*14
+##            datalistR = [None]*14
+##            datalistW = [None]*14
+            
             item = self.q.get()
             self.f.write(item)
-            while self.f.get_queue_status() < 13:
-                pass
-            readData = self.f.read(self.f.get_queue_status())
-            fmtR = '@13B'
-            datalistR[0] = 0xAA
-            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-            fmtW = '@14B'
-            (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-            datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-            confirmFlag = True
-            for i in range(14):
-#                print datalistW[i],' ',datalistR[i]
-                if datalistR[i]!=datalistW[i]:
-                    confirmFlag = False
-                    for j in range(2):
-                        self.f.write(item)
-                        while self.f.get_queue_status() < 13:
-                            pass
-                        readData = self.f.read(self.f.get_queue_status())
-                        fmtR = '@13B'
-                        datalistR[0] = 0xAA
-                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-                        datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-                        fmtW = '@14B'
-                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-                        datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
-                        for i in range(14):
-                            if datalistR[i]!=datalistW[i]:
-                                confirmFlag = False
-            if confirmFlag == False:
-                print 'Connect error'
-                return 
-                     
-            print repr(item),'\n',repr(readData)
+            
+##            while self.f.get_queue_status() < 13:
+##                pass
+##            readData = self.f.read(self.f.get_queue_status())
+##            
+##            fmtR = '@13B'
+##            datalistR[0] = 0xAA
+##            (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
+##            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
+##            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
+##            
+##            fmtW = '@14B'
+##            (datalistW[0], datalistW[1], datalistW[2],datalistW[3],datalistW[4],datalistW[5],
+##            datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
+##            datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
+##            
+##            confirmFlag = True
+##            for i in range(14):
+###                print datalistW[i],' ',datalistR[i]
+##                if datalistR[i]!=datalistW[i]:
+##                    confirmFlag = False
+##                    for j in range(2):
+##                        self.f.write(item)
+##                        while self.f.get_queue_status() < 13:
+##                            pass
+##                        readData = self.f.read(self.f.get_queue_status())
+##                        fmtR = '@13B'
+##                        datalistR[0] = 0xAA
+##                        (datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
+##                        datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
+##                        datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
+##                        fmtW = '@14B'
+##                        (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
+##                        datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
+##                        datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
+##                        
+##                        for i in range(14):
+##                            if datalistR[i]!=datalistW[i]:
+##                                confirmFlag = False
+##                                
+##            if confirmFlag == False:
+##                print 'Connect error'
+##                return 
+##                     
+##            print repr(item),'\n',repr(readData)
 
 
 

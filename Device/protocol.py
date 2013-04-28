@@ -7,7 +7,6 @@ CONNECT_TEST_SEND = 0X03
 CONNECT_TEST_RECEIVE = 0X06
 TIME_SYNC = 0X04
 AUTO_PLAY = 0X05
-
 def dataUnpack(package):
     datalist = [None]*14
     unpackDict = {'head':None,'length':None,'function':None,'ID':None,
@@ -39,6 +38,11 @@ def dataUnpack(package):
 
     
 class dataPack():
+    def __init__(self,data):
+        self.data = data
+        self.getList()
+        self.getCRC()
+        self.pack()
     def getList(self):
         self.dataList = [None]*self.data['length']
         if self.data['function'] == FIRE_ON_TIME_BOX or self.data['function'] ==  FIRE_ON_TIME_SD:
@@ -126,11 +130,7 @@ class dataPack():
         
 
     
-    def __init__(self,data):
-        self.data = data
-        self.getList()
-        self.getCRC()
-        
+
     def pack(self):
         fmt = '@'+str(self.data['length'])+'B'
         
@@ -159,6 +159,8 @@ class dataPack():
         elif self.data['function'] == AUTO_PLAY:
             self.package = struct.pack(fmt,self.dataList[0],self.dataList[1],self.dataList[2],
                                        self.dataList[3],self.dataList[4],self.dataList[5])
+        
+
 
 
 def main():
