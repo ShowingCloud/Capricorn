@@ -8,6 +8,7 @@ from PySide.QtCore import Qt,QPoint,Slot,SIGNAL
 try:
     import ftdi2 as ft
 except:
+    print "Unable to load ftdi2 driver"
     pass
 
 class getMessage(QtCore.QObject):
@@ -83,7 +84,7 @@ class uiShow(QtGui.QDialog):
         thread = QtCore.QThread()
         self.c.moveToThread(thread)
         thread.start()
-        print 'signal emit'
+        time.sleep(1)
         self.c.signalRead.emit()
         self.pauseFlag = True
         self.deleteFlag = True

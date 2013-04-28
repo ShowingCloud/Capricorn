@@ -2,11 +2,15 @@ from PySide import QtCore, QtGui
 from ui_fireNow import Ui_Dialog
 from protocol import dataPack
 import sys
-import ftdi2 as ft
 import struct
 import Queue
 import time
 
+try:
+    import ftdi2 as ft
+except:
+    print "Unable to load ftdi2 driver"
+    pass
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
@@ -109,7 +113,7 @@ class uiShow(QtGui.QDialog):
         thread = QtCore.QThread()
         self.c.moveToThread(thread)
         thread.start()
-        print 'signal emit'
+        time.sleep(1)
         self.c.signalRead.emit()
         
     def buttonConnect(self):
