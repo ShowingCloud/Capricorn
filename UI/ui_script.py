@@ -11,7 +11,7 @@ from Models.LocalDB import *
 from PySide.QtCore import *
 from PySide.QtGui import *
 from datetime import datetime, timedelta
-import json
+#import json
 
 
 
@@ -35,6 +35,7 @@ class Script(QWidget):
         self.proxyModel = QSortFilterProxyModel()
         self.proxyModel.setDynamicSortFilter(True)
         self.proxyModel.setSourceModel(self.model)
+        self.proxyModel.setFilterKeyColumn(4)
         self.view.setModel(self.proxyModel)
         self.view.setSortingEnabled(True)
         self.view.setItemDelegate(ScriptDelegate(self.session,self.musicSignal,self))
@@ -42,7 +43,7 @@ class Script(QWidget):
         self.view.hideColumn(0)
         self.view.hideColumn(1)
         
-        self.view.sortByColumn(4, Qt.AscendingOrder)
+        
         
         scriptLayout = QVBoxLayout()
         scriptLayout.addWidget(self.view)
@@ -74,6 +75,12 @@ class Script(QWidget):
         matchIndex = proxy.mapToSource(proxy.index(0,0))
 #        print matchIndex
 #        print model.data(matchIndex)
+#        self.view.setStyleSheet("selection-background-color: rgb(255, 246, 108);selection-color: rgb(0, 0, 0);")
+        self.view.setStyleSheet("selection-background-color: rgb(51, 153, 255);selection-color: rgb(255, 255, 255);")
+#        self.view.setStyleSheet("")
+        
+        print type(matchIndex.row())
+        self.view.selectRow(matchIndex.row())
         self.view.scrollTo (model.index(matchIndex.row(),3),hint = QAbstractItemView.PositionAtTop)
 #        self.view.keyboardSearch(scriptUUID)
         
@@ -82,10 +89,10 @@ class Script(QWidget):
         print repr(Type)
         if Type == u'ALL':
             with self.session.begin():
-                record = self.session.query (ScriptData).all()
+                record = self.session.query (ScriptData).order_by(ScriptData.IgnitionTime).all()
         else:     
             with self.session.begin():
-                record = self.session.query (ScriptData).filter_by(FieldID = Type).all()
+                record = self.session.query (ScriptData).filter_by(FieldID = Type).order_by(ScriptData.IgnitionTime).all()
                 self.FieldID = Type
         for row in record:
             newrow = []
@@ -142,7 +149,7 @@ class Script(QWidget):
             newrow.append (QStandardItem (row.Notes))
                 
             self.model.appendRow (newrow)
-
+#        self.view.sortByColumn(4, Qt.AscendingOrder)
         #右键槽函数
     @Slot(QPoint)
     def on_view_customContextMenuRequested(self, point):

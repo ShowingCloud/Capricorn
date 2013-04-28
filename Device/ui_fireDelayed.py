@@ -90,7 +90,7 @@ class Ui_Dialog(object):
         self.labelHead.setText(QtGui.QApplication.translate("Dialog", "Ignitor Head:", None, QtGui.QApplication.UnicodeUTF8))
         self.labelTime.setText(QtGui.QApplication.translate("Dialog", "Time:", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonAdd.setText(QtGui.QApplication.translate("Dialog", "Add", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonDownload.setText(QtGui.QApplication.translate("Dialog", "Download", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonDownload.setText(QtGui.QApplication.translate("Dialog", "Upload", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonStart.setText(QtGui.QApplication.translate("Dialog", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonPause.setText(QtGui.QApplication.translate("Dialog", "Pause", None, QtGui.QApplication.UnicodeUTF8))
 

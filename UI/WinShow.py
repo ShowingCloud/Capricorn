@@ -84,6 +84,7 @@ class MainShow(QtGui.QMainWindow):
         self.ui.actionProjectExport.triggered.connect(self.projectExport)
         self.ui.widget_wave.upAndDownWaveWidget.analyzeWaveAndDrawInit()
         self.ui.actionMinimize.triggered.connect(self.showMinimized)
+        self.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
         self.q = Queue.Queue()
         self.c = getMessage(self.q)
         self.thread = QtCore.QThread()
@@ -94,6 +95,9 @@ class MainShow(QtGui.QMainWindow):
         print 'Read signal emit'
         self.c.signalRead.emit()
 #        self.ui.widgetDatabase.musicSignal.emit()
+
+    def newOrOpenProject(self):
+        print 'newOrOpenProject'
         
     def downloadToDevice(self):       
         with self.session.begin():

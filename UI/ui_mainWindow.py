@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
         self.menuMusic.setObjectName("menuMusic")
         self.menuZoom = QtGui.QMenu(self.menubar)
         self.menuZoom.setObjectName("menuZoom")
-
+        
         self.menuScript = QtGui.QMenu(self.menubar)
         self.menuScript.setObjectName("menuScript")
         self.menuExtras = QtGui.QMenu(self.menubar)
@@ -83,6 +83,8 @@ class Ui_MainWindow(object):
         self.actionProjectExport.setObjectName("actionProjectExport")
 #        self.actionProjectSave_as = QtGui.QAction(MainWindow)
 #        self.actionProjectSave_as.setObjectName("actionProjectSave_as")
+        self.actionNewOrOpen = QtGui.QAction(MainWindow)
+        self.actionNewOrOpen.setObjectName("actionDownload")
         
         self.actionDownload = QtGui.QAction(MainWindow)
         self.actionDownload.setObjectName("actionDownload")
@@ -115,12 +117,12 @@ class Ui_MainWindow(object):
         
      
 
-        
+        self.menuFile.addAction(self.actionNewOrOpen)
         self.menuFile.addAction(self.actionProjectExport)
 #        self.menuFile.addAction(self.actionProjectSave_as)
         self.menuFile.addAction(self.actionDownload)
         self.menuFile.addAction(self.actionExportPDF)
-       
+        
         self.menuMusic.addAction(self.actionPlay)
         self.menuMusic.addAction(self.actionPause)
         self.menuMusic.addAction(self.actionStop)
@@ -141,6 +143,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuInfo.menuAction())
         self.menubar.addAction(self.menuPFM_Advanced.menuAction())
 
+        self.toolBar.addAction(self.actionNewOrOpen)
         self.toolBar.addAction(self.actionProjectExport)
 #        self.toolBar.addAction(self.actionProjectSave_as)
         self.toolBar.addAction(self.actionDownload)
@@ -188,6 +191,7 @@ class Ui_MainWindow(object):
         self.actionProjectExport.setText(QtGui.QApplication.translate("MainWindow", "Export project", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDownload.setText(QtGui.QApplication.translate("MainWindow", "Download to device", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExportPDF.setText(QtGui.QApplication.translate("MainWindow", "Export PDF", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionNewOrOpen.setText(QtGui.QApplication.translate("MainWindow", "New or Open", None, QtGui.QApplication.UnicodeUTF8))
 #        self.actionProjectSave_as.setText(QtGui.QApplication.translate("MainWindow", "project save as", None, QtGui.QApplication.UnicodeUTF8))
 #        self.actionImport_music.setText(QtGui.QApplication.translate("MainWindow", "import music", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPlay.setText(QtGui.QApplication.translate("MainWindow", "Play", None, QtGui.QApplication.UnicodeUTF8))
