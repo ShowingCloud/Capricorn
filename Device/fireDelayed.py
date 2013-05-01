@@ -42,22 +42,28 @@ class getMessage (QtCore.QObject):
         while True:
             item = self.q.get()
 
-			confirmFlag = False
-			for i in xrange (3):
-	            self.f.write(item)
-	            while self.f.get_queue_status() < 20:
-	                pass
-	            readData = self.f.read(self.f.get_queue_status())
-				print repr(readData)
+            confirmFlag = False
+            for i in xrange (3):
+                self.f.write(item[0])
 
-	            if item != readData:
-	                confirmFlag = True
-					break
+            if not item[1]: # We don't need a confirmation for TIME_SYNC
+                confirmFlag = True
+                readData = ""
+                break
+
+                while self.f.get_queue_status() < 20:
+                    pass
+                readData = self.f.read(self.f.get_queue_status())
+                print repr(readData)
+
+                if item[0] == readData:
+                    confirmFlag = True
+                    break
 
             if confirmFlag == False:
                 print 'Data damaged. Please check the device.'
 
-            print repr(item),'\n',repr(readData)
+            print repr(item[0]),'\n',repr(readData)
 
 
 class uiShow(QtGui.QDialog):
@@ -166,7 +172,7 @@ class uiShow(QtGui.QDialog):
         print 'seconds' , self.timeCount
         self.dataSync['seconds'] = self.timeCount
         dataPacks = dataPack(self.dataSync)
-        self.q.put(dataPacks.package)
+        self.q.put((dataPacks.package, False))
 
         self.timeCount = self.timeCount + 1
         if self.timeCount > self.maxTime:
@@ -230,7 +236,7 @@ class uiShow(QtGui.QDialog):
             print self.data['seconds'],'.',self.data['offsetSec']
             dataPackage = dataPack(self.data)
             print repr(dataPackage.package)
-            self.q.put (dataPackage.package)
+            self.q.put ((dataPackage.package, True))
 
         self.ExistList = []
         self.downloadFlag = True

@@ -46,7 +46,6 @@ class getMessage (QtCore.QObject):
             print repr(item)
 
 
-
 class uiShow(QtGui.QDialog):
 
     def __init__(self,parent=None):
