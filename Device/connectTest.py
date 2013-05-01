@@ -63,41 +63,42 @@ class getMessage(QtCore.QObject):
             confirmFlag = True
             for i in xrange (3):
                 self.f.write(item)
-                while self.f.get_queue_status() < 14:
-                    pass
-                readData = self.f.read (self.f.get_queue_status())
-                print repr(readData)
+                break
+#                while self.f.get_queue_status() < 14:
+#                    pass
+#                readData = self.f.read (self.f.get_queue_status())
+#                print repr(readData)
 
-                fmtR = '@14B'
-                (datalistR[0],datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-                datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-                datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
+#                fmtR = '@14B'
+#                (datalistR[0],datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
+#                datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
+#                datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
 
-                fmtW = '@14B'
-                (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
-                datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
-                datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
+#                fmtW = '@14B'
+#                (datalistW[0],datalistW[1],datalistW[2],datalistW[3],datalistW[4],datalistW[5],
+#                datalistW[6],datalistW[7],datalistW[8],datalistW[9],datalistW[10],datalistW[11],
+#                datalistW[12],datalistW[13]) = struct.unpack(fmtW,item)
 
-                for j in xrange (14):
-                    if j != 10 and j != 11 and datalistR[j] != datalistL[j]:
-                        confirmFlag = False
-                        break
+#                for j in xrange (14):
+#                    if j != 10 and j != 11 and datalistR[j] != datalistL[j]:
+#                        confirmFlag = False
+#                        break
 
-                if confirmFlag:
-                    break
+#                if confirmFlag:
+#                    break
 
-            if confirmFlag == False:
-                print 'Connect error: %s' % repr(readData)
+#            if confirmFlag == False:
+#                print 'Connect error: %s' % repr(readData)
 
-            else:
-                listHead = [0] * 16
-                allHead = datalistR[10] * 256 + datalistR[11]
-                a = 1
-                for i in range(16):
-                    if a & allHead:
-                        listHead[i] = 1
-                    a  = a * 2
-                self.p.put(listHead)
+#            else:
+#                listHead = [0] * 16
+#                allHead = datalistR[10] * 256 + datalistR[11]
+#                a = 1
+#                for i in range(16):
+#                    if a & allHead:
+#                        listHead[i] = 1
+#                    a  = a * 2
+#                self.p.put(listHead)
 
 
 class uiShow(QtGui.QDialog):

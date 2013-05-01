@@ -45,25 +45,27 @@ class getMessage (QtCore.QObject):
             confirmFlag = False
             for i in xrange (3):
                 self.f.write(item[0])
-
-            if not item[1]: # We don't need a confirmation for TIME_SYNC
-                confirmFlag = True
-                readData = ""
                 break
 
-                while self.f.get_queue_status() < 20:
-                    pass
-                readData = self.f.read(self.f.get_queue_status())
-                print repr(readData)
+#                if not item[1]: # We don't need a confirmation for TIME_SYNC
+#                    confirmFlag = True
+#                    readData = ""
+#                    break
 
-                if item[0] == readData:
-                    confirmFlag = True
-                    break
+#                while self.f.get_queue_status() < 20:
+#                    pass
+#                readData = self.f.read(self.f.get_queue_status())
+#                print repr(readData)
 
-            if confirmFlag == False:
-                print 'Data damaged. Please check the device.'
+#                if item[0] == readData:
+#                    confirmFlag = True
+#                    break
 
-            print repr(item[0]),'\n',repr(readData)
+#            if confirmFlag == False:
+#                print 'Data damaged. Please check the device.'
+
+#            print repr(item[0]),'\n',repr(readData)
+            print repr(item[0])
 
 
 class uiShow(QtGui.QDialog):
