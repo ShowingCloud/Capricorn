@@ -53,14 +53,14 @@ class uiShow(QtGui.QDialog):
 
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-
         self.buttonConnect()
         self.confirmFlag = None
 
         self.data = {'head':0xAAF0,'length':0x0E,'function':0x02,
                      'ID':0xAABBCCDD,'fireBox':None,'firePoint':None,
                      'crc':0,'tail':0xDD}
-
+        intVal = QtGui.QIntValidator()
+        self.ui.lineEditBoxID.setValidator(intVal)
         self.q = Queue.Queue()
         self.c = getMessage(self.q)
         thread = QtCore.QThread()
@@ -68,7 +68,7 @@ class uiShow(QtGui.QDialog):
         thread.start()
         time.sleep(1)
         self.c.signalRead.emit()
-
+        self.boxChanged()
     def buttonConnect(self):
         self.ui.lineEditBoxID.textChanged.connect(self.boxChanged)
         self.ui.ButtonConfirm.clicked.connect(self.confirm)
@@ -90,9 +90,26 @@ class uiShow(QtGui.QDialog):
         self.ui.boxA16Button.clicked.connect(self.buttonPushed16)
 
     def confirm(self):
+        if self.ui.lineEditBoxID.text() == '':
+            return
         self.data['fireBox'] = int(self.ui.lineEditBoxID.text())
         self.confirmFlag = 'confirm'
-
+        self.ui.boxA1Button.setEnabled(True)
+        self.ui.boxA2Button.setEnabled(True)
+        self.ui.boxA3Button.setEnabled(True)
+        self.ui.boxA4Button.setEnabled(True)
+        self.ui.boxA5Button.setEnabled(True)
+        self.ui.boxA6Button.setEnabled(True)
+        self.ui.boxA7Button.setEnabled(True)
+        self.ui.boxA8Button.setEnabled(True)
+        self.ui.boxA9Button.setEnabled(True)
+        self.ui.boxA10Button.setEnabled(True)
+        self.ui.boxA11Button.setEnabled(True)
+        self.ui.boxA12Button.setEnabled(True)
+        self.ui.boxA13Button.setEnabled(True)
+        self.ui.boxA14Button.setEnabled(True)
+        self.ui.boxA15Button.setEnabled(True)
+        self.ui.boxA16Button.setEnabled(True)
     def buttonPushed1(self):
         if self.confirmFlag == 'confirm':
             print 'Box is ',self.data['fireBox'],', Head is ',1
@@ -196,7 +213,22 @@ class uiShow(QtGui.QDialog):
 
     def boxChanged(self):
         self.confirmFlag = None
-
+        self.ui.boxA1Button.setEnabled(False)
+        self.ui.boxA2Button.setEnabled(False)
+        self.ui.boxA3Button.setEnabled(False)
+        self.ui.boxA4Button.setEnabled(False)
+        self.ui.boxA5Button.setEnabled(False)
+        self.ui.boxA6Button.setEnabled(False)
+        self.ui.boxA7Button.setEnabled(False)
+        self.ui.boxA8Button.setEnabled(False)
+        self.ui.boxA9Button.setEnabled(False)
+        self.ui.boxA10Button.setEnabled(False)
+        self.ui.boxA11Button.setEnabled(False)
+        self.ui.boxA12Button.setEnabled(False)
+        self.ui.boxA13Button.setEnabled(False)
+        self.ui.boxA14Button.setEnabled(False)
+        self.ui.boxA15Button.setEnabled(False)
+        self.ui.boxA16Button.setEnabled(False)
 
 def main():
     app = QtGui.QApplication(sys.argv)
