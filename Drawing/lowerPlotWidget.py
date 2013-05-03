@@ -73,13 +73,13 @@ class fig(Figure):
             ymean = plotDataDict['y_mean']*20
             ymean2 = plotDataDict['y_mean_2']*20
             self.fillPlot = self.ax.fill_between(xarray, ymax, y2=ymin ,color='#DDA0DD', zorder=0)
-            self.linePlot = self.ax.plot(xarray,ymean,'pink',xarray,ymean2,'y',zorder=1)
+#            self.linePlot = self.ax.plot(xarray,ymean,'pink',xarray,ymean2,'y',zorder=1)
         else:
             ymax = plotDataDict['y_max']
             ymin = plotDataDict['y_min']
             ymean = plotDataDict['y_mean']*20
             self.fillPlot = self.ax.fill_between(xarray, ymax, y2=ymin ,color='#DDA0DD', zorder=0)
-            self.linePlot = self.ax.plot(xarray,ymean,'b',zorder=1)
+#            self.linePlot = self.ax.plot(xarray,ymean,'b',zorder=1)
             
         
     def plotDataProcess(self, waveData):

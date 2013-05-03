@@ -20,9 +20,15 @@ class fig(Figure):
         self.lineDataList2 = []
         self.igniteDataList = []
         self.ingiteLines = []
+        self.igniteTimes = []
+        
         self.mo = mediaObject()
         self.bombMedia = self.mo.media2
         
+        
+    def getBombMediaAudioOutput(self):
+        return self.mo.getBombMediaAudioOutput()
+    
     def mediaTimeChanged(self,time):
         self.currentTime_ms = int(time)
 #        print 'mediaTimeChanged time =',time
@@ -30,8 +36,6 @@ class fig(Figure):
         self.signal.freshScreenTime.emit(time)
         
     def fresh(self):
-        
-#        print 'fresh Start-----------'
         if not hasattr(self, 'ax'):
             return
             
@@ -43,12 +47,7 @@ class fig(Figure):
         if dotNow >= self.leftDot + self.dotsInScreen*3/2 or dotNow <= self.leftDot - self.dotsInScreen/2:
             numberOfScreens = (dotNow-self.dotsInScreen/2) // self.dotsInScreen
             self.leftDot = numberOfScreens * self.dotsInScreen
-#             print 'leftDot=',self.leftDot
-#             print 'self.dotsInScreen=',self.dotsInScreen
             npSlice = np.arange(self.leftDot, self.leftDot+self.dotsInScreen)
-#             print 'npSlice[0]=',npSlice[0]
-#             print 'npSlice[-1]=',npSlice[-1]
-#             print 'npSlice.size=',npSlice.size
             self.clearAxes()
             self.plotFunc(npSlice)
             
@@ -81,10 +80,9 @@ class fig(Figure):
         framesInScreen = self.secondsInScreen*self.framerate
         self.signal.freshLowerPlotPanLeftAndWidth.emit(frameNow-framesInScreen/2,frameNow+framesInScreen/2)
         self.canvas.draw()
-#        print 'fresh over-----------'
         
-    def setIgniteList(self,list):
-        self.igniteDataList = list
+    def setIgniteList(self,lista):
+        self.igniteDataList = lista
         self.igniteTimes = [igniteObject.itime for igniteObject in self.igniteDataList]
         self.bombOrNotList = [1]*len(self.igniteTimes)
 ##(itime=itime.total_seconds(), fireName=fireName,\
@@ -104,19 +102,12 @@ class fig(Figure):
         print 'length=',len(self.igniteDataList)
         for line in self.igniteDataList:
             xDot = line.itime*self.framerate/self.zipRate
-#            print '------------'
-#            print 'line.itime',line.itime
-#            print 'self.framerate',self.framerate
-#            print 'self.zipRate=',self.zipRate
-#             print 'xDot',xDot
-#             print 'xDot time',line.itime
-#            print '------------'
-            
             igiteLine = IgniteLine(ax=self.ax,\
                                     x=xDot,color='#0249ee',zorder=5,\
                                     textX=xDot,\
                                     textY=self.uplimit*5/6,\
                                     label=line.fireName+'--'+str(line.boxID))
+            #画线，和烟花信息显示
             self.ingiteLines.append(igiteLine)
         self.canvas.draw()
         
@@ -128,13 +119,13 @@ class fig(Figure):
         self.zipRate = int(self.secondsInScreen*self.framerate/self.dotsInScreen)
         self.lineDataList = []
         self.lineDataList2 = []
-        self.igniteTimes = []
+        
         self.getAllPlotData(self.zipRate)
         
         if hasattr(self, 'ax'):
             self.ax.clear()
         
-        self.ax = self.add_axes([0.038,0.048,0.95,0.94])
+        self.ax = self.add_axes([0.04,0.055,0.945,0.94])
         self.ax.axhline(y=0,color='0.8',zorder=2)
         self.vline = self.ax.axvline(x=0,color='red',zorder=3)
         self.ax.set_ylim(self.downlimit,self.uplimit)
@@ -178,7 +169,7 @@ class fig(Figure):
             ymean2 = plotDataSliceDict['y_mean_2']
             b = zip(npSlice,npSlice)
             npSlice = np.array([i[j] for i in b  for j in xrange(2)])
-            line1, line2 = self.ax.plot(npSlice,ymean,'pink',npSlice,ymean2,'y',zorder=1)
+            line1, line2 = self.ax.plot(npSlice,ymean,'#FF8C69',npSlice,ymean2,'#FF8C69',zorder=1)
             self.lineDataList.append(line1)
             self.lineDataList2.append(line2)
             
@@ -188,7 +179,7 @@ class fig(Figure):
 #            ymean = ymean[npSlice[]]
             print 'npSlice size',npSlice.size
             print 'ymean size',ymean.size
-            line,  = self.ax.plot(npSlice,ymean,'pink',zorder=1)
+            line,  = self.ax.plot(npSlice,ymean,'#FF8C69',zorder=1)
             self.lineDataList.append(line)
             
         self.drawIgniteLines()
@@ -285,9 +276,9 @@ class fig(Figure):
 #        print 'npSlice[-1]*2+2-npSlice[0]*2=',npSlice[-1]*2+2-npSlice[0]*2
 #        print '------------'
         ymeanSlice = self.plotDataAllDict['y_mean'][npSlice[0]*2:npSlice[-1]*2+2]
-#         print self.plotDataAllDict['y_mean'].size
-#         print self.plotDataAllDict['y_mean'][npSlice[0]*2]
-#         print self.plotDataAllDict['y_mean'][npSlice[-1]*2+1]
+        print self.plotDataAllDict['y_mean'].size
+        print self.plotDataAllDict['y_mean'][npSlice[0]*2]
+        print self.plotDataAllDict['y_mean'][npSlice[-1]*2+1]
 #        print '---'
 #        print 'getSlicePlotData npSlice.size',npSlice.size
 #        print 'getSlicePlotData npSlice.size',ymeanSlice.size
@@ -336,8 +327,6 @@ class fig(Figure):
         
     #缩小
     def zoomOut(self): 
-#         print '-----------------'
-#         print 'zoomOut'
         secondsInScreen =  self.secondsInScreen * 2
         if secondsInScreen > 60*60*2:
             return
@@ -395,9 +384,12 @@ class mediaObject(QtCore.QObject):
         path = path2+'/Fire.wav'
         self.media2 = Phonon.MediaObject(self)
         self.media2.setCurrentSource(Phonon.MediaSource())
-        output = Phonon.AudioOutput(Phonon.MusicCategory,self)
-        Phonon.createPath(self.media2, output)
+        self.output = Phonon.AudioOutput(Phonon.MusicCategory,self)
+        Phonon.createPath(self.media2, self.output)
         self.media2.setCurrentSource(Phonon.MediaSource(path))
+        
+    def getBombMediaAudioOutput(self):
+        return self.output
        
 class IgniteLine():
     def __init__(self,ax=None,x=None,color=None,zorder=None, textX=None,textY=None,label=None):
@@ -406,29 +398,22 @@ class IgniteLine():
         self.text = None
         if not label.endswith('None'):
             self.text = self.ax.text(textX, textY, label,horizontalalignment='center',fontsize=10)
+            
     def remove(self):
-        self.line.remove()
+        if self.line in self.ax.lines:
+            self.line.remove()
         if not self.text==None:
-            self.text.remove()
+            try:
+                self.text.remove()
+            except:
+                pass
+
+#         self.line.remove()
+#         if not self.text==None:
+#             self.text.remove()
         
 class freshSignal(QtCore.QObject):
     freshLowerPlotPanLeftAndWidth = QtCore.Signal(int, int)
     freshLowerPlotCurrentTime = QtCore.Signal(int)
     freshScreenTime = QtCore.Signal(int)
     currentFireworks = QtCore.Signal(str)
-        
-# def main():
-#     import plotAndPlay
-#     from PySide import QtGui
-#     import sys
-#     app = QtGui.QApplication(sys.argv)
-#     playAndPlot = plotAndPlay.playAndPlotWidget()
-#     playAndPlot.show()
-#     sys.exit(app.exec_())
-#     
-# if __name__ == "__main__":
-#     from waveModule import main
-#     main()
-#     
-#    from Frontend.LoginShow import main
-#    main()

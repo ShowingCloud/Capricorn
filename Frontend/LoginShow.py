@@ -41,11 +41,15 @@ class uiShow(QtGui.QDialog):
     def handleButtonChoose(self):
         dialog = QtGui.QFileDialog(self)
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+        dialog.setFilter("*.wav")
+
         if dialog.exec_() == QtGui.QDialog.Accepted:
             self.path = dialog.selectedFiles()[0]
             self.ui.lineEditSoundTrack.setText(self.path)
+            
             if self.ui.checkBoxMusic.isChecked():
                 self.getMusicTime()
+                
         dialog.deleteLater()
         
         
