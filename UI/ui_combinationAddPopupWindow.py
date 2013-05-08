@@ -134,21 +134,21 @@ class CombinationDialog(QDialog):
         self.model.insertRow(self.row+1, item)
         
     def saveData(self):
-        l = []
+        contentList = [self.modeCombo.currentText()]
         for count in range(self.model.rowCount()):
             item0 = self.model.item(count, 0)
             item1 = self.model.item(count, 1)
-            t = (item0.text(), item1.text())
-            l.append(t)
-        data = {self.IDCombo.currentText():l}
-        d = json.dumps(data)
+            rowData = (item0.text(), item1.text())
+            contentList.append(rowData)
+        data = {self.IDCombo.currentText():contentList}
+        jsonData = json.dumps(data)
         with self.sess.begin():
             record = FireworksData()
             record.Name = self.IDCombo.currentText()
             record.Type = "Combination"
             record.Size = 0
             record.UUID = str(uuid.uuid1())
-            record.Combination = d
+            record.Combination = jsonData
             record.Perm = 0
 #            record.Owner = ""
             
@@ -158,7 +158,7 @@ class CombinationDialog(QDialog):
         
         self.accept()
         
-        self.close()
+#         self.close()
         
         
     def cancel(self):

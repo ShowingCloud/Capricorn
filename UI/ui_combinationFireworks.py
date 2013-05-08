@@ -29,9 +29,9 @@ class Combination(QWidget):
         #行和列显示都按内容来
         self.view.resizeColumnsToContents()
         self.view.resizeRowsToContents()
-        self.model = QStandardItemModel (0, 4, self)
-        self.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)"])
-        
+        self.model = QStandardItemModel (0, 5, self)
+        self.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)",'Interval type'])
+        self.view.setColumnWidth(2,400)
         self.sess = sess
         self.session = session
         self.musicSignal = musicSignal
@@ -91,22 +91,24 @@ class Combination(QWidget):
             k = info.keys()
             newrow.append (QStandardItem (row.UUID))
             newrow.append (QStandardItem (k[0]))
-            num = len(info[k[0]])
+            num = len(info[k[0]])-1
             con = '('+str(num)+')'
-            con1 = ''
-            for i in range(num):
-                con1 += ','+info[k[0]][i][0]
-                    
-                
+            con1 = info[k[0]][1][0]
+            con2 = info[k[0]][0]
+
+#             for i in range(num):
+#                 con1 += ','+info[k[0]][i][0]
+            
             newrow.append (QStandardItem (con+con1))
-            newrow.append (QStandardItem (str(info[k[0]][num-1][1])))
-                
+            newrow.append (QStandardItem (str(info[k[0]][num][1])))
+            newrow.append(QStandardItem (str(con2)))
             #为model添加行数据
             self.model.appendRow (newrow)
                 
     def refresh(self):
         self.model.clear()
-        self.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)"])
+        self.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)",'Interval type'])
+        self.view.setColumnWidth(2,400)
         self.query()
         self.view.hideColumn(0)
         

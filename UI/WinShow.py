@@ -6,14 +6,11 @@ from Models.LocalDB import ProjectsData
 import Queue
 import time
 from datetime import datetime
-#from Device import ftdi2 as ft
 from config import appdata
 import tarfile, os, sys, subprocess, shutil
 from Frontend.PrintPDF import PrintTable, TABLEFields, TABLEProductList, TABLEFireSequence
 import json
-from newProjectShow import newProjectShow
-#from ImportProjectShow import ImportProjectShow
-#from UI.mainWidget import MainWidget
+import struct
 try:
     from Device import ftdi2 as ft
 except:
@@ -39,7 +36,7 @@ class getMessage(QtCore.QObject):
         while len (dev) == 0:
             if not self.q.empty():
                 item = self.q.get()
-                self.statusQueue.put(item)
+#                self.statusQueue.put(item)
             time.sleep (5)
             print "Rechecking hardware connection..."
             try:
@@ -92,7 +89,7 @@ class MainShow(QtGui.QMainWindow):
         self.ui.actionProjectExport.triggered.connect(self.projectExport)
         self.ui.widget_wave.upAndDownWaveWidget.analyzeWaveAndDrawInit()
         self.ui.actionMinimize.triggered.connect(self.showMinimized)
-        self.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+
         self.q = Queue.Queue()
         self.statusQueue = Queue.Queue()
         self.c = getMessage(self.q,self.statusQueue)
@@ -105,19 +102,13 @@ class MainShow(QtGui.QMainWindow):
         self.c.signalRead.emit()
         self.ui.widgetDatabase.musicSignal.emit()
 
-    def newOrOpenProject(self):
-        print 'newOrOpenProject'
         
-        self.newProjectWin = newProjectShow(self.sess)
-        self.newProjectWin.show()
-#        self.close()
-#         
     def downloadToDevice(self): 
         try:
             dev = ft.list_devices()
         except:
             dev = []
-        if len(dev) :
+        if not len(dev) :
             QtGui.QMessageBox.question(None,'message','No device ,please check',
                                                             QtGui.QMessageBox.Ok)
             return
@@ -125,6 +116,7 @@ class MainShow(QtGui.QMainWindow):
             tableFire = self.session.query(ScriptData).all()
         node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
                 'firePoint':None,'seconds':None,'offsetSec':None,'crc':0,'tail':0xDD}
+        
         for row in tableFire:
             if  row.ConnectorID == None:
                 reply = QtGui.QMessageBox.question(None,'message','Please choose ignitorBox first',
@@ -149,6 +141,7 @@ class MainShow(QtGui.QMainWindow):
             self.timer.start(2000)
             
     def checkQueue(self):
+        print 'Checking Queue...'
         if self.statusQueue.empty():
             return
         statusReturn = self.statusQueue.get()
@@ -156,12 +149,17 @@ class MainShow(QtGui.QMainWindow):
             QtGui.QMessageBox.question(None,'message','Upload Finish',
                                                 QtGui.QMessageBox.Ok)
         else:
-            boxID = int(statusReturn[8]) * 0x100 + int(statusReturn[9])
-            fireHead = int(statusReturn[10]) * 0x100 + int(statusReturn[11])
-            seconds = int(statusReturn[12]) * 0x1000000 + int(statusReturn[13]) * 0x10000 + int(statusReturn[14]) * 0x100 + int(statusReturn[15])
-            offsetSec = int(statusReturn[16]) * 0x100 + int(statusReturn[17])
+            datalist = [0]*20
+            (datalist[0],datalist[1],datalist[2],datalist[3],datalist[4],datalist[5],
+             datalist[6],datalist[7],datalist[8],datalist[9],datalist[10],datalist[11],
+             datalist[12],datalist[13],datalist[14],datalist[15],datalist[16],datalist[17],
+             datalist[18],datalist[19]) = struct.unpack('@20B',statusReturn)
+            boxID = datalist[8] * 0x100 + datalist[9]
+            fireHead = datalist[10] * 0x100 + datalist[11]
+            seconds = datalist[12] * 0x1000000 + datalist[13] * 0x10000 + datalist[14] * 0x100 + datalist[15]
+            offsetSec = datalist[16] * 0x100 + datalist[17]
             igniteTime = float(seconds) + float(offsetSec)/1000
-            QtGui.QMessageBox.question(None,'message','Upload failed,BoxID is %d ,ignite head is %d ,time is %f'%(boxID,fireHead,igniteTime),
+            QtGui.QMessageBox.question(None,'message','Upload failed,\n BoxID is %d ,ignite head is %d ,time is %f'%(boxID,fireHead,round(igniteTime,2)),
                                                 QtGui.QMessageBox.Ok)
             
       
