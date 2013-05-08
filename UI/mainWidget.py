@@ -6,27 +6,27 @@ Created on 2013-3-6
 '''
 from Frontend.FaderWidget import FaderWidget
 from Models.EngineeringDB import FieldsData
-from PySide.QtCore import *
-from PySide.QtGui import *
-from UI import rc_picture
+from PySide import QtCore
+from PySide import QtGui
+#from UI import rc_picture
 from UI.ui_combinationFireworks import Combination
 from UI.ui_customFireworks import Custom
 from UI.ui_fieldDirector import FieldDirectory
 from UI.ui_fireworks import Fireworks
 from UI.ui_script import Script
 from UI.ui_typeList import TypeListWidget
-#import sys
 
-class MainWidget(QWidget):
-    musicSignal = Signal()
+
+class MainWidget(QtGui.QWidget):
+    musicSignal = QtCore.Signal()
     
     def __init__(self, sess, session, fieldUUID, parent = None):
-        QWidget.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent)
         
         self.setWindowTitle(u"综合显示")
-        self.setWindowIcon(QIcon(":/images/title.png"))
+        self.setWindowIcon(QtGui.QIcon(":/images/title.png"))
         
-        self.fireworksGroup = QGroupBox("Database")
+        self.fireworksGroup = QtGui.QGroupBox("Database")
         self.fireworksGroup.setContentsMargins(-10,0,-10,-10)
         
         self.sess = sess
@@ -35,7 +35,7 @@ class MainWidget(QWidget):
         
         self.typeList = TypeListWidget()
         
-        self.fireworksStack = QStackedWidget()
+        self.fireworksStack = QtGui.QStackedWidget()
         
         self.fireworksStack.setContentsMargins(0, 0, 0, 0)
         
@@ -57,14 +57,14 @@ class MainWidget(QWidget):
         self.fireworksStack.addWidget(self.combinationFireworks)
         self.fireworksStack.addWidget(self.customFireworks)
         
-        hbox1 = QHBoxLayout()
+        hbox1 = QtGui.QHBoxLayout()
         hbox1.setSpacing(0)
         hbox1.addWidget(self.typeList)
         hbox1.addWidget(self.fireworksStack, 1)
         
         self.fireworksGroup.setLayout(hbox1)
         
-        self.scriptGroup = QGroupBox("Project")
+        self.scriptGroup = QtGui.QGroupBox("Project")
         self.scriptGroup.setContentsMargins(-10,0,-10,-10)
         
         self.fieldList = FieldDirectory(self.session, self.fieldUUID)
@@ -74,13 +74,13 @@ class MainWidget(QWidget):
             data = self.session.query(FieldsData).filter_by(UUID = self.fieldUUID).first()
         self.script.query(data.FieldID)
         
-        hbox2 = QHBoxLayout()
+        hbox2 = QtGui.QHBoxLayout()
         hbox2.addWidget(self.fieldList)
         hbox2.addWidget(self.script, 1)
         hbox2.setSpacing(0)
         self.scriptGroup.setLayout(hbox2)
         
-        mainLayout = QVBoxLayout()
+        mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.fireworksGroup)
         mainLayout.addWidget(self.scriptGroup)
         self.setLayout(mainLayout)
@@ -88,14 +88,11 @@ class MainWidget(QWidget):
         
         self.faderWidget = None
         
-        self.connect(self.fireworksStack, SIGNAL("currentChanged(int)"), self.fadeInFireworks)
+        self.connect(self.fireworksStack, QtCore.SIGNAL("currentChanged(int)"), self.fadeInFireworks)
         
         self.typeList.listWidget.currentItemChanged.connect(self.changeTypePage)
         
         self.fieldList.view.clicked.connect(self.showScript)
-        
-        
-
         
     #实现标签的变换
     def changeTypePage(self, current, previous):
@@ -105,7 +102,7 @@ class MainWidget(QWidget):
         self.fireworksStack.setCurrentIndex(self.typeList.listWidget.row(current))
         
         self.combinationFireworks.model.clear()
-        self.combinationFireworks.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)"])
+        self.combinationFireworks.model.setHorizontalHeaderLabels(["UUID", "ID", "Contents", "Total Time (sec)",'Interval type'])
         self.combinationFireworks.query()
         self.combinationFireworks.view.hideColumn(0)
         

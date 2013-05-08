@@ -95,15 +95,16 @@ class ModifyCombination(QDialog):
         info = json.loads(record.Combination)
         k = info.keys()
         self.IDCombo.setCurrentIndex(self.IDCombo.findText(k[0]))
-            
-        for row in info[k[0]]:
+        #第一个节点去掉分片
+        self.node0 = info[k[0]][0]
+        for row in info[k[0]][1:len(info[k[0]])]:
             newRow = []
             newRow.append(QStandardItem(row[0]))
             newRow.append(QStandardItem(row[1]))
             self.model.appendRow(newRow)
         
     def update(self):
-        l = []
+        l = [self.node0]
         for count in range(self.model.rowCount()):
             item0 = self.model.item(count, 0)
             item1 = self.model.item(count, 1)

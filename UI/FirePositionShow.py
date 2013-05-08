@@ -2,14 +2,12 @@
 from Models.EngineeringDB import *
 from Models.LocalDB import ProjectsData, L_ScenesData
 from PySide import QtGui
-from UI.WinShow import MainShow
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from ui_firePosition import Ui_FirePositionDialog
 from Delegate.newFieldIgnitorBoxDelegate import ignitorBoxDelegate
 #from PySide.QtCore import *
-from PySide.QtGui import *
 from PySide.QtCore import Qt,QPoint,Slot,SIGNAL
 import json
 import uuid
@@ -20,7 +18,7 @@ from config import appdata
 
 class FirePositionShow(QtGui.QDialog):
 
-    def __init__(self, sess, UUID, owner,musicFilePath, parent=None):
+    def __init__(self, sess, UUID , musicFilePath, parent=None):
         QtGui.QDialog.__init__(self, parent)
         self.ui=Ui_FirePositionDialog()
         self.ui.setupUi(self)
@@ -35,7 +33,8 @@ class FirePositionShow(QtGui.QDialog):
         self.musicPath = musicFilePath
         self.sess = sess
         self.UUID = UUID
-        self.owner = owner
+        self.confirmFlag = True
+#        self.owner = owner
         self.addBoxFlag = False
         intVal = QtGui.QIntValidator()
         self.ui.lineEditPositionX.setValidator(intVal)
@@ -71,7 +70,7 @@ class FirePositionShow(QtGui.QDialog):
             
     def setIgnitorTable(self):
         self.ui.tableViewIgnitor.setAlternatingRowColors(True)
-        self.model = QStandardItemModel(0, 1, self)
+        self.model = QtGui.QStandardItemModel(0, 1, self)
         self.model.setHorizontalHeaderLabels(["BoxID","Heads"])
         self.ui.tableViewIgnitor.setModel(self.model)
         self.ui.tableViewIgnitor.setColumnWidth(0,80)
@@ -89,12 +88,15 @@ class FirePositionShow(QtGui.QDialog):
         if fieldList == None:
             QtGui.QMessageBox.question(None,'message','Please add field first',
                                            QtGui.QMessageBox.Ok)
+            self.confirmFlag = False
             return
         if ignitorBox == None:
             QtGui.QMessageBox.question(None,'message','Please add ignitorBox first',
                                            QtGui.QMessageBox.Ok)    
+            self.confirmFlag = False
             return
         else:
+            self.confirmFlag = True
             FieldList = []
             with self.session.begin():
                 fieldTable = self.session.query(FieldsData).all()
@@ -106,9 +108,9 @@ class FirePositionShow(QtGui.QDialog):
                 row.FieldList = FieldListPack
             print 'add field ',row.FieldList
             self.fieldUUID = fieldList.UUID
-            self.winShow = MainShow(self.sess, self.session, self.fieldUUID,self.musicPath)
-            self.winShow.show()
-            self.close()
+#             self.winShow = MainShow(self.sess, self.session, self.fieldUUID,self.musicPath)
+#             self.winShow.show()
+#             self.close()
             
             
     def checkIgnitor(self):
@@ -121,7 +123,7 @@ class FirePositionShow(QtGui.QDialog):
             ignitorTable = self.session.query (IgnitorsData).all()
         for row in ignitorTable:
             if row.BoxID == self.ui.lineEditIgnitionBox.text():
-                reply = QtGui.QMessageBox.question(None,'message','Ignitor box ID has been used',
+                QtGui.QMessageBox.question(None,'message','Ignitor box ID has been used',
                                            QtGui.QMessageBox.Ok)
                 self.ignitorUseFlag = True
                 return 
@@ -137,7 +139,7 @@ class FirePositionShow(QtGui.QDialog):
             fieldTable = self.session.query(FieldsData).all()
         for row in fieldTable:
             if row.FieldID == self.ui.lineEditName.text():
-                reply = QtGui.QMessageBox.question(None,'message','Field name has been used',
+                QtGui.QMessageBox.question(None,'message','Field name has been used',
                                            QtGui.QMessageBox.Ok)
                 self.fieldUseFlag = True
         
@@ -159,8 +161,8 @@ class FirePositionShow(QtGui.QDialog):
         boxDict['Heads'] = self.ui.comboBoxIgnitionBoxPoints.currentText()
         self.boxList.append(boxDict)
         newRow = []
-        newRow.append (QStandardItem (boxDict['BoxID']))
-        newRow.append (QStandardItem (boxDict['Heads']))      
+        newRow.append (QtGui.QStandardItem (boxDict['BoxID']))
+        newRow.append (QtGui.QStandardItem (boxDict['Heads']))      
         self.model.appendRow(newRow)
         if self.addBoxFlag == True:
             with self.session.begin():
@@ -182,13 +184,13 @@ class FirePositionShow(QtGui.QDialog):
 
     @Slot(QPoint)
     def deleteBoxAction(self,point):
-        rightMenu = QMenu(self)
-        addAction = QAction("Delete", self)
+        rightMenu = QtGui.QMenu(self)
+        addAction = QtGui.QAction("Delete", self)
         self.row = self.ui.tableViewIgnitor.rowAt(point.y())
         addAction.connect(SIGNAL("triggered()"), self.deleteBox)
         rightMenu.addAction(addAction)
         
-        rightMenu.exec_(QCursor.pos())
+        rightMenu.exec_(QtGui.QCursor.pos())
         
         pass
     def deleteBox(self):
@@ -209,7 +211,6 @@ class FirePositionShow(QtGui.QDialog):
             QtGui.QMessageBox.question(None,'message','Please add ignitorBox first',
                                            QtGui.QMessageBox.Ok)
             return
-
         self.fieldUseFlag = False
         self.checkFieldID()
         if  self.fieldUseFlag == True :
@@ -265,8 +266,8 @@ class FirePositionShow(QtGui.QDialog):
             IgnitorTable = self.session.query (IgnitorsData).filter_by(FieldID = rowField.UUID)
         for row in IgnitorTable:
             newRow = []
-            newRow.append (QStandardItem (row.BoxID))
-            newRow.append (QStandardItem (str(row.TotalHeads)))   
+            newRow.append (QtGui.QStandardItem (row.BoxID))
+            newRow.append (QtGui.QStandardItem (str(row.TotalHeads)))   
             self.model.appendRow(newRow)
             
         self.ui.lineEditIgnitionBox.setText('')

@@ -76,14 +76,12 @@ class  uiShow(QtGui.QDialog):
 #            record.Owner = ""         
 #
             self.sess.add(record)
-
-        
+            
         self.accept()
-        self.close()
         
         
     def cancel(self):
-        self.close()
+        self.rejected()
         
     
     @Slot(int)   

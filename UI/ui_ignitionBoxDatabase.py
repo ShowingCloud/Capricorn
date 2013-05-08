@@ -14,17 +14,18 @@ from datetime import datetime
 
 class IgnitionBoxDatabase(QtGui.QDialog):
     
-    def __init__(self, session, parent = None):
+    def __init__(self, session,fieldID, parent = None):
         QtGui.QDialog.__init__(self, parent)
         
         self.groupBox = QtGui.QGroupBox("IgnitionBoxDatabase:") 
         
         self.boxLab = QtGui.QLabel("BoxID:")
-        self.boxEdit = QtGui.QComboBox()
-        self.boxEdit.addItems(["1", "2", "3", "4", "5", "6"])
-#        intVal = QtGui.QIntValidator()
-#        self.boxEdit.setValidator(intVal)
-        
+        self.boxEdit = QtGui.QLineEdit()
+#         self.boxEdit = QtGui.QComboBox()
+#         self.boxEdit.addItems(["1", "2", "3", "4", "5", "6"])
+        intVal = QtGui.QIntValidator()
+        self.boxEdit.setValidator(intVal)
+        self.FieldID = fieldID
         self.headsLab = QtGui.QLabel("Total Heads:")
         self.headsEdit = QtGui.QComboBox()
         self.headsEdit.addItems(["10", "50"])
@@ -62,17 +63,19 @@ class IgnitionBoxDatabase(QtGui.QDialog):
         
     def save(self):
         with self.session.begin():
+            row = self.session.query(FieldsData).filter_by(FieldID = self.FieldID).first()
+        with self.session.begin():
             record = IgnitorsData()
             
             record.UUID = str(uuid.uuid1())
             record.CTime = datetime.utcnow()
             record.MTime = datetime.utcnow()
 #            record.IgnitorID = 
-            record.BoxID = self.boxEdit.currentText()
+            record.BoxID = self.boxEdit.text()
             record.TotalHeads = int(self.headsEdit.currentText())
             record.SurplusHeads = int(self.headsEdit.currentText())
             record.Notes = self.notesText.toPlainText()
-            
+            record.FieldID = row.UUID
             self.session.add(record)
         self.accept()
         self.close()
