@@ -33,11 +33,12 @@ class Script(QtGui.QWidget):
         self.view = QtGui.QTableView(self)
         self.view.setAlternatingRowColors(True)
         
-        self.proxyModel = QtGui.QSortFilterProxyModel()
-        self.proxyModel.setDynamicSortFilter(True)
-        self.proxyModel.setSourceModel(self.model)
-        self.proxyModel.setFilterKeyColumn(4)
-        self.view.setModel(self.proxyModel)
+##        self.proxyModel = QtGui.QSortFilterProxyModel()
+##        self.proxyModel.setDynamicSortFilter(True)
+##        self.proxyModel.setSourceModel(self.model)
+##        self.proxyModel.setFilterKeyColumn(4)
+##        self.view.setModel(self.proxyModel)
+        self.view.setModel(self.model)
         self.view.setSortingEnabled(True)
         self.view.setItemDelegate(ScriptDelegate(self.session,self.musicSignal,self))
         

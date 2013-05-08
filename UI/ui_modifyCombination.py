@@ -5,11 +5,12 @@ Created on 2013-3-8
 @author: pyroshow
 '''
 
+from Delegate.modifyCombinationDelegate import ModifyCombinationDelegate
 from Models.LocalDB import *
 from PySide.QtCore import *
 from PySide.QtGui import *
-import json
 from datetime import datetime
+import json
 
 class ModifyCombination(QDialog):
     
@@ -25,6 +26,7 @@ class ModifyCombination(QDialog):
         self.view = QTableView()
         self.model = QStandardItemModel(0, 2, self)
         self.model.setHorizontalHeaderLabels (["Item", "Time"])
+        self.view.setItemDelegate(ModifyCombinationDelegate())
         
         self.view.setModel (self.model)
         
