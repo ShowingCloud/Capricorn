@@ -86,7 +86,7 @@ class ChangeTime(QtGui.QDialog):
             rTime = timedelta(hours = int(self.risTime[0]), minutes = int(self.risTime[2:4]), seconds = int(self.risTime[5:7]), microseconds = int(self.risTime[8:]))
         else:
             rTime = timedelta(hours = int(self.risTime[0]), minutes = int(self.risTime[2:4]), seconds = int(self.risTime[5:7]))
-        effTime = timedelta(hours = self.hourBox_e.value(), minutes = self.minuteBox_e.value(), seconds = self.secondBox_e.value(), microseconds = self.microBox_e.value())
+        effTime = timedelta(hours = self.hourBox_e.value(), minutes = self.minuteBox_e.value(), seconds = self.secondBox_e.value(), microseconds = self.microBox_e.value()*10000)
         with self.session.begin():
             record = self.session.query(ScriptData).filter_by(UUID = self.UUID).first()
             record.IgnitionTime = effTime - rTime

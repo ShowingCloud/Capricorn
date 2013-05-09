@@ -9,7 +9,7 @@ import sys
 
 class UiControl():
     def __init__(self):
-        upgrade()
+        #upgrade()
         self.loginWin = loginShow()
         self.loginWin.show()
         self.loginWin.ui.pushButtonImport.clicked.connect(self.importProject)
