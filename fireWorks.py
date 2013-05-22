@@ -6,7 +6,7 @@ from UI.ui_loginWin import Ui_Dialog
 from Models.LocalDB import *
 from datetime import datetime, timedelta, date
 import sys, uuid
-from singleton import SingleInstance
+from Toolkit import SingleInstance
  
 #from Translations.tr_rc import *
 
