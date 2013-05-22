@@ -33,6 +33,7 @@ class WaveWidget(QtGui.QWidget):
 #        player.signal.fileChoosedSignal.connect(upAndDownWaveWidget.analyzeWaveAndDrawInit)
         self.draw = upAndDownWaveWidget.analyzeWaveAndDrawInit
         player.setMusicFilePath(self.musicPath)
+        player.setBombMusicAudioOutput(upAndDownWaveWidget.plotWidget.figure.getBombMediaAudioOutput())
         
         player.signal.TimeNowChanged.connect\
                 (upAndDownWaveWidget.plotWidget.figure.mediaTimeChanged)
@@ -42,11 +43,16 @@ class WaveWidget(QtGui.QWidget):
         
         player.ui.pushButton_goLeft.clicked.connect(upAndDownWaveWidget.plotWidget.figure.toNextScreen)
         player.ui.pushButton_goRight.clicked.connect(upAndDownWaveWidget.plotWidget.figure.toPreviousScreen)
-        player.ui.pushButton_musicPlay.clicked.connect(self.getData)
+        
+
+#        player.ui.setBombMusicAudioOutput
+#        player.ui.pushButton_musicPlay.clicked.connect(self.getData)
         
 #        self.getData()
+
     @Slot()
     def getData(self):
+        print 'getData --------'
         with self.session.begin():
             data = self.session.query(ScriptData).all()
             
@@ -89,49 +95,7 @@ class igniteClass(QtCore.QObject):
         self.fireWork = fireWork
         self.boxUUID = boxUUID
         self.scriptUUID = scriptUUID
-
-#     @Slot()
-#     def getData(self):
-#         with self.session.begin():
-#             data = self.session.query(ScriptData).all()
-#             
-#         self.igniteList = []
-#         for row in data:
-#             itime = row.IgnitionTime
-#             firework = row.FireworkID
-#             boxUUID = row.IgnitorID
-#             with self.session.begin():
-#                 rowBox = self.session.query(IgnitorsData).filter_by(UUID = boxUUID).first()
-#                 if rowBox != None:
-#                     boxID = rowBox.BoxID
-#                 else:
-#                     boxID = None
-#             with self.sess.begin():
-#                 fire = self.sess.query(FireworksData).filter_by(UUID = firework).first()
-#                 fireName = fire.Name
-#             dtime = fire.RisingTime
-#             itime = itime + dtime
-#             igniteObject = igniteClass(itime=itime.total_seconds(), fireName=fireName,\
-#                                         fire=fire, boxID=boxID, fireWork=firework, boxUUID=boxUUID )
-#             self.igniteList.append(igniteObject)
-#         self.upAndDownWaveWidget.plotWidget.figure.setIgniteList(self.igniteList)
-#         self.upAndDownWaveWidget.plotWidget.figure.drawIgniteLines()
-#        
-#     def enterEvent(self, e):
-#         if not self.show:
-#             self.show = True
-#             self.draw()
-#         
-# class igniteClass(QtCore.QObject):
-#     def __init__(self,itime=None,fireName=None, fire=None, boxID= None, fireWork= None, boxUUID= None):
-#         super(igniteClass,self).__init__()
-#         self.itime = itime
-#         self.fireName = fireName
-#         self.boxID = boxID
-# #        self.rowBox = rowBox
-#         self.fire = fire
-#         self.fireWork = fireWork
-#         self.boxUUID = boxUUID
+        
     
 def main():
      app = QtGui.QApplication(sys.argv)

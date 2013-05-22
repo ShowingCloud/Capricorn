@@ -1,140 +1,104 @@
-#coding=utf-8
-from PySide import QtCore, QtGui
+from Migrate.DBScript import upgrade
+from PySide import QtGui
 from UI.FirePositionShow import FirePositionShow
 from UI.ImportProjectShow import ImportProjectShow
-from UI.ui_loginWin import Ui_Dialog
-from Models.LocalDB import *
-from datetime import datetime, timedelta, date
-import sys, uuid
+from UI.LoginShow import loginShow
+from UI.WinShow import MainShow
+from UI.newProjectShow import newProjectShow
+import sys
 from Toolkit import SingleInstance
- 
-#from Translations.tr_rc import *
 
-
-class uiShow(QtGui.QDialog):
-
-    def __init__(self,parent=None):
-        QtGui.QDialog.__init__(self, parent)
-        self.ui=Ui_Dialog()
-        self.ui.setupUi(self)
+class UiControl():
+    def __init__(self):
+        #upgrade()
+        self.loginWin = loginShow()
+        self.loginWin.show()
+        self.loginWin.ui.pushButtonImport.clicked.connect(self.importProject)
+        self.loginWin.ui.pushButtonSave.clicked.connect(self.fieldEdit)
         
-        self.sess = session()
-        base.metadata.create_all(engine)        
-        self.UUID = str(uuid.uuid1())
-        self.loginFlag = None
-        self.addComboData()
-        self.path = None
-        self.ui.pushButtonLogin.clicked.connect(self.login)
-        self.ui.pushButtonImport.clicked.connect(self.importProject)
-        self.ui.pushButtonSave.clicked.connect(self.save)
-        self.ui.pushButtonSoundTrack.clicked.connect(self.handleButtonChoose)
-        self.ui.checkBoxMusic.clicked.connect(self.setMusicTime)
-        self.ui.lineEditDurationMin.setText('5')
-        self.ui.lineEditDurationSec.setText('0')
-
-    def addComboData(self):
-        with self.sess.begin():
-            data = self.sess.query(L_ScenesData).all()
-            
-        for row in data:
-            self.ui.comboBoxShootSite.addItem(row.Name, row.UUID)
-            
-    def handleButtonChoose(self):
-        dialog = QtGui.QFileDialog(self)
-        dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
-        if dialog.exec_() == QtGui.QDialog.Accepted:
-            self.path = dialog.selectedFiles()[0]
-            self.ui.lineEditSoundTrack.setText(self.path)
-            if self.ui.checkBoxMusic.isChecked():
-                self.getMusicTime()
-        dialog.deleteLater()
-        
-        
-    def getMusicTime(self):
-        from PySide.phonon import Phonon
-        self.media2 = Phonon.MediaObject(self)
-        self.media2.setCurrentSource(Phonon.MediaSource())
-        self.media2.setCurrentSource(Phonon.MediaSource(self.path))
-        output = Phonon.AudioOutput(Phonon.MusicCategory, self)
-        Phonon.createPath(self.media2, output)
-        self.media2.stateChanged.connect(self.stateChanged2)
-        
-    def stateChanged2(self):
-        print 'stateChanged2 media.totalTime()=',self.media2.totalTime()
-        if self.ui.checkBoxMusic.isChecked():
-            musicTime = self.media2.totalTime()/1000
-            musicSeconds = musicTime%60
-            musicMinutes = musicTime/60
-            self.ui.lineEditDurationMin.setText(str(musicMinutes))
-            self.ui.lineEditDurationSec.setText(str(musicSeconds))
-            
-    def setMusicTime(self):
-        if self.ui.checkBoxMusic.isChecked():
-            if self.path == None:
-                return
-            else:
-                self.getMusicTime()
+    def importProject(self): 
+        if self.loginWin.loginFlag == "Success" :
+            self.sess = self.loginWin.sess
+            self.importProjectWin = ImportProjectShow(self.sess)
+            self.importProjectWin.ui.pushButtonSave.clicked.connect(self.mainWindow)
+            self.importProjectWin.show()
+            self.loginWin.close()
         else:
-            self.ui.lineEditDurationMin.setText('5')
-            self.ui.lineEditDurationSec.setText('0')
-        
-    def login(self):
-        print self.ui.lineEditUsername.text()
-        print self.ui.lineEditPassword.text()
-        if self.ui.lineEditUsername.text() == "admin" and self.ui.lineEditPassword.text() == "admin":
-            self.loginFlag = "Success"
-            self.ui.label_progress.setText('Login Success')
-        else:
-            self.ui.label_progress.setText('Wrong password or username')
+            QtGui.QMessageBox.question(None,'message','Please login first',QtGui.QMessageBox.Ok)
             
-    def importProject(self):
-        if self.loginFlag == "Success":
-            self.project = ImportProjectShow(self.sess)
-            self.project.show()
-            self.close()
-        else:
-            QtGui.QMessageBox.question(None,'message','Please login first ',
-                                           QtGui.QMessageBox.Ok)
-    def save(self):
-        #通过ComboBox获取场景的UUID
-        with self.sess.begin():
-            row = self.sess.query(ProjectsData).filter_by(Name = self.ui.lineEditShowName.text()).first()
-        if row != None:
-            QtGui.QMessageBox.question(None,'message','Show name has been used',
-                                           QtGui.QMessageBox.Ok)
+            
+    def fieldEdit(self):
+        self.loginWin.save()
+        if self.loginWin.loginFlag != "Success" or self.loginWin.nameFlag == 'used':
             return
-        item = self.ui.comboBoxShootSite.itemData(self.ui.comboBoxShootSite.currentIndex())
-        if self.loginFlag == "Success" :
-            with self.sess.begin():
-                record = ProjectsData()
-                record.UUID = self.UUID
-                record.CTime = datetime.utcnow()
-                record.MTime = datetime.utcnow()
-                record.Name = self.ui.lineEditShowName.text()
-                record.Time = date(self.ui.lineEditShowDate.date().year(), self.ui.lineEditShowDate.date().month(), self.ui.lineEditShowDate.date().day())
-                record.Designer = self.ui.lineEditDesigner.text()
-                record.Worker = self.ui.lineEditFiredBy.text()
-                record.Scenes = item
-                record.Duration = timedelta(minutes = int(self.ui.lineEditDurationMin.text()), seconds = int(self.ui.lineEditDurationSec.text()))
-                record.Notes = self.ui.textEditNotes.toPlainText()
-                record.MusicID = self.path
-                self.sess.add(record)
-                
-            self.fire = FirePositionShow(self.sess, self.UUID, self.ui.lineEditUsername.text(),self.path)
-            self.fire.show()
-            self.close()
-        else:
-            QtGui.QMessageBox.information(self, "Information", " Username or password error, please login again!")
-            
+        self.sess = self.loginWin.sess
+        self.fieldWin = FirePositionShow(self.sess, self.loginWin.UUID,self.loginWin.path)
+        self.fieldWin.ui.pushButtonDone.clicked.connect(self.fieldToMainWin)
+        self.fieldWin.show()
+        self.loginWin.close()
+        
+    def fieldToMainWin(self):
+        self.fieldWin.next()
+        if self.fieldWin.confirmFlag == False:
+            return
+        self.mainWin = MainShow(self.sess, self.fieldWin.session, self.fieldWin.fieldUUID,self.fieldWin.musicPath)
+        self.fieldWin.close()
+        self.mainWin.show()
+        self.mainWin.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+        
+    def mainWindow(self):
+        self.importProjectWin.save()
+        if self.importProjectWin.ui.lineEditMusic.text() == '':
+            return
+        self.session = self.importProjectWin.session
+        self.mainWin = MainShow(self.sess, self.session, self.importProjectWin.fieldUUID,self.importProjectWin.musicPath)
+        self.mainWin.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+        self.mainWin.show()
+        self.importProjectWin.close()
+        
+    def newOrOpenProject(self):
+        self.newOrOpenWin = newProjectShow(self.sess)
+        self.newOrOpenWin.ui.pushButtonSave.clicked.connect(self.createProject)
+        self.newOrOpenWin.ui.pushButtonImport.clicked.connect(self.openExistedPorject)
+        self.newOrOpenWin.show()
+    
+    def openExistedPorject(self):
+        self.newOrOpenWin.close()
+        self.openExistProjectWin = ImportProjectShow(self.sess)
+        self.openExistProjectWin.show()
+        self.openExistProjectWin.ui.pushButtonSave.clicked.connect(self.reDisplayMainWin)
+        
+    def reDisplayMainWin(self):
+        self.openExistProjectWin.save()
+        self.mainWin.close()
+        self.openExistProjectWin.close()
+        self.session = self.openExistProjectWin.session
+        self.mainWin = MainShow(self.sess, self.session, self.openExistProjectWin.fieldUUID,self.openExistProjectWin.musicPath)
+        self.mainWin.show()
+        self.mainWin.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+        
+    def createProject(self):
+        self.newOrOpenWin.save()
+        if self.newOrOpenWin.nameFlag == 'used' or self.newOrOpenWin.selectFlag == False:
+            return
+        self.fieldEditWin = FirePositionShow(self.sess, self.newOrOpenWin.UUID,self.newOrOpenWin.path)
+        self.fieldEditWin.ui.pushButtonDone.clicked.connect(self.reShowMainWin)
+        self.fieldEditWin.show()
+        self.newOrOpenWin.close()
+        
+    def reShowMainWin(self):
+        self.fieldEditWin.next()
+        if self.fieldEditWin.confirmFlag == False:
+            return
+        self.mainWin.close()
+        self.mainWin = MainShow(self.sess, self.fieldEditWin.session, self.fieldEditWin.fieldUUID,self.fieldEditWin.musicPath)
+        self.fieldEditWin.close()
+        self.mainWin.show()
+        self.mainWin.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+        
 def main():
-    me = SingleInstance()
     app = QtGui.QApplication(sys.argv)
-    locale = QtCore.QLocale.system().name()
-##    appTranslator = QtCore.QTranslator()
-##    if appTranslator.load (":/loginWin_" + locale):
-##        app.installTranslator (appTranslator)
-    window = uiShow()
-    window.show()
+    control = UiControl()
     sys.exit(app.exec_())
     
 if __name__ == "__main__":

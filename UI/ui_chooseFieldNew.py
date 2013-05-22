@@ -16,8 +16,6 @@ import uuid
 from datetime import datetime, timedelta
 
 
-
-
 class ChooseField(QDialog):
     
     def __init__(self, sess, session, FireworkID, time, musicSignal,parent = None):
@@ -109,10 +107,12 @@ class ChooseField(QDialog):
                     if UUID[i]['BoxID'] != 'Not chosen' and UUID[i]['Choose']=='1':
                         with self.session.begin():
                             row = self.session.query(IgnitorsData).filter_by(BoxID = UUID[i]['BoxID']).first()
-                            if row.SurplusHeads < num :
+                            if row.SurplusHeads < num -1:
                                 QMessageBox.information(self, "Information", "SurplusHeads not enough!!!")
                                 return
                 for i in range(num):
+                    if i == 0:
+                        continue
                     with self.sess.begin():
                         item = self.sess.query (FireworksData).filter_by(Name = info[k[0]][i][0]).first()
                     risTime = item.RisingTime
@@ -154,6 +154,7 @@ class ChooseField(QDialog):
             if UUID[i]['BoxID'] != "Not chosen":
                 self.assignIgnitionHead(record.UUID)
                 print 'assignIgnitionHead fun'
+                
     def assignIgnitionHead(self,scriptUUID):    
         with self.session.begin():
             other = self.session.query (ScriptData).filter_by(UUID = scriptUUID).first()

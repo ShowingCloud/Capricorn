@@ -5,11 +5,12 @@ Created on 2013-3-8
 @author: pyroshow
 '''
 
+from Delegate.modifyCombinationDelegate import ModifyCombinationDelegate
 from Models.LocalDB import *
 from PySide.QtCore import *
 from PySide.QtGui import *
-import json
 from datetime import datetime
+import json
 
 class ModifyCombination(QDialog):
     
@@ -25,6 +26,7 @@ class ModifyCombination(QDialog):
         self.view = QTableView()
         self.model = QStandardItemModel(0, 2, self)
         self.model.setHorizontalHeaderLabels (["Item", "Time"])
+        self.view.setItemDelegate(ModifyCombinationDelegate())
         
         self.view.setModel (self.model)
         
@@ -95,15 +97,16 @@ class ModifyCombination(QDialog):
         info = json.loads(record.Combination)
         k = info.keys()
         self.IDCombo.setCurrentIndex(self.IDCombo.findText(k[0]))
-            
-        for row in info[k[0]]:
+        #第一个节点去掉分片
+        self.node0 = info[k[0]][0]
+        for row in info[k[0]][1:len(info[k[0]])]:
             newRow = []
             newRow.append(QStandardItem(row[0]))
             newRow.append(QStandardItem(row[1]))
             self.model.appendRow(newRow)
         
     def update(self):
-        l = []
+        l = [self.node0]
         for count in range(self.model.rowCount()):
             item0 = self.model.item(count, 0)
             item1 = self.model.item(count, 1)

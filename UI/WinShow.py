@@ -6,13 +6,11 @@ from Models.LocalDB import ProjectsData
 import Queue
 import time
 from datetime import datetime
-#from Device import ftdi2 as ft
 from config import appdata
 import tarfile, os, sys, subprocess, shutil
 from Frontend.PrintPDF import PrintTable, TABLEFields, TABLEProductList, TABLEFireSequence
 import json
-
-#from UI.mainWidget import MainWidget
+import struct
 try:
     from Device import ftdi2 as ft
 except:
@@ -20,21 +18,25 @@ except:
 
 class getMessage(QtCore.QObject):
     signalRead = QtCore.Signal()
-    def __init__(self, q, parent = None):
+    def __init__(self, q, statusQueue,parent = None):
 
         QtCore.QObject.__init__ (self, parent)
 
         self.signalRead.connect(self.readFun)
         self.q = q
-
+        
+        self.statusQueue = statusQueue
+        
     def readFun(self):
         try:
             dev = ft.list_devices()
         except:
             dev = []
-
-        while len (dev) == 0:
             
+        while len (dev) == 0:
+            if not self.q.empty():
+                item = self.q.get()
+#                self.statusQueue.put(item)
             time.sleep (5)
             print "Rechecking hardware connection..."
             try:
@@ -45,7 +47,7 @@ class getMessage(QtCore.QObject):
 
 
         self.f = ft.open_ex(dev[0])
-        print self.f
+        print self.f  
         while True:
             item = self.q.get()
             self.f.write(item)
@@ -64,10 +66,13 @@ class getMessage(QtCore.QObject):
                         confirmFlag = True
                         break
             if confirmFlag == False:
+                self.statusQueue.put(item)
                 print 'Connect error,please check device'
+                
+            elif self.q.empty() and confirmFlag != False:
+                self.statusQueue.put('Finished')
+                
             print repr(item),'\n',repr(readData)
-
-
         
 class MainShow(QtGui.QMainWindow):
     def __init__(self, sess, session, fieldUUID,musicPath, parent=None):
@@ -84,9 +89,10 @@ class MainShow(QtGui.QMainWindow):
         self.ui.actionProjectExport.triggered.connect(self.projectExport)
         self.ui.widget_wave.upAndDownWaveWidget.analyzeWaveAndDrawInit()
         self.ui.actionMinimize.triggered.connect(self.showMinimized)
-        self.ui.actionNewOrOpen.triggered.connect(self.newOrOpenProject)
+
         self.q = Queue.Queue()
-        self.c = getMessage(self.q)
+        self.statusQueue = Queue.Queue()
+        self.c = getMessage(self.q,self.statusQueue)
         self.thread = QtCore.QThread()
         self.c.moveToThread(self.thread)
         self.getLocalData()
@@ -94,16 +100,23 @@ class MainShow(QtGui.QMainWindow):
         self.showMaximized()
         print 'Read signal emit'
         self.c.signalRead.emit()
-#        self.ui.widgetDatabase.musicSignal.emit()
+        self.ui.widgetDatabase.musicSignal.emit()
 
-    def newOrOpenProject(self):
-        print 'newOrOpenProject'
         
-    def downloadToDevice(self):       
+    def downloadToDevice(self): 
+        try:
+            dev = ft.list_devices()
+        except:
+            dev = []
+        if not len(dev) :
+            QtGui.QMessageBox.question(None,'message','No device ,please check',
+                                                            QtGui.QMessageBox.Ok)
+            return
         with self.session.begin():
             tableFire = self.session.query(ScriptData).all()
         node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
                 'firePoint':None,'seconds':None,'offsetSec':None,'crc':0,'tail':0xDD}
+        
         for row in tableFire:
             if  row.ConnectorID == None:
                 reply = QtGui.QMessageBox.question(None,'message','Please choose ignitorBox first',
@@ -123,9 +136,33 @@ class MainShow(QtGui.QMainWindow):
             self.q.put (package.package)
             print 'fire head',node['firePoint'],'fire Box ',node['fireBox']
             print repr(package.package)
-        QtGui.QMessageBox.question(None,'message','DownLoad Finish',
-                                           QtGui.QMessageBox.Ok)
-        
+            self.timer = QtCore.QTimer()
+            QtCore.QObject.connect(self.timer,QtCore.SIGNAL("timeout()"), self.checkQueue)
+            self.timer.start(2000)
+            
+    def checkQueue(self):
+        print 'Checking Queue...'
+        if self.statusQueue.empty():
+            return
+        statusReturn = self.statusQueue.get()
+        if statusReturn == 'Finished':
+            QtGui.QMessageBox.question(None,'message','Upload Finish',
+                                                QtGui.QMessageBox.Ok)
+        else:
+            datalist = [0]*20
+            (datalist[0],datalist[1],datalist[2],datalist[3],datalist[4],datalist[5],
+             datalist[6],datalist[7],datalist[8],datalist[9],datalist[10],datalist[11],
+             datalist[12],datalist[13],datalist[14],datalist[15],datalist[16],datalist[17],
+             datalist[18],datalist[19]) = struct.unpack('@20B',statusReturn)
+            boxID = datalist[8] * 0x100 + datalist[9]
+            fireHead = datalist[10] * 0x100 + datalist[11]
+            seconds = datalist[12] * 0x1000000 + datalist[13] * 0x10000 + datalist[14] * 0x100 + datalist[15]
+            offsetSec = datalist[16] * 0x100 + datalist[17]
+            igniteTime = float(seconds) + float(offsetSec)/1000
+            QtGui.QMessageBox.question(None,'message','Upload failed,\n BoxID is %d ,ignite head is %d ,time is %f'%(boxID,fireHead,round(igniteTime,2)),
+                                                QtGui.QMessageBox.Ok)
+            
+      
         
     def exportPDF(self,OpenReader = True):
         print 'ExportPDF'

@@ -9,7 +9,7 @@ import json, uuid
 from PySide.QtGui import *
 from PySide.QtCore import *
 from Models.LocalDB import *
-
+import math
 class CombinationDialog(QDialog):
     
     def __init__(self, sess, Item, UUID, parent = None):
@@ -33,18 +33,21 @@ class CombinationDialog(QDialog):
         
         self.modeLabel = QLabel("Primary Mode:")
         self.modeCombo = QComboBox()
-        self.modeCombo.addItems(["Linear", "Fast", "Slowly"])
+        self.modeCombo.addItems(["Uniform", "Faster", "Slower"])
         
         self.countLabel = QLabel("Count:")
         self.countEdit = QLineEdit()
         intVal = QIntValidator()
         self.countEdit.setValidator(intVal)
         
-        self.intervalLabel = QLabel("Interval:")
-        self.intervalEdit = QLineEdit()
-        intVal = QIntValidator()
-        self.intervalEdit.setValidator(intVal)
-        
+#         self.intervalLabel = QLabel("Interval:")
+#         self.intervalEdit = QLineEdit()
+#         intVal = QIntValidator()
+#         self.intervalEdit.setValidator(intVal)
+        self.totalTimeLabel = QLabel('total time:')
+        self.totalTimeEdit = QLineEdit()
+        floatVal = QDoubleValidator()
+        self.totalTimeEdit.setValidator(floatVal)
         self.itemLabel = QLabel("Item ID:")
 
         self.itemEdit = QLineEdit()
@@ -57,8 +60,10 @@ class CombinationDialog(QDialog):
         grid.addWidget(self.modeCombo, 0, 1, 1, 2)
         grid.addWidget(self.countLabel, 1, 0)
         grid.addWidget(self.countEdit, 1, 1, 1, 2)
-        grid.addWidget(self.intervalLabel, 2, 0)
-        grid.addWidget(self.intervalEdit, 2, 1, 1, 2)
+#         grid.addWidget(self.intervalLabel, 2, 0)
+#         grid.addWidget(self.intervalEdit, 2, 1, 1, 2)
+        grid.addWidget(self.totalTimeLabel,2,0)
+        grid.addWidget(self.totalTimeEdit,2,1,1,2)
         grid.addWidget(self.itemLabel, 3, 0)
         grid.addWidget(self.itemEdit, 3, 1, 1, 2)
         
@@ -86,7 +91,7 @@ class CombinationDialog(QDialog):
         
         self.saveButton.clicked.connect(self.saveData)
         self.cancelButton.clicked.connect(self.cancel)
-        
+#        self.modeCombo.currentIndexChanged.connect(self.modeChange)
         self.addBtn.clicked.connect(self.addData)
         
         #设置右键菜单
@@ -123,28 +128,27 @@ class CombinationDialog(QDialog):
     def delete(self):
         self.model.takeRow(self.row)
         
-        
     #在选中行的下面添加空白行 
     def add(self):
         item = QStandardItem()
         self.model.insertRow(self.row+1, item)
         
     def saveData(self):
-        l = []
+        contentList = [self.modeCombo.currentText()]
         for count in range(self.model.rowCount()):
             item0 = self.model.item(count, 0)
             item1 = self.model.item(count, 1)
-            t = (item0.text(), item1.text())
-            l.append(t)
-        data = {self.IDCombo.currentText():l}
-        d = json.dumps(data)
+            rowData = (item0.text(), item1.text())
+            contentList.append(rowData)
+        data = {self.IDCombo.currentText():contentList}
+        jsonData = json.dumps(data)
         with self.sess.begin():
             record = FireworksData()
             record.Name = self.IDCombo.currentText()
             record.Type = "Combination"
             record.Size = 0
             record.UUID = str(uuid.uuid1())
-            record.Combination = d
+            record.Combination = jsonData
             record.Perm = 0
 #            record.Owner = ""
             
@@ -154,7 +158,7 @@ class CombinationDialog(QDialog):
         
         self.accept()
         
-        self.close()
+#         self.close()
         
         
     def cancel(self):
@@ -162,20 +166,35 @@ class CombinationDialog(QDialog):
         
     
     def addData(self):
-        if self.modeCombo.currentText() == "Linear":
-            for i in range(int(self.countEdit.text())+1):
+        totalCount = int(self.countEdit.text())
+        totalTime = float(self.totalTimeEdit.text())
+        
+        if self.modeCombo.currentText() == "Uniform":
+            interval = totalTime/(totalCount - 1)
+            for i in range(totalCount):
                 row = []
                 row.append(QStandardItem(self.itemEdit.text()))
-                row.append(QStandardItem(str(int(self.intervalEdit.text())*i)))
-                
+                row.append(QStandardItem(str(interval * i)))
                 self.model.appendRow(row)
-        elif self.modeCombo.currentText() == "Fast" :
-            
-            pass
+                
+        elif self.modeCombo.currentText() == "Faster" :
+            originTime = math.sqrt(totalCount-1)
+            multiple = totalTime/originTime
+            for i in range(totalCount):
+                row = []
+                row.append(QStandardItem(self.itemEdit.text()))
+                row.append(QStandardItem(str(round(multiple * math.sqrt(i),2))))
+                self.model.appendRow(row)
         else:
-            pass
-            
-            
-
-
-
+            originTime = math.sqrt(totalCount-1)
+            multiple = totalTime/originTime
+            rowList = []
+            for i in range(totalCount):
+                row = []
+                row.append(QStandardItem(self.itemEdit.text()))
+                row.append(QStandardItem(str(round(totalTime - multiple * math.sqrt(i),2))))
+                rowList.append(row)
+            rowList.reverse()
+            for node in rowList:
+                self.model.appendRow(node)
+                

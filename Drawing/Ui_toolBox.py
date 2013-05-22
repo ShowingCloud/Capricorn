@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'toolBox.ui'
 #
-# Created: Sat Apr 27 11:34:54 2013
+# Created: Fri May 03 10:14:12 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_toolBoxWidget(object):
     def setupUi(self, toolBoxWidget):
         toolBoxWidget.setObjectName("toolBoxWidget")
-        toolBoxWidget.resize(1332, 85)
+        toolBoxWidget.resize(1332, 86)
         toolBoxWidget.setAutoFillBackground(True)
         self.verticalLayout_2 = QtGui.QVBoxLayout(toolBoxWidget)
         self.verticalLayout_2.setSpacing(2)
@@ -49,31 +49,30 @@ class Ui_toolBoxWidget(object):
         self.lineEdit_musicFilePath.setObjectName("lineEdit_musicFilePath")
         self.horizontalLayout.addWidget(self.lineEdit_musicFilePath)
         self.pushButton_musicReplay = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_musicReplay.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_musicReplay.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_musicReplay.setText("")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Image/Image/replay.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_musicReplay.setIcon(icon)
         self.pushButton_musicReplay.setIconSize(QtCore.QSize(33, 30))
         self.pushButton_musicReplay.setShortcut("")
-        self.pushButton_musicReplay.setCheckable(False)
+        self.pushButton_musicReplay.setCheckable(True)
         self.pushButton_musicReplay.setChecked(False)
         self.pushButton_musicReplay.setAutoRepeat(False)
         self.pushButton_musicReplay.setAutoExclusive(False)
         self.pushButton_musicReplay.setObjectName("pushButton_musicReplay")
         self.horizontalLayout.addWidget(self.pushButton_musicReplay)
         self.pushButton_musicPlay = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_musicPlay.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_musicPlay.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_musicPlay.setText("")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/Image/Image/play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_musicPlay.setIcon(icon1)
         self.pushButton_musicPlay.setIconSize(QtCore.QSize(33, 30))
-        self.pushButton_musicPlay.setCheckable(False)
         self.pushButton_musicPlay.setObjectName("pushButton_musicPlay")
         self.horizontalLayout.addWidget(self.pushButton_musicPlay)
         self.pushButton_musicStop = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_musicStop.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_musicStop.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_musicStop.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/Image/Image/stop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -90,6 +89,10 @@ class Ui_toolBoxWidget(object):
         self.label_5.setText("")
         self.label_5.setObjectName("label_5")
         self.horizontalLayout.addWidget(self.label_5)
+        self.volumeSlider_bombMusic = phonon.Phonon.VolumeSlider(toolBoxWidget)
+        self.volumeSlider_bombMusic.setMaximumSize(QtCore.QSize(120, 16777215))
+        self.volumeSlider_bombMusic.setObjectName("volumeSlider_bombMusic")
+        self.horizontalLayout.addWidget(self.volumeSlider_bombMusic)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.label_2 = QtGui.QLabel(toolBoxWidget)
@@ -99,7 +102,7 @@ class Ui_toolBoxWidget(object):
         self.label_2.setObjectName("label_2")
         self.horizontalLayout.addWidget(self.label_2)
         self.pushButton_zoomIn = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_zoomIn.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_zoomIn.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_zoomIn.setText("")
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(":/Image/Image/zoomIn.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -108,7 +111,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_zoomIn.setObjectName("pushButton_zoomIn")
         self.horizontalLayout.addWidget(self.pushButton_zoomIn)
         self.pushButton_zoomOut = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_zoomOut.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_zoomOut.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_zoomOut.setText("")
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(":/Image/Image/zoomOut.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -117,7 +120,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_zoomOut.setObjectName("pushButton_zoomOut")
         self.horizontalLayout.addWidget(self.pushButton_zoomOut)
         self.pushButton_goLeft = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_goLeft.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_goLeft.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_goLeft.setText("")
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(":/Image/Image/left.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -126,7 +129,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_goLeft.setObjectName("pushButton_goLeft")
         self.horizontalLayout.addWidget(self.pushButton_goLeft)
         self.pushButton_goRight = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_goRight.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_goRight.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_goRight.setText("")
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap(":/Image/Image/right.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -135,7 +138,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_goRight.setObjectName("pushButton_goRight")
         self.horizontalLayout.addWidget(self.pushButton_goRight)
         self.pushButton_ampDecrease = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_ampDecrease.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_ampDecrease.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_ampDecrease.setText("")
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/Image/Image/in.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -144,7 +147,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_ampDecrease.setObjectName("pushButton_ampDecrease")
         self.horizontalLayout.addWidget(self.pushButton_ampDecrease)
         self.pushButton_ampIncrease = QtGui.QPushButton(toolBoxWidget)
-        self.pushButton_ampIncrease.setMaximumSize(QtCore.QSize(23, 23))
+        self.pushButton_ampIncrease.setMaximumSize(QtCore.QSize(25, 25))
         self.pushButton_ampIncrease.setText("")
         icon8 = QtGui.QIcon()
         icon8.addPixmap(QtGui.QPixmap(":/Image/Image/out.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -154,7 +157,7 @@ class Ui_toolBoxWidget(object):
         self.pushButton_ampIncrease.setObjectName("pushButton_ampIncrease")
         self.horizontalLayout.addWidget(self.pushButton_ampIncrease)
         self.lcdNumber = QtGui.QLCDNumber(toolBoxWidget)
-        self.lcdNumber.setMaximumSize(QtCore.QSize(70, 30))
+        self.lcdNumber.setMaximumSize(QtCore.QSize(75, 30))
         self.lcdNumber.setNumDigits(5)
         self.lcdNumber.setDigitCount(5)
         self.lcdNumber.setSegmentStyle(QtGui.QLCDNumber.Flat)
@@ -190,7 +193,6 @@ class Ui_toolBoxWidget(object):
 
 from PySide import phonon
 import waveIcon_rc
-
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)

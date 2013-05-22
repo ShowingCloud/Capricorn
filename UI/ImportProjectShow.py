@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from Models.EngineeringDB import *#ParametersData,FieldsData,base1
 from Models.LocalDB import ProjectsData
-from UI.WinShow import MainShow
+#from UI.WinShow import MainShow
 import json
 
 class ImportProjectShow(QtGui.QDialog):
@@ -20,7 +20,7 @@ class ImportProjectShow(QtGui.QDialog):
         self.showList()
         self.ui.pushButtonImport.clicked.connect(self.importProject)
         self.ui.pushButtonDelete.clicked.connect(self.deleteProject)
-        self.ui.pushButtonSave.clicked.connect(self.save)
+#        self.ui.pushButtonSave.clicked.connect(self.save)
         self.ui.pushButtonClose.clicked.connect(self.cancel)
         self.ui.listWidgetProject.itemClicked.connect(self.showDetail)
     
@@ -40,7 +40,6 @@ class ImportProjectShow(QtGui.QDialog):
         
     def showDetail(self):
         name = self.ui.listWidgetProject.currentItem().text()
-        
         self.ui.labelTitle.setText(name)
         with self.sess.begin():
             row = self.sess.query(ProjectsData).filter_by(Name = name).first()
@@ -146,11 +145,9 @@ class ImportProjectShow(QtGui.QDialog):
         engine = create_engine("sqlite:///" + os.path.join (appdata, "proj", file1+ '.db'))
         self.session = scoped_session(sessionmaker(bind = engine, autocommit= True))
      
-        self.winShow = MainShow(self.sess, self.session, self.fieldUUID,self.musicPath)
-        self.winShow.show()
-        self.close()
-        self.close()
+#        self.winShow = MainShow(self.sess, self.session, self.fieldUUID,self.musicPath)
+#        self.winShow.show()
+#        self.close()
         
-    
     def cancel(self):
         self.close()
