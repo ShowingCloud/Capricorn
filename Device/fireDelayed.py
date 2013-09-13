@@ -41,37 +41,8 @@ class getMessage (QtCore.QObject):
 
         while True:
             item = self.q.get()
-
-            confirmFlag = False
-            for i in xrange (3):
-                self.f.write(item[0])
-		time.sleep (0.1)
-                print "sleep"
-
-#                if not item[1]: # We don't need a confirmation for TIME_SYNC
-#                    confirmFlag = True
-#                    readData = ""
-#                    break
-
-                if item[1]:
-                    l = 20
-                else:
-                    l = 10
-
-                while self.f.get_queue_status() < l:
-                    pass
-                readData = self.f.read(self.f.get_queue_status())
-		print "resp: ", repr(readData)
-
-                if item[0] == readData:
-                    confirmFlag = True
-                    break
-
-                if confirmFlag == False:
-                    print 'Data damaged. Please check the device.'
-
-            print repr(item[0]),'\n',repr(readData)
-
+            self.f.write(item[0])
+            time.sleep(0.1)
 
 class uiShow(QtGui.QDialog):
 
@@ -245,11 +216,11 @@ class uiShow(QtGui.QDialog):
             print repr(dataPackage.package)
             self.q.put ((dataPackage.package, True))
 
-#        self.ExistList = []
+        self.ExistList = []
         self.downloadFlag = True
         self.ui.pushButtonStart.setEnabled(True)
-#        self.ui.pushButtonAdd.setEnabled(False)
-#        self.ui.pushButtonDownload.setEnabled(False)
+        self.ui.pushButtonAdd.setEnabled(False)
+        self.ui.pushButtonDownload.setEnabled(False)
         self.deleteFlag = False
 
 
