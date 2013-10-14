@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="/">
+    <file>Images/pause.png</file>
+    <file>Images/play.png</file>
+    <file>Images/sound.png</file>
+    <file>Images/stop.png</file>
+    <file>Images/mute.png</file>
+	<file>Images/open.png</file>
+	<file>Images/add.png</file>
+	<file>Images/clock.png</file>
+	<file>Images/brocade hat.jpg</file>
+	<file>Images/coco.jpg</file>
+	<file>Images/gorgeous.jpg</file>
+	<file>Images/peony.jpg</file>
+	<file>Images/candle.jpg</file>
+	<file>Images/pot flower.jpg</file>
+	<file>Images/willow.jpg</file>
+	<file>Images/glint.jpg</file>
+	<file>Images/mum.jpg</file>
+  </qresource>
+</RCC>
