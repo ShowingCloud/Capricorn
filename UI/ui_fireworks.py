@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'fireworks.ui'
 #
-# Created: Mon Oct 14 17:56:15 2013
+# Created: Mon Oct 14 16:23:37 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -81,6 +81,16 @@ class Ui_widgetWaveModule(object):
         self.pushButtonDelay.setIconSize(QtCore.QSize(32, 32))
         self.pushButtonDelay.setObjectName("pushButtonDelay")
         self.horizontalLayoutButton.addWidget(self.pushButtonDelay)
+        self.pushButtonUpLoad = QtGui.QPushButton(widgetWaveModule)
+        self.pushButtonUpLoad.setMinimumSize(QtCore.QSize(29, 30))
+        self.pushButtonUpLoad.setMaximumSize(QtCore.QSize(30, 30))
+        self.pushButtonUpLoad.setText("")
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/Images/upLoad.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonUpLoad.setIcon(icon4)
+        self.pushButtonUpLoad.setIconSize(QtCore.QSize(24, 24))
+        self.pushButtonUpLoad.setObjectName("pushButtonUpLoad")
+        self.horizontalLayoutButton.addWidget(self.pushButtonUpLoad)
         self.comboBoxMode = QtGui.QComboBox(widgetWaveModule)
         self.comboBoxMode.setMinimumSize(QtCore.QSize(80, 30))
         self.comboBoxMode.setObjectName("comboBoxMode")
