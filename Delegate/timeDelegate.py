@@ -6,15 +6,12 @@ Created on 2013-10-12
 '''
 from PySide import QtGui, QtCore
 from Models.ProjectDB import ProFireworksData
-from Models.LocalDB import FireworksData
-import json
 
 class TimeDelegate(QtGui.QStyledItemDelegate):
 
-    def __init__(self, localSession, proSession, parent = None):
+    def __init__(self, proSession, parent = None):
         QtGui.QStyledItemDelegate.__init__(self, parent)
         self.parent = parent
-        self.localSession = localSession
         self.proSession = proSession
         
 #    #重写自带方法(参数自带)
@@ -46,19 +43,16 @@ class TimeDelegate(QtGui.QStyledItemDelegate):
         
         data = editor.time().hour()*3600000 + editor.time().minute() * 60000 + editor.time().second() *1000 + editor.time().msec()
         model.setData(index, data)
-        print data
-        print index.column()
+#         print data
+#         print index.column()
         #获取该行脚本烟花
         scriptUUID = self.parent.proModel.item(index.row(), 0).text()
-        with self.proSession.begin():
-            scriptData = self.proSession.query(ProFireworksData).filter_by(UUID = scriptUUID).first()
-        with self.localSession.begin():
-            fireworks = self.localSession.query(FireworksData).filter_by(UUID = scriptData.FireworkID).first()
         
         if index.column() == 1: #开爆时刻
             with self.proSession.begin():
                 recordEffectMoment = self.proSession.query(ProFireworksData).filter_by(UUID = scriptUUID).first()
-                recordEffectMoment.IgnitionTime = data - fireworks.RisingTime
+                notes = recordEffectMoment.Notes.split(',')
+                recordEffectMoment.IgnitionTime = data - int(notes[0])
         
         if index.column() == 6: #点火时刻
             with self.proSession.begin():
@@ -66,19 +60,20 @@ class TimeDelegate(QtGui.QStyledItemDelegate):
                 recordIgnitionMoment.IgnitionTime = data
             
         if index.column() == 7: #上升时间
-            with self.localSession.begin():
-                recordRisingTime = self.localSession.query(FireworksData).filter_by(UUID = scriptData.FireworkID).first()
-                recordRisingTime.RisingTime = data
+            with self.proSession.begin():
+                recordRisingTime = self.proSession.query(ProFireworksData).filter_by(UUID = scriptUUID).first()
+                recordRisingTime.Notes = str(data) + ',' + recordRisingTime.Notes.split(',')[1]
         
         if index.column() == 8: #效果时间
-            with self.localSession.begin():
-                recordEffectTime = self.localSession.query(FireworksData).filter_by(UUID = scriptData.FireworkID).first()
-                info = json.loads(recordEffectTime.EffectsInfo)
-                info["EffectsInfo"][0][2] = str(data / 1000.0)
-                recordEffectTime.EffectsInfo = json.dumps(info)
+            with self.proSession.begin():
+                recordEffectTime = self.proSession.query(ProFireworksData).filter_by(UUID = scriptUUID).first()
+                recordEffectTime.Notes = recordEffectTime.Notes.split(',')[0] + ',' + str(data)
                 
         if index.column() == 9: #结束时刻
-            print index.column()
+            with self.proSession.begin():
+                recordOverMoment = self.proSession.query(ProFireworksData).filter_by(UUID = scriptUUID).first()
+                overNotes = recordOverMoment.Notes.split(',')
+                recordOverMoment.IgnitionTime = data - int(overNotes[0]) - int(overNotes[1])
             
         self.parent.refreshScript()
         

@@ -71,18 +71,21 @@ class Fireworks(QtGui.QWidget):
         #为脚本烟火库tableview添加model
         self.proModel = QtGui.QStandardItemModel(0, 11, self)
         self.ui.scriptTableView.setModel(self.proModel)
-#         self.ui.scriptTableView.setItemDelegate(ScriptDelegate(self))
-        self.ui.scriptTableView.setItemDelegateForColumn(1, TimeDelegate(self.localSession, self.proSession, self))
+        self.ui.scriptTableView.setItemDelegateForColumn(1, TimeDelegate(self.proSession, self))
         self.ui.scriptTableView.setItemDelegateForColumn(2, ScriptDelegate(self))
         self.ui.scriptTableView.setItemDelegateForColumn(3, ScriptDelegate(self))
         self.ui.scriptTableView.setItemDelegateForColumn(4, ScriptDelegate(self))
         self.ui.scriptTableView.setItemDelegateForColumn(5, ScriptDelegate(self))
-        self.ui.scriptTableView.setItemDelegateForColumn(6, TimeDelegate(self.localSession, self.proSession,self))
-        self.ui.scriptTableView.setItemDelegateForColumn(7, TimeDelegate(self.localSession, self.proSession,self))
-        self.ui.scriptTableView.setItemDelegateForColumn(8, TimeDelegate(self.localSession, self.proSession,self))
-        self.ui.scriptTableView.setItemDelegateForColumn(9, TimeDelegate(self.localSession, self.proSession,self))
+        self.ui.scriptTableView.setItemDelegateForColumn(6, TimeDelegate(self.proSession,self))
+        self.ui.scriptTableView.setItemDelegateForColumn(7, TimeDelegate(self.proSession,self))
+        self.ui.scriptTableView.setItemDelegateForColumn(8, TimeDelegate(self.proSession,self))
+        self.ui.scriptTableView.setItemDelegateForColumn(9, TimeDelegate(self.proSession,self))
         self.ui.scriptTableView.setItemDelegateForColumn(10, SpinBoxDelegate(self.proSession, self))
         self.ui.scriptTableView.setItemDelegateForColumn(11, ScriptDelegate(self))
+        
+        #为工程脚本tableview添加右键菜单
+        self.ui.scriptTableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
         #测试全局字符串
         print MessageDisplay.getMessage('a')
@@ -177,13 +180,31 @@ class Fireworks(QtGui.QWidget):
             
         rightMenu.exec_(QtGui.QCursor.pos())
         
-        
     def addFireworks(self):
         dialogAddFireworks = EditFireworks(self.localSession, self)
         accept = dialogAddFireworks.exec_()
         if accept == 1:
             self.query(self.type)
             
+    @Slot(QPoint)  
+    def scriptRightContextMenu(self, point):
+        self.scriptRow = self.ui.scriptTableView.rowAt(point.y())
+        scriptRightMenu = QtGui.QMenu(self)
+        if self.scriptRow >= 0:
+            deleteScriptAction = QtGui.QAction("Delete", self)
+            deleteScriptAction.setStatusTip("Delete  the script fireworks  information")
+            deleteScriptAction.connect(QtCore.SIGNAL("triggered()"), self.deleteScript)
+            scriptRightMenu.addAction(deleteScriptAction)
+            
+        scriptRightMenu.exec_(QtGui.QCursor.pos()) 
+        
+    def deleteScript(self):
+        deleteUUID = self.proModel.item(self.scriptRow).text()
+        with self.proSession.begin():
+            deleteRecord = self.proSession.query (ProFireworksData).filter_by(UUID = deleteUUID).first()
+            self.proSession.delete(deleteRecord)
+        self.proModel.takeRow(self.scriptRow)
+    
     def editFireworks(self):
         pass
     
@@ -252,8 +273,8 @@ class Fireworks(QtGui.QWidget):
         
         effectTime = self.musicTime
         info = json.loads(self.model.item(index.row(), 3).text())
-        print int(float(info["EffectsInfo"][0][2])*1000)
-        print self.model.item(index.row(), 2).text()
+#         print int(float(info["EffectsInfo"][0][2])*1000)
+#         print self.model.item(index.row(), 2).text()
         with self.proSession.begin():
             record = ProFireworksData()
             record.UUID = str(uuid.uuid1())
@@ -272,7 +293,6 @@ class Fireworks(QtGui.QWidget):
              
         self.scriptTable = self.refreshScript()
         
-        print "***********"
     #刷新显示脚本     
     def refreshScript(self):
         self.proModel.clear()
@@ -301,7 +321,7 @@ class Fireworks(QtGui.QWidget):
             self.proModel.setData(self.proModel.index(i, 4), info["EffectsInfo"][0][1])#颜色
             self.proModel.setData(self.proModel.index(i, 5), 90)#燃放方向,设置默认值为正对主席台90度
             self.proModel.setData(self.proModel.index(i, 6), scriptTable[i].IgnitionTime)#点火时刻
-            self.proModel.setData(self.proModel.index(i, 7), data.RisingTime)#上升时间
+            self.proModel.setData(self.proModel.index(i, 7), int(effectAndRisingtimes[0]))#上升时间
             self.proModel.setData(self.proModel.index(i, 8),  int(effectAndRisingtimes[1]))#效果时间
             
             self.proModel.setData(self.proModel.index(i, 9), effectTime + int(effectAndRisingtimes[1]))#结束时刻
