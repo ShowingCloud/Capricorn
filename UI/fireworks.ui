@@ -196,6 +196,35 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonUpLoad">
+         <property name="minimumSize">
+          <size>
+           <width>29</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Resource/images.qrc">
+           <normaloff>:/Images/upLoad.ico</normaloff>:/Images/upLoad.ico</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QComboBox" name="comboBoxMode">
          <property name="minimumSize">
           <size>
