@@ -78,6 +78,7 @@ class Fireworks(QtGui.QWidget):
         #为脚本烟火库tableview添加model
         self.proModel = QtGui.QStandardItemModel(0, 11, self)
         self.ui.scriptTableView.setModel(self.proModel)
+        self.ui.scriptTableView.setSortingEnabled(True)
         self.ui.scriptTableView.setItemDelegateForColumn(1, TimeDelegate(self.proSession, self))
         self.ui.scriptTableView.setItemDelegateForColumn(2, ScriptDelegate(self))
         self.ui.scriptTableView.setItemDelegateForColumn(3, ScriptDelegate(self))

@@ -48,6 +48,8 @@ class SpinBoxDelegate(QtGui.QStyledItemDelegate):
             msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
             msgBox.exec_()
             return
+        if editor.value() == index.data():
+            return
         
         scriptUUID = self.parent.proModel.item(index.row(), 0).text()
         with self.proSession.begin():
