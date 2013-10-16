@@ -9,9 +9,12 @@ from sqlalchemy import Column, Integer, Sequence, String, DateTime,Interval, Tex
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+import os
+from config import appdata
 
 #工程数据库
-proEngine = create_engine("sqlite:///project.db")
+# proEngine = create_engine("sqlite:///project.db")
+proEngine = create_engine("sqlite:///" + os.path.join (appdata, 'proj', 'project.db'))
 proSession = scoped_session(sessionmaker(bind = proEngine, autocommit = True))
 proMeta = MetaData()
 proBase = declarative_base(metadata=proMeta)

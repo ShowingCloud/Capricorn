@@ -7,10 +7,12 @@ from sqlalchemy import Column, Integer, Sequence, String, create_engine, \
     DateTime, Interval, Text, Boolean, Float, Date, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
+import os
+from config import appdata
 
 #本地数据库
-##engine = create_engine("sqlite:///" + os.path.join (appdata, 'local', 'local.db'))
-engine = create_engine("sqlite:///local.db")
+engine = create_engine("sqlite:///" + os.path.join (appdata, 'local', 'local.db'))
+# engine = create_engine("sqlite:///local.db")
 session = scoped_session(sessionmaker(bind = engine, autocommit = True))
 meta = MetaData()
 base = declarative_base(metadata=meta)
