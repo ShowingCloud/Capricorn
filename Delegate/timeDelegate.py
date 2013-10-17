@@ -29,6 +29,7 @@ class TimeDelegate(QtGui.QStyledItemDelegate):
     def createEditor (self, parent, option, index):
         
         timeEdit = QtGui.QTimeEdit(parent)
+        timeEdit.setDisplayFormat('h:mm:ss.z')
         timeEdit.installEventFilter(self)
         return timeEdit
     

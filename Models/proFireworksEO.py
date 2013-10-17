@@ -36,10 +36,19 @@ class FireworksEO(object):
             record = self.session.query(ProFireworksData).filter_by(UUID == UUID).first()
         return record
     
-    def update(self, UUID):
+    def update(self, UUID, IgnitionTime = None, Notes = None, IgnitorID = None, ConnectorID = None):
         with self.session.begin():
             record = self.session.query(ProFireworksData).filter_by(UUID == UUID).first()
+            if IgnitionTime != None :
+                record.IgnitionTime = IgnitionTime
+            if Notes != None :
+                record.Notes = Notes
+            if IgnitorID != None :
+                record.IgnitorID = IgnitorID
+            if ConnectorID != None :
+                record.ConnectorID = ConnectorID
             
+    
     def deleteByUUID(self, UUID):
         with self.session.begin():
             record = self.session.query(ProFireworksData).filter_by(UUID == UUID).first()

@@ -18,5 +18,7 @@
 	<file>Images/willow.jpg</file>
 	<file>Images/glint.jpg</file>
 	<file>Images/mum.jpg</file>
+	<file>Images/main.png</file>
+	<file>Images/title.png</file>
   </qresource>
 </RCC>

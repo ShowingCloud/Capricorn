@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>编辑工程系统</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../Resource/images.qrc">
+    <normaloff>:/Images/title.png</normaloff>:/Images/title.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>

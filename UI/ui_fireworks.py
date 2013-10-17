@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'fireworks.ui'
 #
-# Created: Mon Oct 14 16:23:37 2013
+# Created: Thu Oct 17 15:05:14 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,6 +13,9 @@ class Ui_widgetWaveModule(object):
     def setupUi(self, widgetWaveModule):
         widgetWaveModule.setObjectName("widgetWaveModule")
         widgetWaveModule.resize(897, 526)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/Images/title.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        widgetWaveModule.setWindowIcon(icon)
         widgetWaveModule.setAutoFillBackground(True)
         self.verticalLayout_2 = QtGui.QVBoxLayout(widgetWaveModule)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -30,9 +33,9 @@ class Ui_widgetWaveModule(object):
         self.pushButtonOpen = QtGui.QPushButton(widgetWaveModule)
         self.pushButtonOpen.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonOpen.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/Images/open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonOpen.setIcon(icon)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/Images/open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonOpen.setIcon(icon1)
         self.pushButtonOpen.setIconSize(QtCore.QSize(30, 30))
         self.pushButtonOpen.setShortcut("")
         self.pushButtonOpen.setCheckable(False)
@@ -44,18 +47,18 @@ class Ui_widgetWaveModule(object):
         self.pushButtonPlayOrPause = QtGui.QPushButton(widgetWaveModule)
         self.pushButtonPlayOrPause.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonPlayOrPause.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/Images/play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonPlayOrPause.setIcon(icon1)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/Images/play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonPlayOrPause.setIcon(icon2)
         self.pushButtonPlayOrPause.setIconSize(QtCore.QSize(30, 30))
         self.pushButtonPlayOrPause.setObjectName("pushButtonPlayOrPause")
         self.horizontalLayoutButton.addWidget(self.pushButtonPlayOrPause)
         self.pushButtonStop = QtGui.QPushButton(widgetWaveModule)
         self.pushButtonStop.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonStop.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/Images/stop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonStop.setIcon(icon2)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/Images/stop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonStop.setIcon(icon3)
         self.pushButtonStop.setIconSize(QtCore.QSize(30, 30))
         self.pushButtonStop.setObjectName("pushButtonStop")
         self.horizontalLayoutButton.addWidget(self.pushButtonStop)
@@ -75,9 +78,9 @@ class Ui_widgetWaveModule(object):
         self.pushButtonDelay.setMinimumSize(QtCore.QSize(29, 30))
         self.pushButtonDelay.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonDelay.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/Images/clock.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonDelay.setIcon(icon3)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/Images/clock.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonDelay.setIcon(icon4)
         self.pushButtonDelay.setIconSize(QtCore.QSize(32, 32))
         self.pushButtonDelay.setObjectName("pushButtonDelay")
         self.horizontalLayoutButton.addWidget(self.pushButtonDelay)
@@ -85,9 +88,9 @@ class Ui_widgetWaveModule(object):
         self.pushButtonUpLoad.setMinimumSize(QtCore.QSize(29, 30))
         self.pushButtonUpLoad.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonUpLoad.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/Images/upLoad.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonUpLoad.setIcon(icon4)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/Images/upLoad.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonUpLoad.setIcon(icon5)
         self.pushButtonUpLoad.setIconSize(QtCore.QSize(24, 24))
         self.pushButtonUpLoad.setObjectName("pushButtonUpLoad")
         self.horizontalLayoutButton.addWidget(self.pushButtonUpLoad)
@@ -138,7 +141,7 @@ class Ui_widgetWaveModule(object):
         QtCore.QMetaObject.connectSlotsByName(widgetWaveModule)
 
     def retranslateUi(self, widgetWaveModule):
-        widgetWaveModule.setWindowTitle(QtGui.QApplication.translate("widgetWaveModule", "Form", None, QtGui.QApplication.UnicodeUTF8))
+        widgetWaveModule.setWindowTitle(QtGui.QApplication.translate("widgetWaveModule", "编辑工程系统", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBoxMode.setItemText(0, QtGui.QApplication.translate("widgetWaveModule", "编辑模式", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBoxMode.setItemText(1, QtGui.QApplication.translate("widgetWaveModule", "控制模式", None, QtGui.QApplication.UnicodeUTF8))
 

@@ -384,15 +384,15 @@ class Fireworks(QtGui.QWidget):
         self.stopMusic()
         
     
-def main():
-    app = QtGui.QApplication(sys.argv)
-#     locale = QtCore.QLocale.system().name()
-##    appTranslator = QtCore.QTranslator()
-##    if appTranslator.load (":/loginWin_" + locale):
-##        app.installTranslator (appTranslator)
-    window = Fireworks()
-    window.show()
-    sys.exit(app.exec_())
-    
-if __name__ == "__main__":
-    main()
+# def main():
+#     app = QtGui.QApplication(sys.argv)
+# #     locale = QtCore.QLocale.system().name()
+# ##    appTranslator = QtCore.QTranslator()
+# ##    if appTranslator.load (":/loginWin_" + locale):
+# ##        app.installTranslator (appTranslator)
+#     window = Fireworks()
+#     window.show()
+#     sys.exit(app.exec_())
+#     
+# if __name__ == "__main__":
+#     main()
