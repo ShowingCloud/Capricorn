@@ -20,8 +20,13 @@ from datetime import datetime
 from Delegate.timeDelegate import TimeDelegate
 from Delegate.spinBoxDelegate import SpinBoxDelegate
 from Device.Communication import HardwareCommunicate
+from Device.protocol import dataPack
 import Queue
 import time
+try:
+    from Device import ftdi2 as ft
+except:
+    pass
 
 
 class Fireworks(QtGui.QWidget):
@@ -35,7 +40,7 @@ class Fireworks(QtGui.QWidget):
         self.ui.lcdNumber.display('00:00')
         self.ui.pushButtonDelay.hide()
         self.ui.pushButtonUpLoad.hide()
-        self.ui.pushButtonOpen.clicked.connect(self.openMusic)
+        self.ui.pushButtonOpenMusic.clicked.connect(self.openMusic)
         self.ui.pushButtonPlayOrPause.clicked.connect(self.playOrPauseMusic)
         self.ui.pushButtonStop.clicked.connect(self.stopMusic)
         self.ui.pushButtonDelay.clicked.connect(self.delayFire)
@@ -115,19 +120,29 @@ class Fireworks(QtGui.QWidget):
         self.path = None
     
     def upLoadToDevice(self):
-        self.myQueue = Queue.Queue()
-        self.comminute = HardwareCommunicate(self.myQueue)
-        thread = QtCore.QThread()
-        self.comminute.moveToThread(thread)
-        thread.start()
-        time.sleep(0.1)
-        self.comminute.signalCommunicate.emit()
-        self.progressBar = ProgressBarShow(12)
+        with self.proSession.begin():
+            tableFire = self.proSession.query(ProFireworksData).all()
+        node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
+                'firePoint':None,'seconds':None,'offsetSec':None,'crc':0,'tail':0xDD}
+        
+        self.progressBar = ProgressBarShow(len(tableFire))
+        print len(tableFire)
         self.progressBar.show()
-        for i in range(12):
-            for a in range(10000000):
-                pass
+        i = 0
+        for row in tableFire:
+            node['fireBox'] = row.IgnitorID
+            node['firePoint'] = row.ConnectorID
+            node['seconds'] = int(row.IgnitionTime/1000)
+            node['offsetSec'] = int(row.IgnitionTime%1000) #ms
+            package = dataPack(node)
+            package.pack()
+            self.myQueue.put (package.package)
+            print row.IgnitionTime
+            print "++++++++++++++++++"
+            i += 1
             self.progressBar.ui.progressBar.setValue(i)
+            for a in range(1000000):
+                pass
         self.progressBar.close()
     
     def delayFire(self):
@@ -270,10 +285,23 @@ class Fireworks(QtGui.QWidget):
             self.ui.pushButtonUpLoad.hide()
             self.ui.seekSlider.setDisabled(False)
         else:
+            try:
+                dev = ft.list_devices()
+            except:
+                dev = []
             self.ui.pushButtonDelay.show()
             self.ui.pushButtonUpLoad.show()
             self.stopMusic()
             self.ui.seekSlider.setDisabled(True)
+            
+            
+            self.myQueue = Queue.Queue()
+            self.comminute = HardwareCommunicate(self.myQueue)
+            thread = QtCore.QThread()
+            self.comminute.moveToThread(thread)
+            thread.start()
+            time.sleep(0.1)
+            self.comminute.signalCommunicate.emit()
             
         
     def musicStatusChanged(self, newstate, oldState):
@@ -390,15 +418,11 @@ class Fireworks(QtGui.QWidget):
         self.showSignal.emit()
         event.accept()
     
-# def main():
-#     app = QtGui.QApplication(sys.argv)
-# #     locale = QtCore.QLocale.system().name()
-# ##    appTranslator = QtCore.QTranslator()
-# ##    if appTranslator.load (":/loginWin_" + locale):
-# ##        app.installTranslator (appTranslator)
-#     window = Fireworks()
-#     window.show()
-#     sys.exit(app.exec_())
-#     
-# if __name__ == "__main__":
-#     main()
+def main():
+    app = QtGui.QApplication(sys.argv)
+    window = Fireworks()
+    window.show()
+    sys.exit(app.exec_())
+    
+if __name__ == "__main__":
+    main()

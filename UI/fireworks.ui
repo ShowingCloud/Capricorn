@@ -45,7 +45,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonOpen">
+        <widget class="QPushButton" name="pushButtonOpenMusic">
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -57,28 +57,13 @@
          </property>
          <property name="icon">
           <iconset resource="../Resource/images.qrc">
-           <normaloff>:/Images/open.png</normaloff>:/Images/open.png</iconset>
+           <normaloff>:/Images/openMusic.png</normaloff>:/Images/openMusic.png</iconset>
          </property>
          <property name="iconSize">
           <size>
-           <width>30</width>
-           <height>30</height>
+           <width>25</width>
+           <height>27</height>
           </size>
-         </property>
-         <property name="shortcut">
-          <string/>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-         <property name="autoRepeat">
-          <bool>false</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -164,13 +149,6 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="labelTotal">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="pushButtonDelay">
          <property name="minimumSize">
           <size>
@@ -225,6 +203,89 @@
            <width>24</width>
            <height>24</height>
           </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonOpenPro">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Resource/images.qrc">
+           <normaloff>:/Images/open.png</normaloff>:/Images/open.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonSavePro">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Resource/images.qrc">
+           <normaloff>:/Images/save.png</normaloff>:/Images/save.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelTotal">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
