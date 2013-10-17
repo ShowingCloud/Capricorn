@@ -3,7 +3,7 @@ from PySide import QtCore,QtGui
 from UI.ui_fireworks import Ui_widgetWaveModule
 from PySide.phonon import Phonon
 from Resource import images_rc
-import sys
+# import sys
 from PySide.QtCore import QPoint, Slot
 from Models.LocalDB import session, engine, meta, FireworksData
 from Models.ProjectDB import proSession, proEngine, proMeta, ProFireworksData
@@ -23,10 +23,13 @@ from Device.Communication import HardwareCommunicate
 import Queue
 import time
 
+
 class Fireworks(QtGui.QWidget):
 
-    def __init__(self,parent=None):
+    def __init__(self, signal, parent=None):
         QtGui.QWidget.__init__(self,parent)
+        
+        self.showSignal = signal
         self.ui=Ui_widgetWaveModule()
         self.ui.setupUi(self)
         self.ui.lcdNumber.display('00:00')
@@ -80,16 +83,16 @@ class Fireworks(QtGui.QWidget):
         self.ui.scriptTableView.setModel(self.proModel)
         self.ui.scriptTableView.setSortingEnabled(True)
         self.ui.scriptTableView.setItemDelegateForColumn(1, TimeDelegate(self.proSession, self))
-        self.ui.scriptTableView.setItemDelegateForColumn(2, ScriptDelegate(self))
-        self.ui.scriptTableView.setItemDelegateForColumn(3, ScriptDelegate(self))
-        self.ui.scriptTableView.setItemDelegateForColumn(4, ScriptDelegate(self))
-        self.ui.scriptTableView.setItemDelegateForColumn(5, ScriptDelegate(self))
+        self.ui.scriptTableView.setItemDelegateForColumn(2, ScriptDelegate(self.proSession, self))
+        self.ui.scriptTableView.setItemDelegateForColumn(3, ScriptDelegate(self.proSession, self))
+        self.ui.scriptTableView.setItemDelegateForColumn(4, ScriptDelegate(self.proSession, self))
+        self.ui.scriptTableView.setItemDelegateForColumn(5, ScriptDelegate(self.proSession, self))
         self.ui.scriptTableView.setItemDelegateForColumn(6, TimeDelegate(self.proSession,self))
         self.ui.scriptTableView.setItemDelegateForColumn(7, TimeDelegate(self.proSession,self))
         self.ui.scriptTableView.setItemDelegateForColumn(8, TimeDelegate(self.proSession,self))
         self.ui.scriptTableView.setItemDelegateForColumn(9, TimeDelegate(self.proSession,self))
         self.ui.scriptTableView.setItemDelegateForColumn(10, SpinBoxDelegate(self.proSession, self))
-        self.ui.scriptTableView.setItemDelegateForColumn(11, ScriptDelegate(self))
+        self.ui.scriptTableView.setItemDelegateForColumn(11, ScriptDelegate(self.proSession, self))
         
         #为工程脚本tableview添加右键菜单
         self.ui.scriptTableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -383,6 +386,9 @@ class Fireworks(QtGui.QWidget):
     def mediaFinish(self):
         self.stopMusic()
         
+    def closeEvent(self, event):
+        self.showSignal.emit()
+        event.accept()
     
 # def main():
 #     app = QtGui.QApplication(sys.argv)

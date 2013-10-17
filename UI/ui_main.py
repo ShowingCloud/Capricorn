@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Thu Oct 17 15:00:24 2013
+# Created: Thu Oct 17 19:47:35 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,14 +18,12 @@ class Ui_Form(object):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Images/title.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Form.setWindowIcon(icon)
-        '''
-                    设置窗口背景
-        '''
+#         Form.setAutoFillBackground(False)
+#         Form.setStyleSheet("image: url(:/Images/main.png);")
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Background, QtGui.QBrush(QtGui.QPixmap(":/Images/main.png")))
         Form.setPalette(palette)
-#         Form.setAutoFillBackground(True)
-#         Form.setStyleSheet("QWidget{image:url(:/Images/main.png)}")
+        
         self.pushButtonConnect = QtGui.QPushButton(Form)
         self.pushButtonConnect.setGeometry(QtCore.QRect(290, 260, 150, 30))
         self.pushButtonConnect.setFlat(False)
@@ -44,7 +42,7 @@ class Ui_Form(object):
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
-        Form.setWindowTitle(QtGui.QApplication.translate("Form", "橘星－烟花软件", None, QtGui.QApplication.UnicodeUTF8))
+        Form.setWindowTitle(QtGui.QApplication.translate("Form", "音乐烟花V1.0", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonConnect.setText(QtGui.QApplication.translate("Form", "连接测试", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonFire.setText(QtGui.QApplication.translate("Form", "手动燃放", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonProject.setText(QtGui.QApplication.translate("Form", "工程编辑", None, QtGui.QApplication.UnicodeUTF8))
