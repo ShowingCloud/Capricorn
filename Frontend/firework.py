@@ -427,7 +427,7 @@ class Fireworks(QtGui.QWidget):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    window = Fireworks(None)
+    window = Fireworks()
     window.show()
     sys.exit(app.exec_())
     
