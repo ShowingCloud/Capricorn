@@ -81,11 +81,11 @@ class getMessage(QtCore.QObject):
             self.p.put(listHead)
 
 
-class uiShow(QtGui.QDialog):
+class UiShow(QtGui.QDialog):
 
-    def __init__(self,parent=None):
+    def __init__(self ,signalClose ,parent=None):
         QtGui.QDialog.__init__(self,parent)
-
+        self.signalClose = signalClose
         self.ui=Ui_Dialog()
         self.ui.setupUi(self)
         self.buttonConnect()
@@ -109,8 +109,19 @@ class uiShow(QtGui.QDialog):
         self.timer.start(1000)
 
         intVal = QtGui.QIntValidator()
+        self.ui.pushButtonTest.setEnabled(False)
         self.ui.lineEditBoxID.setValidator(intVal)
+        self.ui.lineEditBoxID.textChanged.connect(self.setStartEnable)
 
+    def setStartEnable(self):
+        if self.ui.lineEditBoxID.text()!='' and self.ui.lineEditBoxID.text()!='0':
+            self.ui.pushButtonTest.setEnabled(True)
+        else:
+            self.ui.pushButtonTest.setEnabled(False)
+    def closeEvent(self, event):
+        self.signalClose.emit()
+        event.accept()
+        
     def timerEvent(self):
         print "get message...."
         if self.p.empty():
@@ -192,7 +203,7 @@ class uiShow(QtGui.QDialog):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    window = uiShow()
+    window = UiShow()
     window.show()
     sys.exit(app.exec_())
 

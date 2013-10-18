@@ -46,11 +46,11 @@ class getMessage (QtCore.QObject):
             print repr(item)
 
 
-class uiShow(QtGui.QDialog):
+class UiShow(QtGui.QDialog):
 
-    def __init__(self,parent=None):
+    def __init__(self,signalClose,parent=None):
         QtGui.QDialog.__init__(self,parent)
-
+        self.signalClose = signalClose
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.buttonConnect()
@@ -69,6 +69,11 @@ class uiShow(QtGui.QDialog):
         time.sleep(1)
         self.c.signalRead.emit()
         self.boxChanged()
+        
+    def closeEvent(self, event):
+        self.signalClose.emit()
+        event.accept()
+    
     def buttonConnect(self):
         self.ui.lineEditBoxID.textChanged.connect(self.boxChanged)
         self.ui.ButtonConfirm.clicked.connect(self.confirm)
@@ -232,7 +237,7 @@ class uiShow(QtGui.QDialog):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    window = uiShow()
+    window = UiShow()
     window.show()
     sys.exit(app.exec_())
 

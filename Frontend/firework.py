@@ -11,6 +11,7 @@ from Frontend.setTime import SetDelayTime
 from Frontend.editFireworks import EditFireworks
 from Frontend.timeTick import TimeTickShow
 from Frontend.progressBar import ProgressBarShow
+from Frontend.control import ControlWinShow
 from Delegate.localDelegate import LocalDelegate
 from Delegate.scriptDelegate import ScriptDelegate
 import json
@@ -119,6 +120,13 @@ class Fireworks(QtGui.QWidget):
         self.path = None
     
     def upLoadToDevice(self):
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             return
+        
         with self.proSession.begin():
             tableFire = self.proSession.query(ProFireworksData).all()
         node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
@@ -136,37 +144,30 @@ class Fireworks(QtGui.QWidget):
             package = dataPack(node)
             package.pack()
             self.myQueue.put (package.package)
-            print row.IgnitionTime
-            print "++++++++++++++++++"
             i += 1
             self.progressBar.ui.progressBar.setValue(i)
             for a in range(1000000):
                 pass
         self.progressBar.close()
-    
+        self.ui.pushButtonUpLoad.setEnabled(False)
+        self.ui.pushButtonDelay.setEnabled(True)
     def delayFire(self):
-        self.delayTime = SetDelayTime()
-        self.delayTime.show()
-        self.delayTime.ui.pushButtonStart.clicked.connect(self.startTick)
-        
+        self.delayTimeWin = SetDelayTime()
+        if self.delayTimeWin.exec_():
+            self.delaySeconds = int(self.delayTimeWin.ui.lineEditDelayTime.text())
+            self.startTick()
+            
     def startTick(self):
-        self.delaySeconds = int(self.delayTime.ui.lineEditDelayTime.text())
-        self.delayTime.close()
-        self.timeCount = TimeTickShow(self.delaySeconds)
-        self.timeCount.show()
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.setLcdDisplay)
-        self.timer.start(1000)
-        
-    def setLcdDisplay(self):
-        self.delaySeconds -= 1
-        displayTime = QtCore.QTime(0, (self.delaySeconds / 60) % 60, (self.delaySeconds) % 60)
-        self.timeCount.ui.lcdNumber.display(displayTime.toString('mm:ss'))
-        if self.delaySeconds == 0 :
-            self.timer.stop()
-            self.timeCount.accept()
+        self.timeCountWin = TimeTickShow(self.delaySeconds)
+        if self.timeCountWin.exec_():
             if self.path != None :
                 self.media.play()
+                self.controlWin = ControlWinShow(self.ui.pushButtonPlayOrPause.clicked,self.ui.pushButtonStop.clicked,self.media.finished)
+                if self.controlWin.exec_():
+                    self.media.stop()
+                
+    
+            
         
     def setTypeData(self):
         coco = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
@@ -288,27 +289,43 @@ class Fireworks(QtGui.QWidget):
         if self.ui.comboBoxMode.currentIndex() == 0:
             self.ui.pushButtonDelay.hide()
             self.ui.pushButtonUpLoad.hide()
+            self.ui.pushButtonOpenPro.show()
+            self.ui.pushButtonSavePro.show()
             self.ui.seekSlider.setDisabled(False)
         else:
-            try:
-                dev = ft.list_devices()
-            except:
-                dev = []
+            if self.checkCondition(): #if not self.checkCondition():
+                self.ui.comboBoxMode.setCurrentIndex(0)
+                return
             self.ui.pushButtonDelay.show()
             self.ui.pushButtonUpLoad.show()
-            self.stopMusic()
+            self.ui.pushButtonOpenPro.hide()
+            self.ui.pushButtonSavePro.hide()
             self.ui.seekSlider.setDisabled(True)
-            
+            self.ui.pushButtonDelay.setEnabled(False)
+            self.stopMusic()
             
             self.myQueue = Queue.Queue()
             self.comminute = HardwareCommunicate(self.myQueue)
-            thread = QtCore.QThread()
-            self.comminute.moveToThread(thread)
-            thread.start()
+            self.threadCommunicate = QtCore.QThread()
+            self.comminute.moveToThread(self.threadCommunicate)
+            self.threadCommunicate.start()
             time.sleep(0.1)
             self.comminute.signalCommunicate.emit()
             
-        
+    def checkCondition(self):
+        if self.path == None:
+            QtGui.QMessageBox.question(None,'message','Please choose music',QtGui.QMessageBox.Ok)
+            return False
+        #TODO:Check Fireworks and Ignitors 
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             QtGui.QMessageBox.question(None,'message','No device connect',QtGui.QMessageBox.Ok)
+#             return False
+#         return True
+    
     def musicStatusChanged(self, newstate, oldState):
         if newstate == Phonon.PlayingState:
             self.ui.pushButtonPlayOrPause.setIcon(QtGui.QIcon(':/Images/pause.png'))
@@ -420,17 +437,18 @@ class Fireworks(QtGui.QWidget):
         self.stopMusic()
         
     def closeEvent(self, event):
+        self.media.stop()
+        self.threadCommunicate.terminate()
         self.showSignal.emit()
 #         print os.path.join (appdata, 'proj', 'project.db')
         os.remove(os.path.join (appdata, 'proj', 'project.db'))
         event.accept()
     
-def main():
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    window = Fireworks()
-    window.show()
-    sys.exit(app.exec_())
-    
-if __name__ == "__main__":
-    main()
+# def main():
+#     app = QtGui.QApplication(sys.argv)
+#     window = Fireworks()
+#     window.show()
+#     sys.exit(app.exec_())
+#     
+# if __name__ == "__main__":
+#     main()

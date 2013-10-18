@@ -10,15 +10,15 @@ class GlobalMessage:
         
     @staticmethod
     def messageDisplayEn():
-        GlobalMessage.dicEnglish.setdefault(u'ç™½è‰²', 'White')
-        GlobalMessage.dicEnglish.setdefault(u'é»‘è‰²', 'Black')
-        GlobalMessage.dicEnglish.setdefault(u'çº¢è‰²', 'Red')
-        GlobalMessage.dicEnglish.setdefault(u'è“è‰²', 'Blue')
-        GlobalMessage.dicEnglish.setdefault(u'ç»¿è‰²', 'Green')
-        GlobalMessage.dicEnglish.setdefault(u'è“ç»¿è‰²', 'Cyan')
-        GlobalMessage.dicEnglish.setdefault(u'æ´‹çº¢è‰²', 'Magenta')
-        GlobalMessage.dicEnglish.setdefault(u'é»„è‰²', 'Yellow')
-        GlobalMessage.dicEnglish.setdefault(u'ç°è‰²', 'Gray')
+        GlobalMessage.dicEnglish.setdefault(u'°×É«', 'White')
+        GlobalMessage.dicEnglish.setdefault(u'ºÚÉ«', 'Black')
+        GlobalMessage.dicEnglish.setdefault(u'ºìÉ«', 'Red')
+        GlobalMessage.dicEnglish.setdefault(u'À¶É«', 'Blue')
+        GlobalMessage.dicEnglish.setdefault(u'ÂÌÉ«', 'Green')
+        GlobalMessage.dicEnglish.setdefault(u'À¶ÂÌÉ«', 'Cyan')
+        GlobalMessage.dicEnglish.setdefault(u'ÑóºìÉ«', 'Magenta')
+        GlobalMessage.dicEnglish.setdefault(u'»ÆÉ«', 'Yellow')
+        GlobalMessage.dicEnglish.setdefault(u'»ÒÉ«', 'Gray')
         
 class MessageDisplay:
     @staticmethod

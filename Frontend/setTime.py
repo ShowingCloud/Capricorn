@@ -16,15 +16,15 @@ class SetDelayTime(QtGui.QDialog):
         self.ui.lineEditDelayTime.setValidator(intVal)
         self.ui.lineEditDelayTime.textChanged.connect(self.inputChanged)
         self.ui.pushButtonCancel.clicked.connect(self.cancel)
-        
+        self.ui.pushButtonStart.clicked.connect(self.start)
     def inputChanged(self):
         if self.ui.lineEditDelayTime.text()=="":
             self.ui.pushButtonStart.setEnabled(False)
         elif int(self.ui.lineEditDelayTime.text())>0:
             self.ui.pushButtonStart.setEnabled(True)
     
-    
-        
+    def start(self):
+        self.accept()
         
     def cancel(self):
-        self.close()
+        self.reject()
