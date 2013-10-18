@@ -146,28 +146,20 @@ class Fireworks(QtGui.QWidget):
         self.progressBar.close()
     
     def delayFire(self):
-        self.delayTime = SetDelayTime()
-        self.delayTime.show()
-        self.delayTime.ui.pushButtonStart.clicked.connect(self.startTick)
-        
+        self.delayTimeWin = SetDelayTime()
+        if self.delayTimeWin.exec_():
+            self.delaySeconds = int(self.delayTimeWin.ui.lineEditDelayTime.text())
+            self.startTick()
+            
     def startTick(self):
-        self.delaySeconds = int(self.delayTime.ui.lineEditDelayTime.text())
-        self.delayTime.close()
-        self.timeCount = TimeTickShow(self.delaySeconds)
-        self.timeCount.show()
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.setLcdDisplay)
-        self.timer.start(1000)
-        
-    def setLcdDisplay(self):
-        self.delaySeconds -= 1
-        displayTime = QtCore.QTime(0, (self.delaySeconds / 60) % 60, (self.delaySeconds) % 60)
-        self.timeCount.ui.lcdNumber.display(displayTime.toString('mm:ss'))
-        if self.delaySeconds == 0 :
-            self.timer.stop()
-            self.timeCount.accept()
+        self.timeCountWin = TimeTickShow(self.delaySeconds)
+        if self.timeCountWin.exec_():
             if self.path != None :
                 self.media.play()
+                #***************************ToDO:startFire Time Sync**********************************************************************************
+                
+    
+            
         
     def setTypeData(self):
         coco = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
@@ -283,6 +275,8 @@ class Fireworks(QtGui.QWidget):
         if self.ui.comboBoxMode.currentIndex() == 0:
             self.ui.pushButtonDelay.hide()
             self.ui.pushButtonUpLoad.hide()
+            self.ui.pushButtonOpenPro.show()
+            self.ui.pushButtonSavePro.show()
             self.ui.seekSlider.setDisabled(False)
         else:
             try:
@@ -291,6 +285,8 @@ class Fireworks(QtGui.QWidget):
                 dev = []
             self.ui.pushButtonDelay.show()
             self.ui.pushButtonUpLoad.show()
+            self.ui.pushButtonOpenPro.hide()
+            self.ui.pushButtonSavePro.hide()
             self.stopMusic()
             self.ui.seekSlider.setDisabled(True)
             

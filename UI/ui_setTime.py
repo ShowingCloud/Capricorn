@@ -35,10 +35,10 @@ class Ui_Dialog(object):
         self.label_s.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.label_s.setObjectName("label_s")
         self.pushButtonCancel = QtGui.QPushButton(Dialog)
-        self.pushButtonCancel.setGeometry(QtCore.QRect(110, 70, 50, 25))
+        self.pushButtonCancel.setGeometry(QtCore.QRect(170, 70, 50, 25))
         self.pushButtonCancel.setObjectName("pushButtonCancel")
         self.pushButtonStart = QtGui.QPushButton(Dialog)
-        self.pushButtonStart.setGeometry(QtCore.QRect(170, 70, 50, 25))
+        self.pushButtonStart.setGeometry(QtCore.QRect(110, 70, 50, 25))
         self.pushButtonStart.setObjectName("pushButtonStart")
 
         self.retranslateUi(Dialog)
