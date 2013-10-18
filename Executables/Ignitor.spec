@@ -1,8 +1,8 @@
-srcdir = 'C:\\Work\\Capricorn'
+srcdir = '..'
 
 
 # -*- mode: python -*-
-a = Analysis([os.path.join (srcdir, 'Frontend\\main.py')],
+a = Analysis([os.path.join (srcdir, 'Capricorn.py')],
              pathex=['C:\\Python27\\pyinstaller'],
              hiddenimports=[],
              hookspath=None,
