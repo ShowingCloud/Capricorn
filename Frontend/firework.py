@@ -247,7 +247,7 @@ class Fireworks(QtGui.QWidget):
         rightMenu.exec_(QtGui.QCursor.pos())
         
     def addFireworks(self):
-        dialogAddFireworks = EditFireworks(self.localSession, self)
+        dialogAddFireworks = EditFireworks(self.localSession, parent = self)
         accept = dialogAddFireworks.exec_()
         if accept == 1:
             self.query(self.type)
@@ -272,6 +272,12 @@ class Fireworks(QtGui.QWidget):
         self.proModel.takeRow(self.scriptRow)
     
     def editFireworks(self):
+        fireworksUUID = self.model.item(self.row, 0).text()
+        
+        dialogEditFireworks = EditFireworks(self.localSession, fireworksUUID, self)
+        accept = dialogEditFireworks.exec_()
+        if accept == 1:
+            self.query(self.type)
         pass
     
     @Slot(QtGui.QListWidgetItem)
@@ -419,8 +425,9 @@ class Fireworks(QtGui.QWidget):
         event.accept()
     
 def main():
+    import sys
     app = QtGui.QApplication(sys.argv)
-    window = Fireworks()
+    window = Fireworks(None)
     window.show()
     sys.exit(app.exec_())
     
