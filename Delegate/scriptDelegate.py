@@ -21,7 +21,10 @@ class ScriptDelegate(QtGui.QStyledItemDelegate):
         
         style = QtGui.QApplication.style()
         label = QtGui.QStyleOptionViewItemV4 (option)
-        label.text = str(index.data())
+        if index.column() == 2 or index.column() == 4:
+            label.text = index.data()
+        else:
+            label.text = str(index.data())
         label.displayAlignment = QtCore.Qt.AlignCenter
     
         style.drawControl (QtGui.QStyle.CE_ItemViewItem, label, painter)

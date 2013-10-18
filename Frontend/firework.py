@@ -9,7 +9,6 @@ from Models.LocalDB import session, engine, meta, FireworksData
 from Models.ProjectDB import proSession, proEngine, proMeta, ProFireworksData
 from Frontend.setTime import SetDelayTime
 from Frontend.editFireworks import EditFireworks
-from Frontend.GlobalMessage import MessageDisplay
 from Frontend.timeTick import TimeTickShow
 from Frontend.progressBar import ProgressBarShow
 from Delegate.localDelegate import LocalDelegate
@@ -23,6 +22,8 @@ from Device.Communication import HardwareCommunicate
 from Device.protocol import dataPack
 import Queue
 import time
+import os
+from config import appdata
 try:
     from Device import ftdi2 as ft
 except:
@@ -103,11 +104,9 @@ class Fireworks(QtGui.QWidget):
         self.ui.scriptTableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
-        #测试全局字符串
-        print MessageDisplay.getMessage('a')
         
         #查询数据库显示本地烟火库
-        self.type = 'coco'
+        self.type = u'椰树'
         self.query(self.type)
         
         #显示脚本库信息
@@ -172,47 +171,47 @@ class Fireworks(QtGui.QWidget):
     def setTypeData(self):
         coco = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         coco.setIcon(QtGui.QIcon(':/Images/coco.jpg'))
-        coco.setToolTip('coco')
+        coco.setToolTip(u'椰树')
         coco.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         brocadeHat = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         brocadeHat.setIcon(QtGui.QIcon(':/Images/brocade hat.jpg'))
-        brocadeHat.setToolTip('brocade hat')
+        brocadeHat.setToolTip(u'锦冠')
         brocadeHat.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         gorgeous = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         gorgeous.setIcon(QtGui.QIcon(':/Images/gorgeous.jpg'))
-        gorgeous.setToolTip('gorgeous')
+        gorgeous.setToolTip(u'大丽')
         gorgeous.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         peony = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         peony.setIcon(QtGui.QIcon(':/Images/peony.jpg'))
-        peony.setToolTip('peony')
+        peony.setToolTip(u'牡丹')
         peony.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         candle = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         candle.setIcon(QtGui.QIcon(':/Images/candle.jpg'))
-        candle.setToolTip('candle')
+        candle.setToolTip(u'喷泉')
         candle.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         potFlower = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         potFlower.setIcon(QtGui.QIcon(':/Images/pot flower.jpg'))
-        potFlower.setToolTip('pot flower')
+        potFlower.setToolTip(u'盆花')
         potFlower.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         willow = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         willow.setIcon(QtGui.QIcon(':/Images/willow.jpg'))
-        willow.setToolTip('willow')
+        willow.setToolTip(u'柳树')
         willow.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         mum = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         mum.setIcon(QtGui.QIcon(':/Images/mum.jpg'))
-        mum.setToolTip('mum')
+        mum.setToolTip(u'菊花')
         mum.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         glint = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         glint.setIcon(QtGui.QIcon(':/Images/glint.jpg'))
-        glint.setToolTip('glint')
+        glint.setToolTip(u'银闪')
         glint.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
     
     def query(self, Type):
@@ -422,6 +421,8 @@ class Fireworks(QtGui.QWidget):
         
     def closeEvent(self, event):
         self.showSignal.emit()
+#         print os.path.join (appdata, 'proj', 'project.db')
+        os.remove(os.path.join (appdata, 'proj', 'project.db'))
         event.accept()
     
 def main():

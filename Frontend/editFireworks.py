@@ -5,6 +5,7 @@ from datetime import datetime
 from UI.ui_editFireworks import Ui_DatabaseDialog
 import json
 import uuid
+from Frontend.GlobalMessage import MessageDisplay
 
 class  EditFireworks(QtGui.QDialog):
     def __init__(self, localSession, editUUID = None, parent=None):
@@ -200,7 +201,7 @@ class  EditFireworks(QtGui.QDialog):
         if index == 0:
             self.ui.IconLabel_color1.setStyleSheet("QLabel{background-color: transparent}")
         else :
-            self.ui.IconLabel_color1.setStyleSheet("QLabel{background-color:%s}" % self.ui.comboBoxColor1.itemText(index))
+            self.ui.IconLabel_color1.setStyleSheet("QLabel{background-color:%s}" % MessageDisplay.getMessage(self.ui.comboBoxColor1.itemText(index)))
             
             
     @Slot(int)   
@@ -209,7 +210,7 @@ class  EditFireworks(QtGui.QDialog):
         if index == 0:
             self.ui.IconLabel_color2.setStyleSheet("QLabel{background-color: transparent}")
         else :
-            self.ui.IconLabel_color2.setStyleSheet("QLabel{background-color:%s}" % self.ui.comboBoxColor2.itemText(index))
+            self.ui.IconLabel_color2.setStyleSheet("QLabel{background-color:%s}" % MessageDisplay.getMessage(self.ui.comboBoxColor2.itemText(index)))
             
     @Slot(int)   
     def changeColor3(self, index):
@@ -217,5 +218,5 @@ class  EditFireworks(QtGui.QDialog):
         if index == 0:
             self.ui.IconLabel_color3.setStyleSheet("QLabel{background-color: transparent}")
         else :
-            self.ui.IconLabel_color3.setStyleSheet("QLabel{background-color:%s}" % self.ui.comboBoxColor3.itemText(index))
+            self.ui.IconLabel_color3.setStyleSheet("QLabel{background-color:%s}" % MessageDisplay.getMessage(self.ui.comboBoxColor3.itemText(index)))
  
