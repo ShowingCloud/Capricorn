@@ -29,7 +29,17 @@ class TimeTickShow(QtGui.QDialog):
         self.timeRemains = delaySeconds 
         displayTime = QtCore.QTime(0, (self.timeRemains / 60) % 60, (self.timeRemains) % 60)
         self.ui.lcdNumber.display(displayTime.toString('mm:ss'))
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.timerEvent)
+        self.timer.start(1000)
         
+    def timerEvent(self):
+        self.timeRemains -= 1
+        displayTime = QtCore.QTime(0, (self.timeRemains / 60) % 60, (self.timeRemains) % 60)
+        self.ui.lcdNumber.display(displayTime.toString('mm:ss'))
+        if self.timeRemains == 0:
+            self.timer.stop()
+            self.accept()
     
         
 

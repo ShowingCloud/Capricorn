@@ -11,6 +11,7 @@ from Frontend.setTime import SetDelayTime
 from Frontend.editFireworks import EditFireworks
 from Frontend.timeTick import TimeTickShow
 from Frontend.progressBar import ProgressBarShow
+from Frontend.control import ControlWinShow
 from Delegate.localDelegate import LocalDelegate
 from Delegate.scriptDelegate import ScriptDelegate
 import json
@@ -24,6 +25,10 @@ import Queue
 import time
 import os
 from config import appdata
+from sqlalchemy.sql.expression import func, distinct
+import tarfile
+import shutil
+
 try:
     from Device import ftdi2 as ft
 except:
@@ -47,14 +52,14 @@ class Fireworks(QtGui.QWidget):
         self.ui.pushButtonDelay.clicked.connect(self.delayFire)
         self.ui.pushButtonUpLoad.clicked.connect(self.upLoadToDevice)
 
-        #生成本地库
+        #create local database
         self.localSession = session()
         meta.create_all(engine)
         
-        #生成工程库
+        #create project database
         self.proSession = proSession()
         proMeta.create_all(proEngine)
-        #添加音乐播放器
+        #create media player 
         self.media = Phonon.MediaObject(self)
         self.output = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.media, self.output)
@@ -68,23 +73,19 @@ class Fireworks(QtGui.QWidget):
         self.media.finished.connect(self.mediaFinish)
         self.musicTime = 0
         
-        #改变模式
         self.ui.comboBoxMode.currentIndexChanged.connect(self.modeChanged)
         
-        #设置烟花类型数据
+        #set fireworks type
         self.setTypeData()
         
-        #为本地烟火库tableview添加model
         self.model = QtGui.QStandardItemModel(0, 3, self)
         self.ui.tableViewLocal.setModel(self.model)
         self.ui.tableViewLocal.setColumnWidth(1, 116)
         self.ui.tableViewLocal.setItemDelegate(LocalDelegate(self))
         
-        #为本地烟火库tableview添加右键菜单
         self.ui.tableViewLocal.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableViewLocal.customContextMenuRequested.connect(self.rightContextMenu)
         
-        #为脚本烟火库tableview添加model
         self.proModel = QtGui.QStandardItemModel(0, 11, self)
         self.ui.scriptTableView.setModel(self.proModel)
         self.ui.scriptTableView.setSortingEnabled(True)
@@ -100,25 +101,36 @@ class Fireworks(QtGui.QWidget):
         self.ui.scriptTableView.setItemDelegateForColumn(10, SpinBoxDelegate(self.proSession, self))
         self.ui.scriptTableView.setItemDelegateForColumn(11, ScriptDelegate(self.proSession, self))
         
-        #为工程脚本tableview添加右键菜单
+        #add right menu
         self.ui.scriptTableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
         
-        #查询数据库显示本地烟火库
         self.type = u'椰树'
         self.query(self.type)
         
-        #显示脚本库信息
+        #show the script fireworks
         self.scriptTable = self.refreshScript()
         
-        #切换烟花种类刷新烟火库
+        #change the local database fireworks
         self.ui.listWidgetLocal.itemClicked.connect(self.refreshQuery)
-        #双击添加脚本烟花
+        
         self.ui.tableViewLocal.doubleClicked.connect(self.addScriptFireworks)
-        self.path = None
+        self.musicPath = None
     
+        self.ui.pushButtonSavePro.clicked.connect(self.saveProject)
+        self.ui.pushButtonOpenPro.clicked.connect(self.openProject)
+        
+        self.projectPath = None
+        
     def upLoadToDevice(self):
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             return
+        
         with self.proSession.begin():
             tableFire = self.proSession.query(ProFireworksData).all()
         node = {'head':0xAAF0,'length':0x14,'function':0x01,'ID':0xAABBCCDD,'fireBox':None,
@@ -136,81 +148,92 @@ class Fireworks(QtGui.QWidget):
             package = dataPack(node)
             package.pack()
             self.myQueue.put (package.package)
-            print row.IgnitionTime
-            print "++++++++++++++++++"
             i += 1
             self.progressBar.ui.progressBar.setValue(i)
             for a in range(1000000):
                 pass
         self.progressBar.close()
-    
+        self.ui.pushButtonUpLoad.setEnabled(False)
+        self.ui.pushButtonDelay.setEnabled(True)
     def delayFire(self):
-        self.delayTime = SetDelayTime()
-        self.delayTime.show()
-        self.delayTime.ui.pushButtonStart.clicked.connect(self.startTick)
-        
+        self.delayTimeWin = SetDelayTime()
+        if self.delayTimeWin.exec_():
+            self.delaySeconds = int(self.delayTimeWin.ui.lineEditDelayTime.text())
+            self.startTick()
+            
     def startTick(self):
-        self.delaySeconds = int(self.delayTime.ui.lineEditDelayTime.text())
-        self.delayTime.close()
-        self.timeCount = TimeTickShow(self.delaySeconds)
-        self.timeCount.show()
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.setLcdDisplay)
-        self.timer.start(1000)
-        
-    def setLcdDisplay(self):
-        self.delaySeconds -= 1
-        displayTime = QtCore.QTime(0, (self.delaySeconds / 60) % 60, (self.delaySeconds) % 60)
-        self.timeCount.ui.lcdNumber.display(displayTime.toString('mm:ss'))
-        if self.delaySeconds == 0 :
-            self.timer.stop()
-            self.timeCount.accept()
-            if self.path != None :
+        self.timeCountWin = TimeTickShow(self.delaySeconds)
+        if self.timeCountWin.exec_():
+            if self.musicPath != None :
                 self.media.play()
+                self.controlWin = ControlWinShow(self.ui.pushButtonPlayOrPause.clicked,self.ui.pushButtonStop.clicked,self.media.finished)
+                if self.controlWin.exec_():
+                    self.media.stop()
+                
+    
+            
         
     def setTypeData(self):
         coco = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        coco.setIcon(QtGui.QIcon(':/Images/coco.jpg'))
+        cocoIcon = QtGui.QIcon()
+        cocoIcon.addPixmap(QtGui.QPixmap(":/Images/coco.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        coco.setIcon(cocoIcon)
         coco.setToolTip(u'椰树')
         coco.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         brocadeHat = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        brocadeHat.setIcon(QtGui.QIcon(':/Images/brocade hat.jpg'))
+        brocadeHatIcon = QtGui.QIcon()
+        brocadeHatIcon.addPixmap(QtGui.QPixmap(":/Images/brocade hat.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        brocadeHat.setIcon(brocadeHatIcon)
         brocadeHat.setToolTip(u'锦冠')
         brocadeHat.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         gorgeous = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        gorgeous.setIcon(QtGui.QIcon(':/Images/gorgeous.jpg'))
+        gorgeousIcon = QtGui.QIcon()
+        gorgeousIcon.addPixmap(QtGui.QPixmap(":/Images/gorgeous.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        gorgeous.setIcon(gorgeousIcon)
         gorgeous.setToolTip(u'大丽')
         gorgeous.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         peony = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        peony.setIcon(QtGui.QIcon(':/Images/peony.jpg'))
+        peonyIcon = QtGui.QIcon()
+        peonyIcon.addPixmap(QtGui.QPixmap(":/Images/peony.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        peony.setIcon(peonyIcon)
         peony.setToolTip(u'牡丹')
         peony.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         candle = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        candle.setIcon(QtGui.QIcon(':/Images/candle.jpg'))
+        candleIcon = QtGui.QIcon()
+        candleIcon.addPixmap(QtGui.QPixmap(":/Images/candle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        candle.setIcon(candleIcon)
         candle.setToolTip(u'喷泉')
         candle.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         potFlower = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        potFlower.setIcon(QtGui.QIcon(':/Images/pot flower.jpg'))
+        potFlowerIcon = QtGui.QIcon()
+        potFlowerIcon.addPixmap(QtGui.QPixmap(":/Images/pot flower.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        potFlower.setIcon(potFlowerIcon)
         potFlower.setToolTip(u'盆花')
         potFlower.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         willow = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        willow.setIcon(QtGui.QIcon(':/Images/willow.jpg'))
+        willowIcon = QtGui.QIcon()
+        willowIcon.addPixmap(QtGui.QPixmap(":/Images/willow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        willow.setIcon(willowIcon)
         willow.setToolTip(u'柳树')
         willow.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         mum = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        mum.setIcon(QtGui.QIcon(':/Images/mum.jpg'))
+        mumIcon = QtGui.QIcon()
+        mumIcon.addPixmap(QtGui.QPixmap(":/Images/mum.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        mum.setIcon(mumIcon)
         mum.setToolTip(u'菊花')
         mum.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        
+         
         glint = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
-        glint.setIcon(QtGui.QIcon(':/Images/glint.jpg'))
+        glintIcon = QtGui.QIcon()
+        glintIcon.addPixmap(QtGui.QPixmap(":/Images/glint.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        glint.setIcon(glintIcon)
         glint.setToolTip(u'银闪')
         glint.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
     
@@ -288,27 +311,47 @@ class Fireworks(QtGui.QWidget):
         if self.ui.comboBoxMode.currentIndex() == 0:
             self.ui.pushButtonDelay.hide()
             self.ui.pushButtonUpLoad.hide()
+            self.ui.pushButtonOpenPro.show()
+            self.ui.pushButtonSavePro.show()
             self.ui.seekSlider.setDisabled(False)
+            self.ui.tableViewLocal.setEnabled(True)
+            self.ui.scriptTableView.setEnabled(True)
         else:
-            try:
-                dev = ft.list_devices()
-            except:
-                dev = []
+            if self.checkCondition(): #if not self.checkCondition():
+                self.ui.comboBoxMode.setCurrentIndex(0)
+                return
+            self.ui.tableViewLocal.setEnabled(False)
+            self.ui.scriptTableView.setEnabled(False)
             self.ui.pushButtonDelay.show()
             self.ui.pushButtonUpLoad.show()
-            self.stopMusic()
+            self.ui.pushButtonOpenPro.hide()
+            self.ui.pushButtonSavePro.hide()
             self.ui.seekSlider.setDisabled(True)
-            
+            self.ui.pushButtonDelay.setEnabled(False)
+            self.stopMusic()
             
             self.myQueue = Queue.Queue()
             self.comminute = HardwareCommunicate(self.myQueue)
-            thread = QtCore.QThread()
-            self.comminute.moveToThread(thread)
-            thread.start()
+            self.threadCommunicate = QtCore.QThread()
+            self.comminute.moveToThread(self.threadCommunicate)
+            self.threadCommunicate.start()
             time.sleep(0.1)
             self.comminute.signalCommunicate.emit()
             
-        
+    def checkCondition(self):
+        if self.musicPath == None:
+            QtGui.QMessageBox.question(None,'message','Please choose music',QtGui.QMessageBox.Ok)
+            return False
+        #TODO:Check Fireworks and Ignitors 
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             QtGui.QMessageBox.question(None,'message','No device connect',QtGui.QMessageBox.Ok)
+#             return False
+#         return True
+    
     def musicStatusChanged(self, newstate, oldState):
         if newstate == Phonon.PlayingState:
             self.ui.pushButtonPlayOrPause.setIcon(QtGui.QIcon(':/Images/pause.png'))
@@ -327,12 +370,12 @@ class Fireworks(QtGui.QWidget):
         dialog.setFilter("*.wav | *.mp3")
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
-            self.path = dialog.selectedFiles()[0]
-            self.media.setCurrentSource(Phonon.MediaSource(self.path))
+            self.musicPath = dialog.selectedFiles()[0]
+            self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))
         dialog.deleteLater()
         
     def playOrPauseMusic(self):
-        if self.path == None:
+        if self.musicPath == None:
             msgBox = QtGui.QMessageBox(self)
             msgBox.setText("please choose a music file first.")
             msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
@@ -353,7 +396,7 @@ class Fireworks(QtGui.QWidget):
         displayTime = QtCore.QTime(0, (time / 60000) % 60, (time / 1000) % 60)
         self.ui.lcdNumber.display(displayTime.toString('mm:ss'))
         
-    #双击添加到脚本
+    #double click add script fireworks
     @Slot(QtCore.QModelIndex) 
     def addScriptFireworks(self, index):
         
@@ -379,7 +422,6 @@ class Fireworks(QtGui.QWidget):
              
         self.scriptTable = self.refreshScript()
         
-    #刷新显示脚本     
     def refreshScript(self):
         self.proModel.clear()
         self.proModel.setHorizontalHeaderLabels(['UUID',  u'开爆时刻', u'烟花名称', u'尺寸', u'颜色', u'燃放方向', u'点火时刻', u'上升时间', u'效果时间', u'结束时刻', u'点火盒', u'点火点'])
@@ -389,7 +431,7 @@ class Fireworks(QtGui.QWidget):
             scriptTable = self.proSession.query (ProFireworksData).all()
             
         for i in xrange(len(scriptTable)):
-            #分解notes获得效果时间和上升时间
+            #Get Rising time and Effect time from Notes
             effectAndRisingtimes = scriptTable[i].Notes.split(',')
             
             self.proModel.insertRow(i)
@@ -415,22 +457,139 @@ class Fireworks(QtGui.QWidget):
             self.proModel.setData(self.proModel.index(i, 11), scriptTable[i].ConnectorID)#点火点,设置默认为0
         return scriptTable 
      
-    #音乐播放结束的时候重新开始数据归零    
     def mediaFinish(self):
         self.stopMusic()
         
     def closeEvent(self, event):
-        self.showSignal.emit()
-#         print os.path.join (appdata, 'proj', 'project.db')
-        os.remove(os.path.join (appdata, 'proj', 'project.db'))
-        event.accept()
+        
+        if not os.path.exists(os.path.join (appdata, 'proj', 'project.db')):
+            return
+        if os.path.getmtime(os.path.join (appdata, 'proj', 'project.db')) - os.path.getctime(os.path.join (appdata, 'proj', 'project.db')) > 1:
+                
+            #create custom message box 
+            customMsgBox = QtGui.QMessageBox(self)
+            customMsgBox.setWindowTitle(self.tr ("Message"))
+            customMsgBox.setText(self.tr ("Do you want to save?"))
+            buttonYes = customMsgBox.addButton(self.tr ("Yes"), QtGui.QMessageBox.ActionRole)
+            buttonNO = customMsgBox.addButton(self.tr ("No"), QtGui.QMessageBox.ActionRole)
+            buttonCancel = customMsgBox.addButton(self.tr("Cancel"), QtGui.QMessageBox.ActionRole)
+            customMsgBox.exec_()    
+            button = customMsgBox.clickedButton()
+            
+            if button == buttonYes:
+                
+                self.media.stop()
+    #             self.threadCommunicate.terminate()
+                self.showSignal.emit()
+                
+                if self.projectPath == None:
+                    self.projectPathAndSave()
+                else:
+                    self.save()
+                os.remove(os.path.join (appdata, 'proj', 'project.db'))
+                event.accept()
+            elif button == buttonNO:
+                
+                self.media.stop()
+    #             self.threadCommunicate.terminate()
+                self.showSignal.emit()
+                os.remove(os.path.join (appdata, 'proj', 'project.db'))
+                event.accept()
+                pass
+            elif button == buttonCancel:
+    #             print time.ctime(os.path.getctime(os.path.join (appdata, 'proj', 'project.db')))
+                print os.path.getctime(os.path.join (appdata, 'proj', 'project.db'))
+                print os.path.getatime(os.path.join (appdata, 'proj', 'project.db'))
+                print os.path.getmtime(os.path.join (appdata, 'proj', 'project.db'))
+                event.ignore()
+           
+        else:
+            self.media.stop()
+#             self.threadCommunicate.terminate()
+            self.showSignal.emit()
+            os.remove(os.path.join (appdata, 'proj', 'project.db'))
+            event.accept()
+                
+        
+    def checkIgnitorBox(self):
+        flag = True
+        #check Ignitor box
+        with self.proSession.begin():
+            records = self.proSession.query(ProFireworksData).all()
+        for row in records:
+            if row.IgnitorID == 0:
+                flag = False
+        #check   ConnectorID
+        with self.proSession.begin():
+            repeatCount = self.proSession.query(ProFireworksData.IgnitorID, func.count(ProFireworksData.ConnectorID)).group_by(ProFireworksData.IgnitorID).all()
+            distinctCount = self.proSession.query(ProFireworksData.IgnitorID, func.count(distinct(ProFireworksData.ConnectorID))).group_by(ProFireworksData.IgnitorID).all()
+        for i in xrange(len(repeatCount)):
+            if repeatCount[i][0] == distinctCount[i][0]  and repeatCount[i][1] != distinctCount[i][1]:
+                flag = False
+        return flag
+    
+    def saveProject(self):
+        
+        if self.projectPath == None:
+            self.projectPathAndSave()
+        else:
+            self.save()
+        
+    def save(self):
+        
+        tmpdir = os.path.join (appdata, 'tmp')
+        if os.path.exists (tmpdir):
+            if not os.path.isdir (tmpdir):
+                os.remove (tmpdir)
+                os.mkdir (tmpdir)
+        else:
+            os.mkdir (tmpdir)
+              
+        tar = tarfile.open (os.path.join (tmpdir, "export.tgz"), "w:gz")
+        
+        files = [(os.path.join (appdata, self.proSession.bind.url.database), os.path.basename (self.proSession.bind.url.database))]
+#         TODO: add Music 
+#         if self.musicPath != None:
+#             shutil.copy2(self.musicPath, os.path.join (appdata, "music"))
+#             files.append ((os.path.join (appdata, 'music', self.musicPath[(self.musicPath).rfind('/') + 1 :]), self.musicPath[(self.musicPath).rfind('/') + 1 :]))
+        
+        for f, name in files:
+            tar.add(f, arcname = name)
+        
+        tar.close()
+        
+        shutil.copy2 (os.path.join (tmpdir, "export.tgz"), self.projectPath)
+        
+#         os.remove(os.path.join (appdata, 'music', self.musicPath[(self.musicPath).rfind('/') + 1 :]))
+    def projectPathAndSave(self):
+        
+        filename = QtGui.QFileDialog.getSaveFileName (self,
+                self.tr ("Save Project As..."),
+                "output.tgz",
+                self.tr ("Compressed Archives (*.tgz, *.tar.gz)"))
+        self.projectPath = filename[0]
+        self.save()
+
+    def openProject(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+        if dialog.exec_() == QtGui.QDialog.Accepted:
+            self.projectPath = dialog.selectedFiles()[0]
+            with tarfile.open (self.projectPath, "r") as tar:
+                for f in tar:
+                    if os.path.splitext (f.name)[1] == ".db":
+                        break
+
+                tar.extract (member = f.name, path = os.path.join (appdata, "proj"))
+                
+        self.refreshScript()
     
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    window = Fireworks()
+    window = Fireworks(None)
     window.show()
     sys.exit(app.exec_())
-    
+     
 if __name__ == "__main__":
     main()

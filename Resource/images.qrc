@@ -11,15 +11,15 @@
 	<file>Images/upLoad.ico</file>
 	<file>Images/openMusic.png</file>
 	<file>Images/save.png</file>
-	<file>Images/brocade hat.jpg</file>
-	<file>Images/coco.jpg</file>
-	<file>Images/gorgeous.jpg</file>
-	<file>Images/peony.jpg</file>
-	<file>Images/candle.jpg</file>
-	<file>Images/pot flower.jpg</file>
-	<file>Images/willow.jpg</file>
-	<file>Images/glint.jpg</file>
-	<file>Images/mum.jpg</file>
+	<file>Images/brocade hat.png</file>
+	<file>Images/coco.png</file>
+	<file>Images/gorgeous.png</file>
+	<file>Images/peony.png</file>
+	<file>Images/candle.png</file>
+	<file>Images/pot flower.png</file>
+	<file>Images/willow.png</file>
+	<file>Images/glint.png</file>
+	<file>Images/mum.png</file>
 	<file>Images/main.png</file>
 	<file>Images/title.png</file>
   </qresource>
