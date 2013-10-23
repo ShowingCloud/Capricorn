@@ -479,7 +479,7 @@ class Fireworks(QtGui.QWidget):
             if button == buttonYes:
                 
                 self.media.stop()
-    #             self.threadCommunicate.terminate()
+        self.threadCommunicate.terminate()
                 self.showSignal.emit()
                 
                 if self.projectPath == None:
