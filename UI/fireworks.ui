@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>编辑工程系统</string>
+   <string>Fireworks Editor</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resource/images.qrc">
@@ -299,12 +299,12 @@
          </property>
          <item>
           <property name="text">
-           <string>编辑模式</string>
+           <string>Edit mode</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>控制模式</string>
+           <string>Control mode</string>
           </property>
          </item>
         </widget>

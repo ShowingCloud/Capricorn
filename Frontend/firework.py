@@ -3,7 +3,6 @@ from PySide import QtCore,QtGui
 from UI.ui_fireworks import Ui_widgetWaveModule
 from PySide.phonon import Phonon
 from Resource import images_rc
-# import sys
 from PySide.QtCore import QPoint, Slot
 from Models.LocalDB import session, engine, meta, FireworksData
 from Models.ProjectDB import proSession, proEngine, proMeta, ProFireworksData
@@ -24,6 +23,7 @@ from Device.protocol import dataPack
 import Queue
 import time
 import os
+
 from config import appdata
 from sqlalchemy.sql.expression import func, distinct
 import tarfile
@@ -35,7 +35,7 @@ except:
     pass
 
 
-class Fireworks(QtGui.QWidget):
+class Firework(QtGui.QWidget):
 
     def __init__(self, signal, parent=None):
         QtGui.QWidget.__init__(self,parent)
@@ -105,8 +105,9 @@ class Fireworks(QtGui.QWidget):
         self.ui.scriptTableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
-        
-        self.type = u'椰树'
+        self.type = self.tr('coco')
+#        print self.tr('brocade'),self.tr('gorgrous'),self.tr('peony'),self.tr('candle'),self.tr('pot flower'),self.tr('willow'),self.tr('mum'),self.tr('glint'),self.tr('Fireworks Info'),self.tr('Rising Time'),self.tr('Fireworks Effect'),self.tr("Add Fireworks"),self.tr("Insert the fireworks info into  database"),self.tr("Edit Fireworks"),self.tr("Edit  the fireworks  information"),self.tr("Delete"),self.tr("Delete  the script fireworks  information"),self.tr('message'),self.tr('Please choose music'),self.tr("please choose a music file first."),self.tr('Bomb moment'),self.tr('Firework name'),self.tr('Size'),self.tr('Color'),self.tr('Direction'),self.tr('Ignite moment'),self.tr('Rising time'),self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')
+
         self.query(self.type)
         
         #show the script fireworks
@@ -178,68 +179,68 @@ class Fireworks(QtGui.QWidget):
         cocoIcon = QtGui.QIcon()
         cocoIcon.addPixmap(QtGui.QPixmap(":/Images/coco.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         coco.setIcon(cocoIcon)
-        coco.setToolTip(u'椰树')
+        coco.setToolTip(self.tr('coco'))
         coco.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         brocadeHat = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         brocadeHatIcon = QtGui.QIcon()
         brocadeHatIcon.addPixmap(QtGui.QPixmap(":/Images/brocade hat.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         brocadeHat.setIcon(brocadeHatIcon)
-        brocadeHat.setToolTip(u'锦冠')
+        brocadeHat.setToolTip(self.tr('brocade'))
         brocadeHat.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
         gorgeous = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         gorgeousIcon = QtGui.QIcon()
         gorgeousIcon.addPixmap(QtGui.QPixmap(":/Images/gorgeous.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         gorgeous.setIcon(gorgeousIcon)
-        gorgeous.setToolTip(u'大丽')
+        gorgeous.setToolTip(self.tr('gorgrous'))
         gorgeous.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         peony = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         peonyIcon = QtGui.QIcon()
         peonyIcon.addPixmap(QtGui.QPixmap(":/Images/peony.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         peony.setIcon(peonyIcon)
-        peony.setToolTip(u'牡丹')
+        peony.setToolTip(self.tr('peony'))
         peony.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         candle = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         candleIcon = QtGui.QIcon()
         candleIcon.addPixmap(QtGui.QPixmap(":/Images/candle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         candle.setIcon(candleIcon)
-        candle.setToolTip(u'喷泉')
+        candle.setToolTip(self.tr('candle'))
         candle.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         potFlower = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         potFlowerIcon = QtGui.QIcon()
         potFlowerIcon.addPixmap(QtGui.QPixmap(":/Images/pot flower.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         potFlower.setIcon(potFlowerIcon)
-        potFlower.setToolTip(u'盆花')
+        potFlower.setToolTip(self.tr('pot flower'))
         potFlower.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         willow = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         willowIcon = QtGui.QIcon()
         willowIcon.addPixmap(QtGui.QPixmap(":/Images/willow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         willow.setIcon(willowIcon)
-        willow.setToolTip(u'柳树')
+        willow.setToolTip(self.tr('willow'))
         willow.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         mum = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         mumIcon = QtGui.QIcon()
         mumIcon.addPixmap(QtGui.QPixmap(":/Images/mum.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         mum.setIcon(mumIcon)
-        mum.setToolTip(u'菊花')
+        mum.setToolTip(self.tr('mum'))
         mum.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
          
         glint = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
         glintIcon = QtGui.QIcon()
         glintIcon.addPixmap(QtGui.QPixmap(":/Images/glint.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         glint.setIcon(glintIcon)
-        glint.setToolTip(u'银闪')
+        glint.setToolTip(self.tr('glint'))
         glint.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
     
     def query(self, Type):
         self.model.clear()
-        self.model.setHorizontalHeaderLabels(["UUID",u"烟花信息", u'上升时间', u'烟花效果'])
+        self.model.setHorizontalHeaderLabels(["UUID",self.tr('Fireworks Info'), self.tr('Rising Time'), self.tr('Fireworks Effect')])
         self.ui.tableViewLocal.hideColumn(0)
         self.ui.tableViewLocal.hideColumn(2)
         self.ui.tableViewLocal.hideColumn(3)
@@ -256,13 +257,13 @@ class Fireworks(QtGui.QWidget):
     def rightContextMenu(self, point):
         self.row = self.ui.tableViewLocal.rowAt(point.y())
         rightMenu = QtGui.QMenu(self)
-        addFireworksAction = QtGui.QAction("Add Fireworks", self)
-        addFireworksAction.setStatusTip("Insert the fireworks info into  database")
+        addFireworksAction = QtGui.QAction(self.tr('Add Fireworks'), self)
+        addFireworksAction.setStatusTip(self.tr('Insert the fireworks info into  database'))
         addFireworksAction.connect(QtCore.SIGNAL("triggered()"), self.addFireworks)
         rightMenu.addAction(addFireworksAction)
         if self.row >= 0:
-            editFireworksAction = QtGui.QAction("Edit Fireworks", self)
-            editFireworksAction.setStatusTip("Edit  the fireworks  information")
+            editFireworksAction = QtGui.QAction(self.tr('Edit Fireworks'), self)
+            editFireworksAction.setStatusTip(self.tr('Edit  the fireworks  information'))
             editFireworksAction.connect(QtCore.SIGNAL("triggered()"), self.editFireworks)
             rightMenu.addAction(editFireworksAction)
             
@@ -279,8 +280,8 @@ class Fireworks(QtGui.QWidget):
         self.scriptRow = self.ui.scriptTableView.rowAt(point.y())
         scriptRightMenu = QtGui.QMenu(self)
         if self.scriptRow >= 0:
-            deleteScriptAction = QtGui.QAction("Delete", self)
-            deleteScriptAction.setStatusTip("Delete  the script fireworks  information")
+            deleteScriptAction = QtGui.QAction(self.tr('Delete'), self)
+            deleteScriptAction.setStatusTip(self.tr('Delete  the script fireworks  information'))
             deleteScriptAction.connect(QtCore.SIGNAL("triggered()"), self.deleteScript)
             scriptRightMenu.addAction(deleteScriptAction)
             
@@ -377,7 +378,7 @@ class Fireworks(QtGui.QWidget):
     def playOrPauseMusic(self):
         if self.musicPath == None:
             msgBox = QtGui.QMessageBox(self)
-            msgBox.setText("please choose a music file first.")
+            msgBox.setText(self.tr('please choose a music file first.'))
             msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
             msgBox.exec_()
             return
@@ -424,7 +425,7 @@ class Fireworks(QtGui.QWidget):
         
     def refreshScript(self):
         self.proModel.clear()
-        self.proModel.setHorizontalHeaderLabels(['UUID',  u'开爆时刻', u'烟花名称', u'尺寸', u'颜色', u'燃放方向', u'点火时刻', u'上升时间', u'效果时间', u'结束时刻', u'点火盒', u'点火点'])
+        self.proModel.setHorizontalHeaderLabels(['UUID',  self.tr('Bomb moment'), self.tr('Firework name'), self.tr('Size'), self.tr('Color'), self.tr('Direction'), self.tr('Ignite moment'), self.tr('Rising time'), self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')])
         self.ui.scriptTableView.hideColumn(0)
         
         with self.proSession.begin():

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'untitled.ui'
+# Form implementation generated from reading ui file 'setTime.ui'
 #
-# Created: Mon Oct 14 08:13:21 2013
+# Created: Mon Oct 21 15:29:08 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,19 +35,19 @@ class Ui_Dialog(object):
         self.label_s.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.label_s.setObjectName("label_s")
         self.pushButtonCancel = QtGui.QPushButton(Dialog)
-        self.pushButtonCancel.setGeometry(QtCore.QRect(170, 70, 50, 25))
+        self.pushButtonCancel.setGeometry(QtCore.QRect(110, 70, 50, 25))
         self.pushButtonCancel.setObjectName("pushButtonCancel")
         self.pushButtonStart = QtGui.QPushButton(Dialog)
-        self.pushButtonStart.setGeometry(QtCore.QRect(110, 70, 50, 25))
+        self.pushButtonStart.setGeometry(QtCore.QRect(170, 70, 50, 25))
         self.pushButtonStart.setObjectName("pushButtonStart")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "延时燃放", None, QtGui.QApplication.UnicodeUTF8))
-        self.labelDelayTime.setText(QtGui.QApplication.translate("Dialog", "输入延时时间:", None, QtGui.QApplication.UnicodeUTF8))
+        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Delay Fire", None, QtGui.QApplication.UnicodeUTF8))
+        self.labelDelayTime.setText(QtGui.QApplication.translate("Dialog", "Delay time:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_s.setText(QtGui.QApplication.translate("Dialog", "S", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonCancel.setText(QtGui.QApplication.translate("Dialog", "取消", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButtonStart.setText(QtGui.QApplication.translate("Dialog", "开始", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonCancel.setText(QtGui.QApplication.translate("Dialog", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonStart.setText(QtGui.QApplication.translate("Dialog", "Start", None, QtGui.QApplication.UnicodeUTF8))
 

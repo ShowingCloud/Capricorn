@@ -9,7 +9,8 @@ from UI.ui_main import Ui_Form
 from Frontend.fireNow import UiShow as FireNowWin
 from Frontend.connectTest import UiShow as ConnectTestWin
 import sys
-from Frontend.firework import Fireworks
+from Translations.tr_rc import *
+from Frontend.firework import Firework
 
 class Main(QtGui.QWidget):
     showSignal = QtCore.Signal()
@@ -26,23 +27,23 @@ class Main(QtGui.QWidget):
         
         self.showSignal.connect(self.showAgain)
         
-    #连接测试系统
+    
     def connectTest(self):
         self.connectTestForm = ConnectTestWin(self.showSignal)
         self.connectTestForm.show()
         self.hide()
-    #手动点火系统
+    
     def handFire(self):
         self.fireNowWin = FireNowWin(self.showSignal)
         self.fireNowWin.show()
         self.hide()
-    #工程编辑系统
+    
     def editProject(self):
-        self.fireworks = Fireworks(self.showSignal)
+        self.fireworks = Firework(self.showSignal)
         self.fireworks.show()
         self.hide()
         
-    #退出
+    
     def cancel(self):
         self.close()
         
@@ -51,6 +52,10 @@ class Main(QtGui.QWidget):
         
 def main():
     app = QtGui.QApplication(sys.argv)
+    locale = QtCore.QLocale.system().name()
+    appTranslator = QtCore.QTranslator()
+    if appTranslator.load (":/Fireworks_" + locale):
+        app.installTranslator (appTranslator)
     window = Main()
     window.show()
     sys.exit(app.exec_())

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'fireworks.ui'
 #
-# Created: Thu Oct 17 16:08:02 2013
+# Created: Mon Oct 21 15:20:54 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -164,9 +164,9 @@ class Ui_widgetWaveModule(object):
         QtCore.QMetaObject.connectSlotsByName(widgetWaveModule)
 
     def retranslateUi(self, widgetWaveModule):
-        widgetWaveModule.setWindowTitle(QtGui.QApplication.translate("widgetWaveModule", "编辑工程系统", None, QtGui.QApplication.UnicodeUTF8))
-        self.comboBoxMode.setItemText(0, QtGui.QApplication.translate("widgetWaveModule", "编辑模式", None, QtGui.QApplication.UnicodeUTF8))
-        self.comboBoxMode.setItemText(1, QtGui.QApplication.translate("widgetWaveModule", "控制模式", None, QtGui.QApplication.UnicodeUTF8))
+        widgetWaveModule.setWindowTitle(QtGui.QApplication.translate("widgetWaveModule", "Fireworks Editor", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBoxMode.setItemText(0, QtGui.QApplication.translate("widgetWaveModule", "Edit mode", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBoxMode.setItemText(1, QtGui.QApplication.translate("widgetWaveModule", "Control mode", None, QtGui.QApplication.UnicodeUTF8))
 
 from PySide import phonon
 from Resource import images_rc

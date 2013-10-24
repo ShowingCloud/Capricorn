@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'fireNow.ui'
 #
-# Created: Mon Apr 22 15:27:31 2013
-#      by: pyside-uic 0.2.14 running on PySide 1.1.2
+# Created: Mon Oct 21 15:30:56 2013
+#      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -98,9 +98,9 @@ class Ui_Dialog(object):
         self.lineEditBoxID.setMaximumSize(QtCore.QSize(40, 16777215))
         self.lineEditBoxID.setObjectName("lineEditBoxID")
         self.labelBoxID = QtGui.QLabel(Dialog)
-        self.labelBoxID.setGeometry(QtCore.QRect(120, 10, 40, 30))
+        self.labelBoxID.setGeometry(QtCore.QRect(79, 10, 81, 30))
         self.labelBoxID.setMinimumSize(QtCore.QSize(40, 30))
-        self.labelBoxID.setAlignment(QtCore.Qt.AlignCenter)
+        self.labelBoxID.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.labelBoxID.setObjectName("labelBoxID")
         self.labelBoxIDShow = QtGui.QLabel(Dialog)
         self.labelBoxIDShow.setGeometry(QtCore.QRect(30, 10, 80, 30))
@@ -121,7 +121,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "FireImmediately", None, QtGui.QApplication.UnicodeUTF8))
         self.ButtonConfirm.setText(QtGui.QApplication.translate("Dialog", "Confirm", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox.setTitle(QtGui.QApplication.translate("Dialog", "IgnitePoints", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox.setTitle(QtGui.QApplication.translate("Dialog", "Button", None, QtGui.QApplication.UnicodeUTF8))
         self.boxA1Button.setText(QtGui.QApplication.translate("Dialog", "1", None, QtGui.QApplication.UnicodeUTF8))
         self.boxA2Button.setText(QtGui.QApplication.translate("Dialog", "2", None, QtGui.QApplication.UnicodeUTF8))
         self.boxA3Button.setText(QtGui.QApplication.translate("Dialog", "3", None, QtGui.QApplication.UnicodeUTF8))

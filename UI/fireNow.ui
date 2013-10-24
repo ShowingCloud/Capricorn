@@ -353,9 +353,9 @@
   <widget class="QLabel" name="labelBoxID">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>79</x>
      <y>10</y>
-     <width>40</width>
+     <width>81</width>
      <height>30</height>
     </rect>
    </property>
@@ -369,7 +369,7 @@
     <string>BoxID:</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="labelBoxIDShow">
