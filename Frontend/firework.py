@@ -123,7 +123,7 @@ class Firework(QtGui.QWidget):
         self.ui.pushButtonOpenPro.clicked.connect(self.openProject)
         
         self.projectPath = None
-        
+        self.musicFileName = None
     def upLoadToDevice(self):
 #         try:
 #             dev = ft.list_devices()
@@ -371,8 +371,13 @@ class Firework(QtGui.QWidget):
         dialog.setFilter("*.wav | *.mp3")
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
+            #if the music is exist delete old music
+            if self.musicFileName != None :
+                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
+            #choose or change music 
             self.musicPath = dialog.selectedFiles()[0]
             self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))
+            self.musicFileName = self.musicPath[(self.musicPath).rfind('/') + 1 :]
         dialog.deleteLater()
         
     def playOrPauseMusic(self):
@@ -390,7 +395,7 @@ class Firework(QtGui.QWidget):
     def stopMusic(self):
         #self.ui.lcdNumber.display('00:00')
         self.media.seek(0)
-        self.media.pause()
+        self.media.stop()
     
     def tick(self, time):
         self.musicTime = time
@@ -443,19 +448,19 @@ class Firework(QtGui.QWidget):
             effectTime = int(effectAndRisingtimes[0]) + scriptTable[i].IgnitionTime
             
             self.proModel.setData(self.proModel.index(i, 0), scriptTable[i].UUID)#uuid
-            self.proModel.setData(self.proModel.index(i, 1), effectTime)#开爆时刻
+            self.proModel.setData(self.proModel.index(i, 1), effectTime)
             
-            self.proModel.setData(self.proModel.index(i, 2), data.Name)#烟火名称
-            self.proModel.setData(self.proModel.index(i, 3), data.Size)#尺寸
-            self.proModel.setData(self.proModel.index(i, 4), info["EffectsInfo"][0][1])#颜色
-            self.proModel.setData(self.proModel.index(i, 5), 90)#燃放方向,设置默认值为正对主席台90度
-            self.proModel.setData(self.proModel.index(i, 6), scriptTable[i].IgnitionTime)#点火时刻
-            self.proModel.setData(self.proModel.index(i, 7), int(effectAndRisingtimes[0]))#上升时间
-            self.proModel.setData(self.proModel.index(i, 8),  int(effectAndRisingtimes[1]))#效果时间
+            self.proModel.setData(self.proModel.index(i, 2), data.Name)
+            self.proModel.setData(self.proModel.index(i, 3), data.Size)
+            self.proModel.setData(self.proModel.index(i, 4), info["EffectsInfo"][0][1])
+            self.proModel.setData(self.proModel.index(i, 5), 90)
+            self.proModel.setData(self.proModel.index(i, 6), scriptTable[i].IgnitionTime)
+            self.proModel.setData(self.proModel.index(i, 7), int(effectAndRisingtimes[0]))
+            self.proModel.setData(self.proModel.index(i, 8),  int(effectAndRisingtimes[1]))
             
-            self.proModel.setData(self.proModel.index(i, 9), effectTime + int(effectAndRisingtimes[1]))#结束时刻
-            self.proModel.setData(self.proModel.index(i, 10), scriptTable[i].IgnitorID)#点火盒,设置默认为0
-            self.proModel.setData(self.proModel.index(i, 11), scriptTable[i].ConnectorID)#点火点,设置默认为0
+            self.proModel.setData(self.proModel.index(i, 9), effectTime + int(effectAndRisingtimes[1]))
+            self.proModel.setData(self.proModel.index(i, 10), scriptTable[i].IgnitorID)
+            self.proModel.setData(self.proModel.index(i, 11), scriptTable[i].ConnectorID)
         return scriptTable 
      
     def mediaFinish(self):
@@ -488,6 +493,8 @@ class Firework(QtGui.QWidget):
                 else:
                     self.save()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
+                if self.musicFileName != None :
+                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
                 event.accept()
             elif button == buttonNO:
                 
@@ -495,13 +502,10 @@ class Firework(QtGui.QWidget):
     #             self.threadCommunicate.terminate()
                 self.showSignal.emit()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
+                if self.musicFileName != None :
+                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
                 event.accept()
-                pass
             elif button == buttonCancel:
-    #             print time.ctime(os.path.getctime(os.path.join (appdata, 'proj', 'project.db')))
-                print os.path.getctime(os.path.join (appdata, 'proj', 'project.db'))
-                print os.path.getatime(os.path.join (appdata, 'proj', 'project.db'))
-                print os.path.getmtime(os.path.join (appdata, 'proj', 'project.db'))
                 event.ignore()
            
         else:
@@ -509,6 +513,8 @@ class Firework(QtGui.QWidget):
 #             self.threadCommunicate.terminate()
             self.showSignal.emit()
             os.remove(os.path.join (appdata, 'proj', 'project.db'))
+            if self.musicFileName != None :
+                os.remove(os.path.join (appdata, 'music', self.musicFileName))
             event.accept()
                 
         
@@ -549,10 +555,10 @@ class Firework(QtGui.QWidget):
         tar = tarfile.open (os.path.join (tmpdir, "export.tgz"), "w:gz")
         
         files = [(os.path.join (appdata, self.proSession.bind.url.database), os.path.basename (self.proSession.bind.url.database))]
-#         TODO: add Music 
-#         if self.musicPath != None:
-#             shutil.copy2(self.musicPath, os.path.join (appdata, "music"))
-#             files.append ((os.path.join (appdata, 'music', self.musicPath[(self.musicPath).rfind('/') + 1 :]), self.musicPath[(self.musicPath).rfind('/') + 1 :]))
+#        add Music 
+        if self.musicPath != None:
+            shutil.copy2(self.musicPath, os.path.join (appdata, "music"))
+            files.append ((os.path.join (appdata, 'music', self.musicFileName), self.musicFileName))
         
         for f, name in files:
             tar.add(f, arcname = name)
@@ -561,7 +567,6 @@ class Firework(QtGui.QWidget):
         
         shutil.copy2 (os.path.join (tmpdir, "export.tgz"), self.projectPath)
         
-#         os.remove(os.path.join (appdata, 'music', self.musicPath[(self.musicPath).rfind('/') + 1 :]))
     def projectPathAndSave(self):
         
         filename = QtGui.QFileDialog.getSaveFileName (self,
@@ -572,23 +577,30 @@ class Firework(QtGui.QWidget):
         self.save()
 
     def openProject(self):
+        self.stopMusic()
+        
         dialog = QtGui.QFileDialog(self)
+        dialog.setFilter("*.tgz | *.tar.gz")
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
             self.projectPath = dialog.selectedFiles()[0]
             with tarfile.open (self.projectPath, "r") as tar:
                 for f in tar:
+                    
                     if os.path.splitext (f.name)[1] == ".db":
-                        break
-
-                tar.extract (member = f.name, path = os.path.join (appdata, "proj"))
-                
+                        tar.extract (member = f.name, path = os.path.join (appdata, "proj"))
+                    else:
+                        self.musicFileName = f.name
+                        tar.extract (member = f.name, path = os.path.join (appdata, "music"))
+                        
+        self.musicPath = os.path.join (appdata, "music", self.musicFileName)
+        self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))        
         self.refreshScript()
     
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    window = Fireworks(None)
+    window = Firework(None)
     window.show()
     sys.exit(app.exec_())
      

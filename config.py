@@ -26,7 +26,7 @@ else:
 
 
 # Make subdirectories in APPDATA directory
-for directory in ['local', 'proj', 'pdf']:
+for directory in ['local', 'proj', 'pdf', 'music']:
 	subdir = os.path.join (appdata, directory)
 	
 	if os.path.exists (subdir):
