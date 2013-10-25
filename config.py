@@ -16,6 +16,13 @@ else:
 	appdata = os.path.expanduser (os.path.join ("~", "." + APPNAME))
 
 
+# Check if we're running in a pyinstaller bundle
+if getattr (sys, 'frozen', False):
+    basedir = sys._MEIPASS
+else:
+    basedir = os.path.dirname (__file__)
+
+
 # Make the APPDATA directory, if necessary
 if os.path.exists (appdata):
 	if not os.path.isdir (appdata):
@@ -39,4 +46,4 @@ for directory in ['local', 'proj', 'pdf']:
 
 # Copy local database file only if it doesn't exist
 if not os.path.exists (os.path.join (appdata, 'local', 'local.db')):
-	shutil.copy2 ('local.db', os.path.join (appdata, 'local'))
+	shutil.copy2 (os.path.join (basedir, 'Resource', 'local.db'), os.path.join (appdata, 'local'))

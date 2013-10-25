@@ -11,6 +11,7 @@ from Frontend.connectTest import UiShow as ConnectTestWin
 import sys
 from Translations.tr_rc import *
 from Frontend.firework import Firework
+from config import basedir
 
 class Main(QtGui.QWidget):
     showSignal = QtCore.Signal()
@@ -56,6 +57,7 @@ def main():
     appTranslator = QtCore.QTranslator()
     if appTranslator.load (":/Fireworks_" + locale):
         app.installTranslator (appTranslator)
+    app.addLibraryPath (basedir)
     window = Main()
     window.show()
     sys.exit(app.exec_())

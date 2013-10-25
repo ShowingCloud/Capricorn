@@ -8,6 +8,12 @@ a = Analysis([os.path.join (srcdir, 'FireworksMain.py')],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
+
+for d in a.datas:
+    if 'pyconfig' in d[0]:
+        a.datas.remove (d)
+        break
+
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts + [('O', '', 'OPTION')],
@@ -21,7 +27,7 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+               [(os.path.join ('Resource', 'local.db'), os.path.join(srcdir, 'Resource', 'local.db'), 'DATA'),
                (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
                strip=None,
                upx=True,
@@ -32,7 +38,7 @@ exe2 = EXE(pyz,
            a.binaries,
            a.zipfiles,
            a.datas,
-           [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+           [(os.path.join ('Resource', 'local.db'), os.path.join(srcdir, 'Resource', 'local.db'), 'DATA'),
            (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
            strip=None,
            upx=True,
@@ -45,7 +51,7 @@ exe3 = EXE(pyz,
            a.binaries,
            a.zipfiles,
            a.datas,
-           [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+           [(os.path.join ('Resource', 'local.db'), os.path.join(srcdir, 'Resource', 'local.db'), 'DATA'),
            (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
            strip=None,
            upx=True,
