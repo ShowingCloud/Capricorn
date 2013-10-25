@@ -2,7 +2,7 @@ srcdir = '..'
 
 
 # -*- mode: python -*-
-a = Analysis([os.path.join (srcdir, 'Capricorn.py')],
+a = Analysis([os.path.join (srcdir, 'FireworksMain.py')],
              pathex=['C:\\Python27\\pyinstaller'],
              hiddenimports=[],
              hookspath=None,
