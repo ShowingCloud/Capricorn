@@ -1,4 +1,5 @@
 srcdir = '..'
+backend = 'C:\\Python27\\Lib\\site-packages\\PySide\\plugins\\phonon_backend\\phonon_ds94.dll'
 
 
 # -*- mode: python -*-
@@ -20,6 +21,8 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
+               [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+               (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
                strip=None,
                upx=True,
                name=os.path.join('dist', 'Capricorn'))
@@ -29,6 +32,8 @@ exe2 = EXE(pyz,
            a.binaries,
            a.zipfiles,
            a.datas,
+           [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+           (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
            strip=None,
            upx=True,
            debug=False,
@@ -40,6 +45,8 @@ exe3 = EXE(pyz,
            a.binaries,
            a.zipfiles,
            a.datas,
+           [('local.db', os.path.join(srcdir, 'Frontend', 'local.db'), 'DATA'),
+           (os.path.join('phonon_backend', 'phonon_ds94.dll'), backend, 'DATA')],
            strip=None,
            upx=True,
            debug=True,
