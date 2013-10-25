@@ -540,47 +540,47 @@
 <context>
     <name>EditFireworks</name>
     <message>
-        <location filename="Frontend/editFireworks.py" line="201"/>
+        <location filename="Frontend/editFireworks.py" line="198"/>
         <source>White</source>
         <translation>白色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="204"/>
+        <location filename="Frontend/editFireworks.py" line="201"/>
         <source>Blue</source>
         <translation>蓝色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="202"/>
+        <location filename="Frontend/editFireworks.py" line="199"/>
         <source>Black</source>
         <translation>黑色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="203"/>
+        <location filename="Frontend/editFireworks.py" line="200"/>
         <source>Red</source>
         <translation>红色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="205"/>
+        <location filename="Frontend/editFireworks.py" line="202"/>
         <source>Green</source>
         <translation>绿色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="206"/>
+        <location filename="Frontend/editFireworks.py" line="203"/>
         <source>Cyan</source>
         <translation>蓝绿色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="207"/>
+        <location filename="Frontend/editFireworks.py" line="204"/>
         <source>Magenta</source>
         <translation>洋红</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="208"/>
+        <location filename="Frontend/editFireworks.py" line="205"/>
         <source>Yellow</source>
         <translation>黄色</translation>
     </message>
     <message>
-        <location filename="Frontend/editFireworks.py" line="209"/>
+        <location filename="Frontend/editFireworks.py" line="206"/>
         <source>Gray</source>
         <translation>灰色</translation>
     </message>
@@ -588,164 +588,189 @@
 <context>
     <name>Firework</name>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>coco</source>
         <translation>椰树</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>brocade</source>
         <translation>锦冠</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>gorgrous</source>
         <translation>大丽</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>peony</source>
         <translation>牡丹</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>candle</source>
         <translation>烛光</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>pot flower</source>
         <translation>盆花</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>willow</source>
         <translation>柳</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>mum</source>
         <translation>菊花</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>glint</source>
         <translation>闪</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Fireworks Info</source>
         <translation>烟花信息</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Rising Time</source>
         <translation>升空时间</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Fireworks Effect</source>
         <translation>烟花效果</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Add Fireworks</source>
         <translation>添加到脚本</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Insert the fireworks info into  database</source>
         <translation>增加烟花库烟花</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Edit Fireworks</source>
         <translation>编辑烟花</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Edit  the fireworks  information</source>
         <translation>编辑烟花信息</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Delete  the script fireworks  information</source>
         <translation>删除烟花</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>message</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Please choose music</source>
         <translation>请选择音乐文件</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>please choose a music file first.</source>
         <translation>请先选择音乐文件.</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Bomb moment</source>
         <translation>爆炸时刻</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Firework name</source>
         <translation>烟花名</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Size</source>
         <translation>尺寸</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Direction</source>
         <translation>方向</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Ignite moment</source>
         <translation>点火时刻</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Rising time</source>
         <translation>升空时间</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Effect duration</source>
         <translation>效果时间</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>End time</source>
         <translation>结束时间</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="111"/>
+        <location filename="Frontend/firework.py" line="109"/>
         <source>Ignitor Box</source>
         <translation>点火盒</translation>
     </message>
     <message>
-        <location filename="Frontend/firework.py" line="113"/>
+        <location filename="Frontend/firework.py" line="111"/>
         <source>Ignite point</source>
         <translation>点火头</translation>
+    </message>
+    <message>
+        <location filename="Frontend/firework.py" line="109"/>
+        <source>Yes</source>
+        <translation>是</translation>
+    </message>
+    <message>
+        <location filename="Frontend/firework.py" line="109"/>
+        <source>No</source>
+        <translation>否</translation>
+    </message>
+    <message>
+        <location filename="Frontend/firework.py" line="109"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="Frontend/firework.py" line="109"/>
+        <source>No device connect</source>
+        <translation>未连接硬件设备</translation>
+    </message>
+    <message>
+        <location filename="Frontend/firework.py" line="109"/>
+        <source>Do you want to save?</source>
+        <translation>是否保存工程文件?</translation>
     </message>
 </context>
 <context>

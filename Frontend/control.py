@@ -1,23 +1,24 @@
 from PySide import QtCore,QtGui
 from UI.ui_control import ControlDialog
-import sys
 
 
 class ControlWinShow(QtGui.QDialog):
-
-    def __init__(self,signalPlayOrPause,signalStop,signalMusicFinished,parent=None):
+    
+    def __init__(self,signalPlayOrPause,signalStop,signalMusicFinished,syncSignal,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.signalPlayOrPause = signalPlayOrPause
         self.musicStatus = 'play'
         self.signalStop = signalStop
         self.signalMusicFinished = signalMusicFinished
+        self.syncSignal = syncSignal
+        self.syncSignal.emit()
         self.ui=ControlDialog()
         self.ui.setupUi(self)
         self.ui.pushButtonStopFire.setEnabled(False)
         self.signalMusicFinished.connect(self.musicFinished)
         self.ui.pushButtonStartOrPause.clicked.connect(self.playOrPause)
         self.ui.pushButtonStopFire.clicked.connect(self.stopFire)
-        
+    
     def playOrPause(self):
         self.signalPlayOrPause.emit()
         if self.musicStatus == 'play':

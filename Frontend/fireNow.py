@@ -42,6 +42,8 @@ class getMessage (QtCore.QObject):
 
         while True:
             item = self.q.get()
+            if item == False:
+                return
             self.f.write(item)
             print repr(item)
 
@@ -72,6 +74,7 @@ class UiShow(QtGui.QDialog):
         
     def closeEvent(self, event):
         self.signalClose.emit()
+        self.q.put(False)
         event.accept()
     
     def buttonConnect(self):
