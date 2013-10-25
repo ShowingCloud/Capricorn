@@ -137,12 +137,13 @@ class Firework(QtGui.QWidget):
         self.myQueue = None
         
     def upLoadToDevice(self):
-#         try:
-#             dev = ft.list_devices()
-#         except:
-#             dev = []
-#         if len(dev) == 0:
-#             return
+        try:
+            dev = ft.list_devices()
+        except:
+            dev = []
+        if len(dev) == 0:
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
+            return
         
         with self.proSession.begin():
             tableFire = self.proSession.query(ProFireworksData).all()
@@ -356,8 +357,7 @@ class Firework(QtGui.QWidget):
                 self.myQueue.put((True, True))
                 self.myQueue = None
         else:
-#            TODO: change condition
-            if self.checkCondition(): #if not self.checkCondition():
+            if not self.checkCondition():
                 self.ui.comboBoxMode.setCurrentIndex(0)
                 return
             
