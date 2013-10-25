@@ -60,6 +60,8 @@ class getMessage(QtCore.QObject):
         while True:
             datalistR = [None]*14
             item = self.q.get()
+            if item == False:
+                return
             self.f.write(item)
             time.sleep(0.1)
             readData = self.f.read (self.f.get_queue_status())
@@ -120,6 +122,7 @@ class UiShow(QtGui.QDialog):
             self.ui.pushButtonTest.setEnabled(False)
     def closeEvent(self, event):
         self.signalClose.emit()
+        self.q.put(False)
         event.accept()
         
     def timerEvent(self):

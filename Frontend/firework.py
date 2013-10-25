@@ -36,7 +36,7 @@ except:
 
 
 class Firework(QtGui.QWidget):
-
+    syncSignal = QtCore.Signal()
     def __init__(self, signal, parent=None):
         QtGui.QWidget.__init__(self,parent)
         
@@ -51,7 +51,7 @@ class Firework(QtGui.QWidget):
         self.ui.pushButtonStop.clicked.connect(self.stopMusic)
         self.ui.pushButtonDelay.clicked.connect(self.delayFire)
         self.ui.pushButtonUpLoad.clicked.connect(self.upLoadToDevice)
-
+        self.syncFlag = False
         #create local database
         self.localSession = session()
         meta.create_all(engine)
@@ -63,7 +63,7 @@ class Firework(QtGui.QWidget):
         self.media = Phonon.MediaObject(self)
         self.output = Phonon.AudioOutput(Phonon.MusicCategory, self)
         Phonon.createPath(self.media, self.output)
-        self.media.setTickInterval(10)
+        self.media.setTickInterval(100)
         
         self.ui.volumeSlider.setAudioOutput(self.output)
         self.ui.seekSlider.setMediaObject(self.media)
@@ -106,7 +106,14 @@ class Firework(QtGui.QWidget):
         self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
         self.type = self.tr('coco')
-#        print self.tr('brocade'),self.tr('gorgrous'),self.tr('peony'),self.tr('candle'),self.tr('pot flower'),self.tr('willow'),self.tr('mum'),self.tr('glint'),self.tr('Fireworks Info'),self.tr('Rising Time'),self.tr('Fireworks Effect'),self.tr("Add Fireworks"),self.tr("Insert the fireworks info into  database"),self.tr("Edit Fireworks"),self.tr("Edit  the fireworks  information"),self.tr("Delete"),self.tr("Delete  the script fireworks  information"),self.tr('message'),self.tr('Please choose music'),self.tr("please choose a music file first."),self.tr('Bomb moment'),self.tr('Firework name'),self.tr('Size'),self.tr('Color'),self.tr('Direction'),self.tr('Ignite moment'),self.tr('Rising time'),self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')
+#         print self.tr ("Yes"),self.tr ("No"),self.tr("Cancel"),self.tr('No device connect'),self.tr('Do you want to save?'),
+#         self.tr('brocade'),self.tr('gorgrous'),self.tr('peony'),self.tr('candle'),self.tr('pot flower'),self.tr('willow'),
+#         self.tr('mum'),self.tr('glint'),self.tr('Fireworks Info'),self.tr('Rising Time'),self.tr('Fireworks Effect'),
+#         self.tr("Add Fireworks"),self.tr("Insert the fireworks info into  database"),self.tr("Edit Fireworks"),
+#         self.tr("Edit  the fireworks  information"),self.tr("Delete"),self.tr("Delete  the script fireworks  information"),
+#         self.tr('message'),self.tr('Please choose music'),self.tr("please choose a music file first."),self.tr('Bomb moment'),
+#         self.tr('Firework name'),self.tr('Size'),self.tr('Color'),self.tr('Direction'),self.tr('Ignite moment'),self.tr('Rising time'),
+#         self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')
 
         self.query(self.type)
         
@@ -121,16 +128,22 @@ class Firework(QtGui.QWidget):
     
         self.ui.pushButtonSavePro.clicked.connect(self.saveProject)
         self.ui.pushButtonOpenPro.clicked.connect(self.openProject)
+        self.syncSignal.connect(self.syncStart)
         
+        self.dataSync = {'head':0xAAF0,'length':0x0A,'function':0x04,
+                         'ID':0xAABBCCDD,'seconds':None,'crc':0,'tail':0xDD}
         self.projectPath = None
         self.musicFileName = None
+        self.myQueue = None
+        
     def upLoadToDevice(self):
-#         try:
-#             dev = ft.list_devices()
-#         except:
-#             dev = []
-#         if len(dev) == 0:
-#             return
+        try:
+            dev = ft.list_devices()
+        except:
+            dev = []
+        if len(dev) == 0:
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
+            return
         
         with self.proSession.begin():
             tableFire = self.proSession.query(ProFireworksData).all()
@@ -148,26 +161,45 @@ class Firework(QtGui.QWidget):
             node['offsetSec'] = int(row.IgnitionTime%1000) #ms
             package = dataPack(node)
             package.pack()
-            self.myQueue.put (package.package)
+            print repr(package.package)
+            self.myQueue.put((package.package,False))
             i += 1
             self.progressBar.ui.progressBar.setValue(i)
-            for a in range(1000000):
-                pass
+            time.sleep(0.1)
         self.progressBar.close()
         self.ui.pushButtonUpLoad.setEnabled(False)
         self.ui.pushButtonDelay.setEnabled(True)
+        
     def delayFire(self):
         self.delayTimeWin = SetDelayTime()
         if self.delayTimeWin.exec_():
             self.delaySeconds = int(self.delayTimeWin.ui.lineEditDelayTime.text())
             self.startTick()
             
+    def syncStart(self):
+        self.syncFlag = True
+        self.syncTimer = QtCore.QTimer()
+        self.syncTimer.timeout.connect(self.syncTick)
+        self.syncTimer.start(1000)
+        self.syncTime = 1
+        
+    def syncTick(self):
+        print 'self.syncTime = ',self.syncTime
+        self.dataSync['seconds'] = self.syncTime
+        dataPacks = dataPack(self.dataSync)
+        print repr(dataPacks.package)
+        self.myQueue.put((dataPacks.package, False))
+        self.syncTime += 1
+        
     def startTick(self):
         self.timeCountWin = TimeTickShow(self.delaySeconds)
         if self.timeCountWin.exec_():
             if self.musicPath != None :
                 self.media.play()
-                self.controlWin = ControlWinShow(self.ui.pushButtonPlayOrPause.clicked,self.ui.pushButtonStop.clicked,self.media.finished)
+                self.controlWin = ControlWinShow(self.ui.pushButtonPlayOrPause.clicked,self.ui.pushButtonStop.clicked,self.media.finished,self.syncSignal)
+                
+                self.ui.tableViewLocal.setEnabled(True)
+                self.ui.scriptTableView.setEnabled(True)
                 if self.controlWin.exec_():
                     self.media.stop()
                 
@@ -317,19 +349,17 @@ class Firework(QtGui.QWidget):
             self.ui.seekSlider.setDisabled(False)
             self.ui.tableViewLocal.setEnabled(True)
             self.ui.scriptTableView.setEnabled(True)
+            self.ui.pushButtonOpenMusic.setEnabled(True)
+            self.ui.pushButtonPlayOrPause.setEnabled(True)
+            self.ui.pushButtonStop.setEnabled(True)
+            
+            if self.myQueue!= None:
+                self.myQueue.put((True, True))
+                self.myQueue = None
         else:
-            if self.checkCondition(): #if not self.checkCondition():
+            if not self.checkCondition():
                 self.ui.comboBoxMode.setCurrentIndex(0)
                 return
-            self.ui.tableViewLocal.setEnabled(False)
-            self.ui.scriptTableView.setEnabled(False)
-            self.ui.pushButtonDelay.show()
-            self.ui.pushButtonUpLoad.show()
-            self.ui.pushButtonOpenPro.hide()
-            self.ui.pushButtonSavePro.hide()
-            self.ui.seekSlider.setDisabled(True)
-            self.ui.pushButtonDelay.setEnabled(False)
-            self.stopMusic()
             
             self.myQueue = Queue.Queue()
             self.comminute = HardwareCommunicate(self.myQueue)
@@ -339,19 +369,39 @@ class Firework(QtGui.QWidget):
             time.sleep(0.1)
             self.comminute.signalCommunicate.emit()
             
+            self.ui.tableViewLocal.setEnabled(False)
+            self.ui.scriptTableView.setEnabled(False)
+            self.ui.pushButtonDelay.show()
+            self.ui.pushButtonUpLoad.show()
+            self.ui.pushButtonOpenPro.hide()
+            self.ui.pushButtonSavePro.hide()
+            self.ui.pushButtonOpenMusic.setEnabled(False)
+            self.ui.pushButtonPlayOrPause.setEnabled(False)
+            self.ui.pushButtonStop.setEnabled(False)
+            self.ui.pushButtonUpLoad.setEnabled(True)
+            self.ui.seekSlider.setDisabled(True)
+            self.ui.pushButtonDelay.setEnabled(False)
+            self.stopMusic()
+            
+            
+            
     def checkCondition(self):
+        #check music
         if self.musicPath == None:
-            QtGui.QMessageBox.question(None,'message','Please choose music',QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('please choose a music file first.'),QtGui.QMessageBox.Ok)
             return False
-        #TODO:Check Fireworks and Ignitors 
-#         try:
-#             dev = ft.list_devices()
-#         except:
-#             dev = []
-#         if len(dev) == 0:
-#             QtGui.QMessageBox.question(None,'message','No device connect',QtGui.QMessageBox.Ok)
-#             return False
-#         return True
+        #check device
+        try:
+            dev = ft.list_devices()
+        except:
+            dev = []
+        if len(dev) == 0:
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
+            return False
+        #check ignitorBox
+        if self.checkIgnitorBox()== False:
+            return False
+        return True
     
     def musicStatusChanged(self, newstate, oldState):
         if newstate == Phonon.PlayingState:
@@ -371,13 +421,8 @@ class Firework(QtGui.QWidget):
         dialog.setFilter("*.wav | *.mp3")
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
-            #if the music is exist delete old music
-            if self.musicFileName != None :
-                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
-            #choose or change music 
             self.musicPath = dialog.selectedFiles()[0]
             self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))
-            self.musicFileName = self.musicPath[(self.musicPath).rfind('/') + 1 :]
         dialog.deleteLater()
         
     def playOrPauseMusic(self):
@@ -389,14 +434,22 @@ class Firework(QtGui.QWidget):
             return
         if self.media.state() == Phonon.PlayingState:
             self.media.pause()
+            if self.syncFlag:
+                self.syncTimer.stop()
         else:
             self.media.play()
+            if self.syncFlag:
+                self.syncTimer.start(1000)
             
     def stopMusic(self):
         #self.ui.lcdNumber.display('00:00')
         self.media.seek(0)
-        self.media.stop()
-    
+        self.media.pause()
+        if self.syncFlag:
+            self.syncTimer.stop()
+            self.ui.comboBoxMode.setCurrentIndex(0)
+        self.syncFlag = False
+        
     def tick(self, time):
         self.musicTime = time
         displayTime = QtCore.QTime(0, (time / 60000) % 60, (time / 1000) % 60)
@@ -405,7 +458,6 @@ class Firework(QtGui.QWidget):
     #double click add script fireworks
     @Slot(QtCore.QModelIndex) 
     def addScriptFireworks(self, index):
-        
         effectTime = self.musicTime
         info = json.loads(self.model.item(index.row(), 3).text())
 #         print int(float(info["EffectsInfo"][0][2])*1000)
@@ -467,7 +519,6 @@ class Firework(QtGui.QWidget):
         self.stopMusic()
         
     def closeEvent(self, event):
-        
         if not os.path.exists(os.path.join (appdata, 'proj', 'project.db')):
             return
         if os.path.getmtime(os.path.join (appdata, 'proj', 'project.db')) - os.path.getctime(os.path.join (appdata, 'proj', 'project.db')) > 1:
@@ -479,13 +530,12 @@ class Firework(QtGui.QWidget):
             buttonYes = customMsgBox.addButton(self.tr ("Yes"), QtGui.QMessageBox.ActionRole)
             buttonNO = customMsgBox.addButton(self.tr ("No"), QtGui.QMessageBox.ActionRole)
             buttonCancel = customMsgBox.addButton(self.tr("Cancel"), QtGui.QMessageBox.ActionRole)
-            customMsgBox.exec_()    
+            customMsgBox.exec_()
             button = customMsgBox.clickedButton()
             
             if button == buttonYes:
                 
                 self.media.stop()
-#         self.threadCommunicate.terminate()
                 self.showSignal.emit()
                 
                 if self.projectPath == None:
@@ -495,26 +545,36 @@ class Firework(QtGui.QWidget):
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
                 if self.musicFileName != None :
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))
+                    
+                if self.myQueue!= None:
+                    self.myQueue.put((True, True))
+                    self.myQueue = None
                 event.accept()
             elif button == buttonNO:
                 
                 self.media.stop()
-    #             self.threadCommunicate.terminate()
                 self.showSignal.emit()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
                 if self.musicFileName != None :
-                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
+                    os.remove(os.path.join (appdata, 'music', self.musicFileName))    
+                    
+                if self.myQueue!= None:
+                    self.myQueue.put((True, True))
+                    self.myQueue = None
                 event.accept()
             elif button == buttonCancel:
                 event.ignore()
            
         else:
             self.media.stop()
-#             self.threadCommunicate.terminate()
             self.showSignal.emit()
             os.remove(os.path.join (appdata, 'proj', 'project.db'))
             if self.musicFileName != None :
                 os.remove(os.path.join (appdata, 'music', self.musicFileName))
+                
+            if self.myQueue!= None:
+                self.myQueue.put((True, True))
+                self.myQueue = None
             event.accept()
                 
         

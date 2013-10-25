@@ -30,12 +30,18 @@ class HardwareCommunicate(QtCore.QObject):
                 dev = ft.list_devices()
             except:
                 dev = []
+#             item = self.myQueue.get()
+#             if item[1]:
+#                 print 'thread ending...............'
+#                 return
 
         self.f = ft.open_ex(dev[0])
         print self.f
 
         while True:
             item = self.myQueue.get()
+            if item[1]:
+                return
             self.f.write(item[0])
             print repr(item)
             time.sleep(0.1)
