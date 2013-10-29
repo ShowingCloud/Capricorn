@@ -421,8 +421,13 @@ class Firework(QtGui.QWidget):
         dialog.setFilter("*.wav | *.mp3")
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
+            #if the music is exist delete old music
+            if self.musicFileName != None :
+                    os.remove(os.path.join (appdata, 'music', self.musicFileName))
+            #choose or change music 
             self.musicPath = dialog.selectedFiles()[0]
             self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))
+            self.musicFileName = self.musicPath[(self.musicPath).rfind('/') + 1 :]
         dialog.deleteLater()
         
     def playOrPauseMusic(self):
@@ -468,10 +473,16 @@ class Firework(QtGui.QWidget):
             record.CTime = datetime.utcnow()
             record.MTime = datetime.utcnow()
             record.FireworkID = self.model.item(index.row(), 0).text()
-            if effectTime == 0:
+#             if effectTime == 0:
+#                 record.IgnitionTime = 0
+#             else:
+#                 record.IgnitionTime = effectTime - int(self.model.item(index.row(), 2).text())
+            #check Ignition time ,The ignition time is greater than or equal to 0
+            ignitionTime = effectTime - int(self.model.item(index.row(), 2).text())
+            if ignitionTime < 0:
                 record.IgnitionTime = 0
             else:
-                record.IgnitionTime = effectTime - int(self.model.item(index.row(), 2).text())
+                record.IgnitionTime = ignitionTime
             
             record.IgnitorID = 0
             record.ConnectorID = 0
@@ -619,7 +630,6 @@ class Firework(QtGui.QWidget):
         if self.musicPath != None:
             shutil.copy2(self.musicPath, os.path.join (appdata, "music"))
             files.append ((os.path.join (appdata, 'music', self.musicFileName), self.musicFileName))
-        
         for f, name in files:
             tar.add(f, arcname = name)
         

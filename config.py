@@ -33,7 +33,7 @@ else:
 
 
 # Make subdirectories in APPDATA directory
-for directory in ['local', 'proj', 'pdf']:
+for directory in ['local', 'proj', 'pdf', 'music']:
 	subdir = os.path.join (appdata, directory)
 	
 	if os.path.exists (subdir):
@@ -46,4 +46,5 @@ for directory in ['local', 'proj', 'pdf']:
 
 # Copy local database file only if it doesn't exist
 if not os.path.exists (os.path.join (appdata, 'local', 'local.db')):
+# 	shutil.copy2 ('local.db', os.path.join (appdata, 'local'))
 	shutil.copy2 (os.path.join (basedir, 'Resource', 'local.db'), os.path.join (appdata, 'local'))
