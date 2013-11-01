@@ -4,7 +4,7 @@ Created on 2013-10-17
 
 @author: YuJin
 '''
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from UI.ui_main import Ui_Form
 from Frontend.fireNow import UiShow as FireNowWin
 from Frontend.connectTest import UiShow as ConnectTestWin

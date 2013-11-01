@@ -422,7 +422,7 @@ class Firework(QtGui.QWidget):
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
             #if the music is exist delete old music
-            if self.musicFileName != None :
+            if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))
             #choose or change music 
             self.musicPath = dialog.selectedFiles()[0]
@@ -465,19 +465,12 @@ class Firework(QtGui.QWidget):
     def addScriptFireworks(self, index):
         effectTime = self.musicTime
         info = json.loads(self.model.item(index.row(), 3).text())
-#         print int(float(info["EffectsInfo"][0][2])*1000)
-#         print self.model.item(index.row(), 2).text()
         with self.proSession.begin():
             record = ProFireworksData()
             record.UUID = str(uuid.uuid1())
             record.CTime = datetime.utcnow()
             record.MTime = datetime.utcnow()
             record.FireworkID = self.model.item(index.row(), 0).text()
-#             if effectTime == 0:
-#                 record.IgnitionTime = 0
-#             else:
-#                 record.IgnitionTime = effectTime - int(self.model.item(index.row(), 2).text())
-            #check Ignition time ,The ignition time is greater than or equal to 0
             ignitionTime = effectTime - int(self.model.item(index.row(), 2).text())
             if ignitionTime < 0:
                 record.IgnitionTime = 0
@@ -554,7 +547,7 @@ class Firework(QtGui.QWidget):
                 else:
                     self.save()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
-                if self.musicFileName != None :
+                if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))
                     
                 if self.myQueue!= None:
@@ -566,7 +559,7 @@ class Firework(QtGui.QWidget):
                 self.media.stop()
                 self.showSignal.emit()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
-                if self.musicFileName != None :
+                if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))    
                     
                 if self.myQueue!= None:
@@ -580,7 +573,7 @@ class Firework(QtGui.QWidget):
             self.media.stop()
             self.showSignal.emit()
             os.remove(os.path.join (appdata, 'proj', 'project.db'))
-            if self.musicFileName != None :
+            if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)) :
                 os.remove(os.path.join (appdata, 'music', self.musicFileName))
                 
             if self.myQueue!= None:
@@ -642,7 +635,7 @@ class Firework(QtGui.QWidget):
         filename = QtGui.QFileDialog.getSaveFileName (self,
                 self.tr ("Save Project As..."),
                 "output.tgz",
-                self.tr ("Compressed Archives (*.tgz, *.tar.gz)"))
+                self.tr ("Compressed Archives (*.tgz | *.tar.gz)"))
         self.projectPath = filename[0]
         self.save()
 
@@ -663,8 +656,8 @@ class Firework(QtGui.QWidget):
                         self.musicFileName = f.name
                         tar.extract (member = f.name, path = os.path.join (appdata, "music"))
                         
-        self.musicPath = os.path.join (appdata, "music", self.musicFileName)
-        self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))        
+                        self.musicPath = os.path.join (appdata, "music", self.musicFileName)
+                        self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))        
         self.refreshScript()
     
 def main():
