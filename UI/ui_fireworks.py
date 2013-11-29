@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'fireworks.ui'
 #
-# Created: Mon Oct 21 15:20:54 2013
+# Created: Thu Nov 07 15:36:47 2013
 #      by: pyside-uic 0.2.15 running on PySide 1.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -99,12 +99,26 @@ class Ui_widgetWaveModule(object):
         self.pushButtonOpenPro.setAutoExclusive(False)
         self.pushButtonOpenPro.setObjectName("pushButtonOpenPro")
         self.horizontalLayoutButton.addWidget(self.pushButtonOpenPro)
+        self.pushButtonReport = QtGui.QPushButton(widgetWaveModule)
+        self.pushButtonReport.setMaximumSize(QtCore.QSize(30, 30))
+        self.pushButtonReport.setText("")
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(":/Images/report.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonReport.setIcon(icon7)
+        self.pushButtonReport.setIconSize(QtCore.QSize(28, 28))
+        self.pushButtonReport.setShortcut("")
+        self.pushButtonReport.setCheckable(False)
+        self.pushButtonReport.setChecked(False)
+        self.pushButtonReport.setAutoRepeat(False)
+        self.pushButtonReport.setAutoExclusive(False)
+        self.pushButtonReport.setObjectName("pushButtonReport")
+        self.horizontalLayoutButton.addWidget(self.pushButtonReport)
         self.pushButtonSavePro = QtGui.QPushButton(widgetWaveModule)
         self.pushButtonSavePro.setMaximumSize(QtCore.QSize(30, 30))
         self.pushButtonSavePro.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(":/Images/save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonSavePro.setIcon(icon7)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/Images/save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonSavePro.setIcon(icon8)
         self.pushButtonSavePro.setIconSize(QtCore.QSize(30, 30))
         self.pushButtonSavePro.setShortcut("")
         self.pushButtonSavePro.setCheckable(False)
@@ -165,6 +179,14 @@ class Ui_widgetWaveModule(object):
 
     def retranslateUi(self, widgetWaveModule):
         widgetWaveModule.setWindowTitle(QtGui.QApplication.translate("widgetWaveModule", "Fireworks Editor", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonOpenMusic.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Open music", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonPlayOrPause.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Play or pause", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonStop.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Stop", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonDelay.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Set delay time", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonUpLoad.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Upload to device", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonOpenPro.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Open project", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonReport.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Export PDF", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButtonSavePro.setToolTip(QtGui.QApplication.translate("widgetWaveModule", "Save project", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBoxMode.setItemText(0, QtGui.QApplication.translate("widgetWaveModule", "Edit mode", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBoxMode.setItemText(1, QtGui.QApplication.translate("widgetWaveModule", "Control mode", None, QtGui.QApplication.UnicodeUTF8))
 

@@ -18,12 +18,10 @@ import uuid
 from datetime import datetime
 from Delegate.timeDelegate import TimeDelegate
 from Delegate.spinBoxDelegate import SpinBoxDelegate
-from Device.Communication import HardwareCommunicate
 from Device.protocol import dataPack
-import Queue
 import time
-import os
-
+import os, sys, subprocess
+from Frontend.PrintPDF import PrintTable, TABLEFields, TABLEProductList, TABLEFireSequence
 from config import appdata
 from sqlalchemy.sql.expression import func, distinct
 import tarfile
@@ -34,23 +32,28 @@ try:
 except:
     pass
 
+CONNECT_TEST = 0x01
+FIRE = 0x02
 
 class Firework(QtGui.QWidget):
     syncSignal = QtCore.Signal()
-    def __init__(self, signal, parent=None):
+    def __init__(self, signal,queueGet,deviceConnected, signalDev,parent=None):
         QtGui.QWidget.__init__(self,parent)
-        
+        self.deviceConnected = deviceConnected
         self.showSignal = signal
+        self.signalDev = signalDev
         self.ui=Ui_widgetWaveModule()
         self.ui.setupUi(self)
         self.ui.lcdNumber.display('00:00')
         self.ui.pushButtonDelay.hide()
         self.ui.pushButtonUpLoad.hide()
+        self.signalDev.connect(self.isDevConnected)
         self.ui.pushButtonOpenMusic.clicked.connect(self.openMusic)
         self.ui.pushButtonPlayOrPause.clicked.connect(self.playOrPauseMusic)
         self.ui.pushButtonStop.clicked.connect(self.stopMusic)
         self.ui.pushButtonDelay.clicked.connect(self.delayFire)
         self.ui.pushButtonUpLoad.clicked.connect(self.upLoadToDevice)
+        self.ui.pushButtonReport.clicked.connect(self.exportPDF)
         self.syncFlag = False
         #create local database
         self.localSession = session()
@@ -106,6 +109,7 @@ class Firework(QtGui.QWidget):
         self.ui.scriptTableView.customContextMenuRequested.connect(self.scriptRightContextMenu)
         
         self.type = self.tr('coco')
+        
 #         print self.tr ("Yes"),self.tr ("No"),self.tr("Cancel"),self.tr('No device connect'),self.tr('Do you want to save?'),
 #         self.tr('brocade'),self.tr('gorgrous'),self.tr('peony'),self.tr('candle'),self.tr('pot flower'),self.tr('willow'),
 #         self.tr('mum'),self.tr('glint'),self.tr('Fireworks Info'),self.tr('Rising Time'),self.tr('Fireworks Effect'),
@@ -113,7 +117,7 @@ class Firework(QtGui.QWidget):
 #         self.tr("Edit  the fireworks  information"),self.tr("Delete"),self.tr("Delete  the script fireworks  information"),
 #         self.tr('message'),self.tr('Please choose music'),self.tr("please choose a music file first."),self.tr('Bomb moment'),
 #         self.tr('Firework name'),self.tr('Size'),self.tr('Color'),self.tr('Direction'),self.tr('Ignite moment'),self.tr('Rising time'),
-#         self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')
+#         self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point'),self.tr('Fireworks has not assigned ignitor'),self.tr('Please add fireworks to project first!')
 
         self.query(self.type)
         
@@ -134,16 +138,19 @@ class Firework(QtGui.QWidget):
                          'ID':0xAABBCCDD,'seconds':None,'crc':0,'tail':0xDD}
         self.projectPath = None
         self.musicFileName = None
-        self.myQueue = None
+        self.myQueue = queueGet
+        
+    def isDevConnected(self,isConnected):
+        self.deviceConnected = isConnected
         
     def upLoadToDevice(self):
-        try:
-            dev = ft.list_devices()
-        except:
-            dev = []
-        if len(dev) == 0:
-            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
-            return
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
+#             return
         
         with self.proSession.begin():
             tableFire = self.proSession.query(ProFireworksData).all()
@@ -162,7 +169,7 @@ class Firework(QtGui.QWidget):
             package = dataPack(node)
             package.pack()
             print repr(package.package)
-            self.myQueue.put((package.package,False))
+            self.myQueue.put((FIRE,package.package))
             i += 1
             self.progressBar.ui.progressBar.setValue(i)
             time.sleep(0.1)
@@ -180,15 +187,16 @@ class Firework(QtGui.QWidget):
         self.syncFlag = True
         self.syncTimer = QtCore.QTimer()
         self.syncTimer.timeout.connect(self.syncTick)
+        self.syncTime = 0
+        self.syncTick()
         self.syncTimer.start(1000)
-        self.syncTime = 1
         
     def syncTick(self):
         print 'self.syncTime = ',self.syncTime
         self.dataSync['seconds'] = self.syncTime
         dataPacks = dataPack(self.dataSync)
         print repr(dataPacks.package)
-        self.myQueue.put((dataPacks.package, False))
+        self.myQueue.put((FIRE,dataPacks.package))
         self.syncTime += 1
         
     def startTick(self):
@@ -203,8 +211,18 @@ class Firework(QtGui.QWidget):
                 if self.controlWin.exec_():
                     self.media.stop()
                 
-    
-            
+    def exportPDF(self,openFlag = True):
+        PrintTable (self.localSession, self.proSession, TABLEFields)
+        if openFlag:
+            try:
+                if sys.platform == 'darwin':
+                    subprocess.call (('open', os.path.join (appdata, 'pdf', 'Fireworks.pdf')))
+                elif sys.platform == 'win32':
+                    os.startfile (os.path.join (appdata, 'pdf', 'Fireworks.pdf'))
+                else:
+                    subprocess.call (('xdg-open', os.path.join (appdata, 'pdf', 'Fireworks.pdf')))
+            except:
+                pass
         
     def setTypeData(self):
         coco = QtGui.QListWidgetItem(self.ui.listWidgetLocal)
@@ -346,33 +364,22 @@ class Firework(QtGui.QWidget):
             self.ui.pushButtonUpLoad.hide()
             self.ui.pushButtonOpenPro.show()
             self.ui.pushButtonSavePro.show()
+            self.ui.pushButtonReport.show()
             self.ui.seekSlider.setDisabled(False)
             self.ui.tableViewLocal.setEnabled(True)
             self.ui.scriptTableView.setEnabled(True)
             self.ui.pushButtonOpenMusic.setEnabled(True)
             self.ui.pushButtonPlayOrPause.setEnabled(True)
             self.ui.pushButtonStop.setEnabled(True)
-            
-            if self.myQueue!= None:
-                self.myQueue.put((True, True))
-                self.myQueue = None
         else:
             if not self.checkCondition():
                 self.ui.comboBoxMode.setCurrentIndex(0)
                 return
-            
-            self.myQueue = Queue.Queue()
-            self.comminute = HardwareCommunicate(self.myQueue)
-            self.threadCommunicate = QtCore.QThread()
-            self.comminute.moveToThread(self.threadCommunicate)
-            self.threadCommunicate.start()
-            time.sleep(0.1)
-            self.comminute.signalCommunicate.emit()
-            
             self.ui.tableViewLocal.setEnabled(False)
             self.ui.scriptTableView.setEnabled(False)
             self.ui.pushButtonDelay.show()
             self.ui.pushButtonUpLoad.show()
+            self.ui.pushButtonReport.hide()
             self.ui.pushButtonOpenPro.hide()
             self.ui.pushButtonSavePro.hide()
             self.ui.pushButtonOpenMusic.setEnabled(False)
@@ -383,23 +390,26 @@ class Firework(QtGui.QWidget):
             self.ui.pushButtonDelay.setEnabled(False)
             self.stopMusic()
             
-            
-            
+        
     def checkCondition(self):
         #check music
         if self.musicPath == None:
             QtGui.QMessageBox.question(None,self.tr('message'),self.tr('please choose a music file first.'),QtGui.QMessageBox.Ok)
             return False
-        #check device
-        try:
-            dev = ft.list_devices()
-        except:
-            dev = []
-        if len(dev) == 0:
+        if not self.deviceConnected:
             QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
             return False
+        #check device
+#         try:
+#             dev = ft.list_devices()
+#         except:
+#             dev = []
+#         if len(dev) == 0:
+#             QtGui.QMessageBox.question(None,self.tr('message'),self.tr('No device connect'),QtGui.QMessageBox.Ok)
+#             return False
         #check ignitorBox
         if self.checkIgnitorBox()== False:
+#            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('Fireworks has not assigned ignitor'),QtGui.QMessageBox.Ok)
             return False
         return True
     
@@ -422,7 +432,7 @@ class Firework(QtGui.QWidget):
         dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
         if dialog.exec_() == QtGui.QDialog.Accepted:
             #if the music is exist delete old music
-            if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
+            if self.musicFileName != None :
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))
             #choose or change music 
             self.musicPath = dialog.selectedFiles()[0]
@@ -465,18 +475,25 @@ class Firework(QtGui.QWidget):
     def addScriptFireworks(self, index):
         effectTime = self.musicTime
         info = json.loads(self.model.item(index.row(), 3).text())
+#         print int(float(info["EffectsInfo"][0][2])*1000)
+#         print self.model.item(index.row(), 2).text()
         with self.proSession.begin():
             record = ProFireworksData()
             record.UUID = str(uuid.uuid1())
             record.CTime = datetime.utcnow()
             record.MTime = datetime.utcnow()
             record.FireworkID = self.model.item(index.row(), 0).text()
+#             if effectTime == 0:
+#                 record.IgnitionTime = 0
+#             else:
+#                 record.IgnitionTime = effectTime - int(self.model.item(index.row(), 2).text())
+            #check Ignition time ,The ignition time is greater than or equal to 0
             ignitionTime = effectTime - int(self.model.item(index.row(), 2).text())
             if ignitionTime < 0:
                 record.IgnitionTime = 0
             else:
                 record.IgnitionTime = ignitionTime
-            
+            record.Direction = 90
             record.IgnitorID = 0
             record.ConnectorID = 0
             record.Notes = self.model.item(index.row(), 2).text() + ',' +str(int(float(info["EffectsInfo"][0][2])*1000))
@@ -509,7 +526,7 @@ class Firework(QtGui.QWidget):
             self.proModel.setData(self.proModel.index(i, 2), data.Name)
             self.proModel.setData(self.proModel.index(i, 3), data.Size)
             self.proModel.setData(self.proModel.index(i, 4), info["EffectsInfo"][0][1])
-            self.proModel.setData(self.proModel.index(i, 5), 90)
+            self.proModel.setData(self.proModel.index(i, 5), scriptTable[i].Direction)
             self.proModel.setData(self.proModel.index(i, 6), scriptTable[i].IgnitionTime)
             self.proModel.setData(self.proModel.index(i, 7), int(effectAndRisingtimes[0]))
             self.proModel.setData(self.proModel.index(i, 8),  int(effectAndRisingtimes[1]))
@@ -547,24 +564,18 @@ class Firework(QtGui.QWidget):
                 else:
                     self.save()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
-                if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
+                if self.musicFileName != None :
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))
                     
-                if self.myQueue!= None:
-                    self.myQueue.put((True, True))
-                    self.myQueue = None
                 event.accept()
             elif button == buttonNO:
                 
                 self.media.stop()
                 self.showSignal.emit()
                 os.remove(os.path.join (appdata, 'proj', 'project.db'))
-                if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)):
+                if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName))  :
                     os.remove(os.path.join (appdata, 'music', self.musicFileName))    
                     
-                if self.myQueue!= None:
-                    self.myQueue.put((True, True))
-                    self.myQueue = None
                 event.accept()
             elif button == buttonCancel:
                 event.ignore()
@@ -576,9 +587,6 @@ class Firework(QtGui.QWidget):
             if self.musicFileName != None and os.path.exists(os.path.join (appdata, 'music', self.musicFileName)) :
                 os.remove(os.path.join (appdata, 'music', self.musicFileName))
                 
-            if self.myQueue!= None:
-                self.myQueue.put((True, True))
-                self.myQueue = None
             event.accept()
                 
         
@@ -587,6 +595,9 @@ class Firework(QtGui.QWidget):
         #check Ignitor box
         with self.proSession.begin():
             records = self.proSession.query(ProFireworksData).all()
+        if len(records) == 0:
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('Please add fireworks to project first!'),QtGui.QMessageBox.Ok)
+            return False
         for row in records:
             if row.IgnitorID == 0:
                 flag = False
@@ -597,6 +608,8 @@ class Firework(QtGui.QWidget):
         for i in xrange(len(repeatCount)):
             if repeatCount[i][0] == distinctCount[i][0]  and repeatCount[i][1] != distinctCount[i][1]:
                 flag = False
+        if not flag:
+            QtGui.QMessageBox.question(None,self.tr('message'),self.tr('Fireworks has not assigned ignitor'),QtGui.QMessageBox.Ok)
         return flag
     
     def saveProject(self):
@@ -623,6 +636,8 @@ class Firework(QtGui.QWidget):
         if self.musicPath != None:
             shutil.copy2(self.musicPath, os.path.join (appdata, "music"))
             files.append ((os.path.join (appdata, 'music', self.musicFileName), self.musicFileName))
+        self.exportPDF(False)
+        files.append ((os.path.join (appdata, 'pdf', 'Fireworks.pdf'), 'Fireworks.pdf'))
         for f, name in files:
             tar.add(f, arcname = name)
         
@@ -635,7 +650,7 @@ class Firework(QtGui.QWidget):
         filename = QtGui.QFileDialog.getSaveFileName (self,
                 self.tr ("Save Project As..."),
                 "output.tgz",
-                self.tr ("Compressed Archives (*.tgz | *.tar.gz)"))
+                self.tr ("Compressed Archives (*.tgz, *.tar.gz)"))
         self.projectPath = filename[0]
         self.save()
 
@@ -658,7 +673,7 @@ class Firework(QtGui.QWidget):
                         
                         self.musicPath = os.path.join (appdata, "music", self.musicFileName)
                         self.media.setCurrentSource(Phonon.MediaSource(self.musicPath))        
-        self.refreshScript()
+            self.refreshScript()
     
 def main():
     import sys

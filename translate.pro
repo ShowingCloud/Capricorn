@@ -1,2 +1,2 @@
-SOURCES += Frontend/editFireworks.py Frontend/firework.py UI/ui_main.py UI/ui_editFireworks.py UI/ui_fireNow.py UI/ui_fireworks.py UI/ui_setTime.py UI/ui_connectTest.py
+SOURCES += FireworksMain.py Frontend/PrintPDF.py Frontend/editFireworks.py Frontend/firework.py UI/ui_main.py UI/ui_editFireworks.py UI/ui_fireNow.py UI/ui_fireworks.py UI/ui_setTime.py UI/ui_connectTest.py
 TRANSLATIONS += Translations/Fireworks_zh_CN.ts

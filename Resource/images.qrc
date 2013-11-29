@@ -22,5 +22,6 @@
 	<file>Images/mum.png</file>
 	<file>Images/main.png</file>
 	<file>Images/title.png</file>
+	<file>Images/report.png</file>
   </qresource>
 </RCC>

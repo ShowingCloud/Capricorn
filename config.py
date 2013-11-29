@@ -48,3 +48,9 @@ for directory in ['local', 'proj', 'pdf', 'music']:
 if not os.path.exists (os.path.join (appdata, 'local', 'local.db')):
 # 	shutil.copy2 ('local.db', os.path.join (appdata, 'local'))
 	shutil.copy2 (os.path.join (basedir, 'Resource', 'local.db'), os.path.join (appdata, 'local'))
+	
+# Copy local database file only if it doesn't exist
+if not os.path.exists (os.path.join (appdata, 'local', 'simhei.ttf')):
+# 	shutil.copy2 ('local.db', os.path.join (appdata, 'local'))
+	shutil.copy2 (os.path.join (basedir, 'Resource', 'simhei.ttf'), os.path.join (appdata, 'local'))
+	

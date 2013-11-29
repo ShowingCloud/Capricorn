@@ -1,91 +1,15 @@
 from PySide import QtCore, QtGui
-import Queue, time
 from UI.ui_connectTest import Ui_Dialog
 import sys
 from Device.protocol import dataPack
-import struct
-import time
 
-try:
-    from Device import ftdi2 as ft
-except:
-    print "Unable to load ftdi2 driver"
-    pass
-
-
-class getMessage(QtCore.QObject):
-    signalRead = QtCore.Signal()
-
-    def __init__(self, q,p,parent = None):
-        QtCore.QObject.__init__ (self, parent)
-
-        self.signalRead.connect(self.readFun)
-
-        self.p = p
-        self.q = q
-  #=============================================================================
-  #       listHead = [0]*16
-  #       allHead = 0xffff
-  #  
-  #       a = 1
-  #       for i in range(16):
-  #           if a & allHead :
-  #               listHead[i]=1
-  #  
-  #           a  = a << 1
-  # 
-  #       for i in listHead:
-  #           print i
-  # 
-  #       self.p.put(listHead)
-  #=============================================================================
-
-    def readFun(self):
-        try:
-            dev = ft.list_devices()
-        except:
-            dev = []
-
-        while len (dev) == 0:
-            time.sleep (5)
-            print "Rechecking hardware connection..."
-            try:
-                dev = ft.list_devices()
-            except:
-                dev = []
-
-        self.f = ft.open_ex(dev[0])
-        print self.f
-
-        while True:
-            datalistR = [None]*14
-            item = self.q.get()
-            if item == False:
-                return
-            self.f.write(item)
-            time.sleep(0.1)
-            readData = self.f.read (self.f.get_queue_status())
-            print repr(readData)
-            fmtR = '@14B'
-            (datalistR[0],datalistR[1],datalistR[2],datalistR[3],datalistR[4],datalistR[5],
-            datalistR[6],datalistR[7],datalistR[8],datalistR[9],datalistR[10],datalistR[11],
-            datalistR[12],datalistR[13]) = struct.unpack(fmtR,readData)
-
-            listHead = [1] * 16
-            allHead = datalistR[10] * 256 + datalistR[11]
-            a = 1
-            
-            for i in range(16):
-                if a & allHead:
-                    listHead[i] = 0
-                a  = a * 2
-                
-            self.p.put(listHead)
+CONNECT_TEST = 0x01
+FIRE = 0x02
 
 
 class UiShow(QtGui.QDialog):
 
-    def __init__(self ,signalClose ,parent=None):
+    def __init__(self ,signalClose ,queueGet,queuePut,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.signalClose = signalClose
         self.ui=Ui_Dialog()
@@ -96,19 +20,12 @@ class UiShow(QtGui.QDialog):
                      'ID':0xAABBCCDD,'fireBox':None,'firePoint':None,
                      'crc':0,'tail':0xDD}
 
-        self.q = Queue.Queue()
-        self.p = Queue.Queue()
-        self.c = getMessage(self.q,self.p)
-        thread = QtCore.QThread()
-        self.c.moveToThread(thread)
-        thread.start()
-        time.sleep(1)
-        self.c.signalRead.emit()
+        self.q = queueGet
+        self.p = queuePut
 
         self.timer = QtCore.QTimer()
-       # QtCore.QObject.connect(self.timer,QtCore.SIGNAL("timeout()"), self.timerEvent)
         self.timer.timeout.connect(self.timerEvent)
-        self.timer.start(1000)
+        self.timer.setInterval(1000)
 
         intVal = QtGui.QIntValidator()
         self.ui.pushButtonTest.setEnabled(False)
@@ -120,9 +37,10 @@ class UiShow(QtGui.QDialog):
             self.ui.pushButtonTest.setEnabled(True)
         else:
             self.ui.pushButtonTest.setEnabled(False)
+            
     def closeEvent(self, event):
         self.signalClose.emit()
-        self.q.put(False)
+        self.timer.stop()
         event.accept()
         
     def timerEvent(self):
@@ -179,11 +97,12 @@ class UiShow(QtGui.QDialog):
         if self.ui.lineEditBoxID.text() == '':
             return
         self.buttonReset()
+        self.timer.start()
         self.data['fireBox'] = int(self.ui.lineEditBoxID.text())
         self.data['firePoint'] = 0
         dataPackage = dataPack(self.data)
         print repr(dataPackage.package)
-        self.q.put(dataPackage.package)
+        self.q.put((CONNECT_TEST,dataPackage.package))
 
     def buttonReset(self):
         self.ui.radioButton_1.setChecked(False)
@@ -202,7 +121,7 @@ class UiShow(QtGui.QDialog):
         self.ui.radioButton_14.setChecked(False)
         self.ui.radioButton_15.setChecked(False)
         self.ui.radioButton_16.setChecked(False)
-
+        self.timer.stop()
 
 def main():
     app = QtGui.QApplication(sys.argv)

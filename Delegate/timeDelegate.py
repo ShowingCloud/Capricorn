@@ -19,7 +19,7 @@ class TimeDelegate(QtGui.QStyledItemDelegate):
          
         style = QtGui.QApplication.style()
         label = QtGui.QStyleOptionViewItemV4 (option)
-          
+        
         displayTime = QtCore.QTime(index.data() / 3600000, (index.data() / 60000) % 60, (index.data() / 1000) % 60, index.data() % 1000)
         label.text = displayTime.toString('h:mm:ss.z')
         label.displayAlignment = QtCore.Qt.AlignCenter

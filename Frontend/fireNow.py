@@ -2,55 +2,13 @@ from PySide import QtCore, QtGui
 from UI.ui_fireNow import Ui_Dialog
 from Device.protocol import dataPack
 import sys
-import struct
-import Queue
-import time
 
-try:
-    from Device import ftdi2 as ft
-except:
-    print "Unable to load ftdi2 driver"
-    pass
-
-
-class getMessage (QtCore.QObject):
-    signalRead = QtCore.Signal()
-
-    def __init__(self, q, parent = None):
-        QtCore.QObject.__init__ (self, parent)
-
-        self.signalRead.connect(self.readFun)
-
-        self.q = q
-
-    def readFun(self):
-        try:
-            dev = ft.list_devices()
-        except:
-            dev = []
-
-        while len (dev) == 0:
-            time.sleep (5)
-            print "Rechecking hardware connection..."
-            try:
-                dev = ft.list_devices()
-            except:
-                dev = []
-
-        self.f = ft.open_ex(dev[0])
-        print self.f
-
-        while True:
-            item = self.q.get()
-            if item == False:
-                return
-            self.f.write(item)
-            print repr(item)
-
+CONNECT_TEST = 0x01
+FIRE = 0x02
 
 class UiShow(QtGui.QDialog):
 
-    def __init__(self,signalClose,parent=None):
+    def __init__(self,signalClose,queueGet,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.signalClose = signalClose
         self.ui = Ui_Dialog()
@@ -63,18 +21,11 @@ class UiShow(QtGui.QDialog):
                      'crc':0,'tail':0xDD}
         intVal = QtGui.QIntValidator()
         self.ui.lineEditBoxID.setValidator(intVal)
-        self.q = Queue.Queue()
-        self.c = getMessage(self.q)
-        thread = QtCore.QThread()
-        self.c.moveToThread(thread)
-        thread.start()
-        time.sleep(1)
-        self.c.signalRead.emit()
+        self.q = queueGet
         self.boxChanged()
         
     def closeEvent(self, event):
         self.signalClose.emit()
-        self.q.put(False)
         event.accept()
     
     def buttonConnect(self):
@@ -217,7 +168,7 @@ class UiShow(QtGui.QDialog):
     def downloadData(self):
         dataPackage = dataPack(self.data)
         print repr(dataPackage.package)
-        self.q.put (dataPackage.package)
+        self.q.put ((FIRE,dataPackage.package))
 
     def boxChanged(self):
         self.confirmFlag = None

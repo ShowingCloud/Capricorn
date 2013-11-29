@@ -52,6 +52,9 @@
            <height>30</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Open music</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -75,6 +78,9 @@
            <height>30</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Play or pause</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -97,6 +103,9 @@
            <width>30</width>
            <height>30</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Stop</string>
          </property>
          <property name="text">
           <string/>
@@ -162,6 +171,9 @@
            <height>30</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Set delay time</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -191,6 +203,9 @@
            <height>30</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Upload to device</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -213,6 +228,9 @@
            <width>30</width>
            <height>30</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Open project</string>
          </property>
          <property name="text">
           <string/>
@@ -245,12 +263,56 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonReport">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Export PDF</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Resource/images.qrc">
+           <normaloff>:/Images/report.png</normaloff>:/Images/report.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>28</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonSavePro">
          <property name="maximumSize">
           <size>
            <width>30</width>
            <height>30</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Save project</string>
          </property>
          <property name="text">
           <string/>
