@@ -27,7 +27,6 @@ class PrintTable(QtCore.QObject):
 #        print self.tr('Bomb moment'), self.tr('Firework name'), self.tr('Size'), self.tr('Color'), self.tr('Direction'), self.tr('Ignite moment'), self.tr('Rising time'), self.tr('Effect duration'), self.tr('End time'), self.tr('Ignitor Box'), self.tr('Ignite point')
         
         import copy
-        'C:\Windows\Fonts\simhei.ttf'
         pdfmetrics.registerFont(TTFont('song',os.path.join (appdata, 'local', 'simhei.ttf')))
         styles = getSampleStyleSheet()
         stylesSong= copy.deepcopy(styles['Normal'])
